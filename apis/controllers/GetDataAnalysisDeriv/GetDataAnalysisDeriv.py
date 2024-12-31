@@ -5,6 +5,9 @@ import apis.services.events.ServicesEvents as ServicesEvents
 import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.api.ServicesApi as ServicesApi
 import apis.services.smtp.ServicesSmtp as ServicesSmtp
+import apis.services.shedule.ServicesShedule as ServicesShedule
+import apis.services.deriv.ServicesDeriv as ServicesDeriv
+import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 
 class ControllerGetDataAnalysisDeriv: 
 
@@ -20,6 +23,12 @@ class ControllerGetDataAnalysisDeriv:
 
     ServicesSmtp = None
 
+    ServicesShedule = None
+
+    ServicesDeriv = None
+
+    ServicesManagerDays = None
+
     def __init__(self):
 
         self.ServicesDates = ServicesDate.ServicesDate()
@@ -32,7 +41,15 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesSmtp = ServicesSmtp.ServicesSmtp()
 
-    def GetDataAnalysisDeriv(self,request):
+        self.ServicesShedule = ServicesShedule.ServicesShedule()
+
+        self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
+
+        self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
+
+        self.ServicesDeriv.init_services_manager_days(self.ServicesManagerDays)
+
+    async def GetDataAnalysisDeriv(self,request):
 
         self.ServicesEvents.set_events_field('start_endpoint',self.ServicesDates.get_current_date_mil_dynamic())
 
@@ -43,7 +60,44 @@ class ControllerGetDataAnalysisDeriv:
         date = self.ServicesDates.get_current_date(now)
 
         hour = self.ServicesDates.get_current_hour(now)
+        
+        servicios_a_verificar = [
+            lambda: self.ServicesApi.get_api_key(request),  
+            lambda: self.ServicesShedule.get_shedule_result(hour),  
+            lambda: self.ServicesApi.get_api_result(),
+            lambda: self.ServicesCronjobs.add(id_cronjobs,date)
+        ]
 
-        result = self.ServicesApi.get_api_key(request)
+        resultado = None
+
+        for servicio in servicios_a_verificar:
+ 
+            resultado = servicio() if callable(servicio) else servicio
+
+            if not resultado['status']:
+
+                self.ServicesSmtp.send_notification_email(date, resultado['msj'])
+
+                return resultado
+            
+        self.ServicesEvents.set_events_field('init_endpoint',self.ServicesDates.get_current_date_mil_dynamic())
+
+        result = await self.ServicesDeriv.init()
+
+        if not result['status']:
+
+            return self.ServicesSmtp.send_notification_email(date, result['msj'])
+        
+        self.ServicesEvents.set_events_field('init_broker',self.ServicesDates.get_current_date_mil_dynamic())
+
+        result = await self.ServicesDeriv.set_balance(self.ServicesDates.get_day())
+
+        result = await self.ServicesDeriv.closed()
+
+        if not result['status']:
+
+            return self.ServicesSmtp.send_notification_email(date, result['msj'])
+        
+        self.ServicesEvents.set_events_field('config_broker',self.ServicesDates.get_current_date_mil_dynamic())
 
         return result

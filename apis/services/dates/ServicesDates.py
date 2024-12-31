@@ -27,3 +27,7 @@ class ServicesDate():
     def get_current_hour(self,now):
 
         return self.entity.get_current_hour(now)
+    
+    def get_day(self):
+
+        return self.entity.get_day()

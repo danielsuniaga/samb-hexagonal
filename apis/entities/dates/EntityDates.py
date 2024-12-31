@@ -39,3 +39,9 @@ class EntityDates():
     def get_current_hour(self,hour):
 
         return hour.strftime("%H%M%S")
+    
+    def get_day(self):
+
+        now = self.get_current_utc5()
+
+        return now.weekday()
