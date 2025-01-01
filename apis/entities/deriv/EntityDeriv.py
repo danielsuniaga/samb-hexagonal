@@ -8,6 +8,78 @@ class EntityDeriv():
 
     api = None
 
+    par = None
+
+    count = None
+
+    end = None
+
+    style = None
+
+    granularity = None
+
+    def __init__(self):
+
+        self.init_par()
+
+        self.init_count()
+
+        self.init_end()
+
+        self.init_style()
+
+        self.init_granularity()
+
+    def init_granularity(self):
+
+        self.granularity = int(config("GRANULARITY"))
+
+        return True
+    
+    def get_granularity(self):
+
+        return self.granularity
+
+    def init_style(self):
+
+        self.style = config("STYLE")
+
+        return True
+    
+    def get_style(self):
+
+        return self.style
+
+    def init_end(self):
+
+        self.end = config("END")
+
+        return True
+    
+    def get_end(self):
+
+        return self.end
+
+    def init_count(self):
+
+        self.count = int(config("COUNT"))
+
+        return True
+    
+    def get_count(self):
+
+        return self.count
+
+    def init_par(self):
+
+        self.par = config("PAR")
+
+        return True
+    
+    def get_par(self):
+
+        return self.par
+
     async def init_id_app(self):
 
         self.id_app = int(config("ID_APP"))
@@ -90,3 +162,38 @@ class EntityDeriv():
             return {'status': False, 'msj': f'Se generó una excepción al cerrar la conexión con Deriv: {err}'}
         
         return {'status': True, 'msj': 'Conexión con Deriv cerrada correctamente'}
+    
+    async def init_data_ticks_history(self):
+
+        return {
+                "ticks_history": self.get_par(),  
+                "count": self.get_count(),           
+                "end": self.get_end(),          
+                "style": self.get_style(),       
+                "granularity": self.get_granularity() 
+            }
+    
+    async def get_candles(self):
+
+        if self.api is None:
+
+            return {'status': False, 'msj': 'API no inicializada'}
+
+        try:
+
+            data = await self.init_data_ticks_history()
+
+            candles_response = await self.api.ticks_history(data)
+
+            candles = candles_response.get("candles", [])
+
+            return {
+                'status': True,
+                'message': f'{len(candles)} velas obtenidas correctamente',
+                'candles': candles
+            }
+
+        except Exception as err:
+
+            return {'status': False, 'msj': f'Error al obtener velas: {err}'}
+

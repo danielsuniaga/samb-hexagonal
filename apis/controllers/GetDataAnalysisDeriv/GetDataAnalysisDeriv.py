@@ -8,6 +8,8 @@ import apis.services.smtp.ServicesSmtp as ServicesSmtp
 import apis.services.shedule.ServicesShedule as ServicesShedule
 import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
+import apis.services.methodologytrends.ServicesMethodologyTrends as ServicesMethodologyTrends
+import apis.services.indicators.ServicesIndicators as ServicesIndicators
 
 class ControllerGetDataAnalysisDeriv: 
 
@@ -29,6 +31,10 @@ class ControllerGetDataAnalysisDeriv:
 
     ServicesManagerDays = None
 
+    ServicesMethodologyTrends = None
+
+    ServicesIndicators = None
+
     def __init__(self):
 
         self.ServicesDates = ServicesDate.ServicesDate()
@@ -47,7 +53,15 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
 
+        self.ServicesMethodologyTrends = ServicesMethodologyTrends.ServicesMethodologyTrends()
+
+        self.ServicesIndicators = ServicesIndicators.ServicesIndicators()
+
         self.ServicesDeriv.init_services_manager_days(self.ServicesManagerDays)
+
+        self.ServicesDeriv.init_services_methodology_trends(self.ServicesMethodologyTrends)
+
+        self.ServicesDeriv.init_services_indicators(self.ServicesIndicators)
 
     async def GetDataAnalysisDeriv(self,request):
 
@@ -90,14 +104,22 @@ class ControllerGetDataAnalysisDeriv:
         
         self.ServicesEvents.set_events_field('init_broker',self.ServicesDates.get_current_date_mil_dynamic())
 
-        result = await self.ServicesDeriv.set_balance(self.ServicesDates.get_day())
+        await self.ServicesDeriv.set_balance(self.ServicesDates.get_day())
+
+        self.ServicesEvents.set_events_field('config_broker',self.ServicesDates.get_current_date_mil_dynamic())
+
+        self.ServicesDeriv.init_services_events(self.ServicesEvents)
+
+        self.ServicesDeriv.init_services_dates(self.ServicesDates)
+
+        result = await self.ServicesDeriv.loops()
+
+        print("result_loops",result)
 
         result = await self.ServicesDeriv.closed()
 
         if not result['status']:
 
             return self.ServicesSmtp.send_notification_email(date, result['msj'])
-        
-        self.ServicesEvents.set_events_field('config_broker',self.ServicesDates.get_current_date_mil_dynamic())
 
         return result
