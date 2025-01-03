@@ -110,9 +110,15 @@ class ServicesDeriv():
 
         return await self.ServicesMethodologyTrends.check_rsi(rsi)
     
+    async def get_sma_short_services(self):
+
+        return self.ServicesIndicators.get_sma_short()
+    
     async def get_sma_short(self,candles):
 
-        return True
+        indicators = await self.get_sma_short_services()
+
+        return await self.ServicesIndicators.generate_sma(candles,indicators)
     
     async def check_indicators(self,result,candles):
 
@@ -122,11 +128,7 @@ class ServicesDeriv():
         
         rsi = await self.get_rsi(candles)
 
-        result = await self.check_rsi(rsi)
-
-        if not result:
-
-            return False
+        result_rsi = await self.check_rsi(rsi)
         
         sma_short = await self.get_sma_short(candles)
 

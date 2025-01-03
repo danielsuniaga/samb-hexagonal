@@ -8,11 +8,28 @@ class EntityIndicators():
 
     candles_rsi = None
 
+    sma_short = None
+
     def __init__(self):
 
         self.init_type_rsi()
 
         self.init_candles_rsi()
+
+        self.init_sma_short()
+
+    def init_sma_short(self):
+
+        self.sma_short = {
+            'value':int(config("SMA_SHORT")),
+            'candle':int(config("CANDLE_SMA_SHORT"))
+        }
+
+        return True
+
+    def get_sma_short(self):
+
+        return self.sma_short
 
     def init_type_rsi(self):
 
@@ -89,3 +106,9 @@ class EntityIndicators():
         candles_rsi_close = await self.get_candles_close(candles_rsi)
 
         return await self.generate_rsi_entity(candles_rsi_close,self.type_rsi)
+    
+    async def generate_sma(self,candles,indicators):
+
+        print("candles",candles,"indicators",indicators)
+        
+        return True

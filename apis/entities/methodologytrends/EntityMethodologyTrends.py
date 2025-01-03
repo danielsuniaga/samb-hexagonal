@@ -22,7 +22,8 @@ class EntityMethodologyTrends():
 
         self.metrics_rsi = {
             'min':int(config("RSI_MIN")),
-            'max':int(config("RSI_MAX"))
+            'max':int(config("RSI_MAX")),
+            'active':int(config("ACTIVE_RSI"))
         }
 
         return True
@@ -99,6 +100,10 @@ class EntityMethodologyTrends():
         return True
     
     async def check_rsi(self,rsi): 
+
+        if not(self.metrics_rsi['active']):
+
+            return True
 
         if((self.metrics_rsi['min']<Decimal(rsi)) and (Decimal(rsi)<self.metrics_rsi['max'])):
 
