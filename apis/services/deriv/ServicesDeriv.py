@@ -102,23 +102,31 @@ class ServicesDeriv():
 
         return await self.ServicesMethodologyTrends.check_candles(candles)
     
-    async def get_rsi(self,candles):
+    def get_rsi(self,candles):
 
-        return await self.ServicesIndicators.generate_rsi(candles)
+        return self.ServicesIndicators.generate_rsi(candles)
     
-    async def check_rsi(self,rsi):
+    def check_rsi(self,rsi):
 
-        return await self.ServicesMethodologyTrends.check_rsi(rsi)
+        return self.ServicesMethodologyTrends.check_rsi(rsi)
     
-    async def get_sma_short_services(self):
+    def get_sma_short_services(self):
 
         return self.ServicesIndicators.get_sma_short()
     
-    async def get_sma_short(self,candles):
+    def get_sma_short(self,candles):
 
-        indicators = await self.get_sma_short_services()
+        indicators = self.get_sma_short_services()
 
-        return await self.ServicesIndicators.generate_sma(candles,indicators)
+        return self.ServicesIndicators.generate_sma(candles,indicators)
+    
+    def check_sma(self,sma,last_candle):
+
+        return self.ServicesMethodologyTrends.check_sma(sma,last_candle)
+    
+    def get_candle_last(self,candle):
+
+        return self.ServicesIndicators.get_candles_last(candle)
     
     async def check_indicators(self,result,candles):
 
@@ -126,11 +134,17 @@ class ServicesDeriv():
 
             return False
         
-        rsi = await self.get_rsi(candles)
+        rsi = self.get_rsi(candles)
 
-        result_rsi = await self.check_rsi(rsi)
+        result_rsi = self.check_rsi(rsi)
+
+        last_candle = self.get_candle_last(candles)
         
-        sma_short = await self.get_sma_short(candles)
+        sma_short = self.get_sma_short(candles)
+
+        result_sma_short = self.check_sma(sma_short,last_candle)
+
+        print("rsi",rsi,"result_rsi",result_rsi,"sma_short",sma_short,"last_candle",last_candle)
 
         return True
 

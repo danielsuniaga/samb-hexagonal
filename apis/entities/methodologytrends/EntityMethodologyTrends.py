@@ -10,6 +10,10 @@ class EntityMethodologyTrends():
 
     metrics_rsi = None
 
+    metrics_sma = None
+
+    type_entry = None
+
     def __init__(self):
 
         self.init_candle_removed()
@@ -17,6 +21,26 @@ class EntityMethodologyTrends():
         self.init_type_entry()
 
         self.init_metrics_rsi()
+
+        self.init_metrics_sma()
+
+    def set_type_entry(self,type_entry):
+        
+        self.type_entry = type_entry
+
+        return True
+    
+    def get_type_entry(self):
+
+        return self.type_entry
+
+    def init_metrics_sma(self):
+
+        self.metrics_sma = {
+            'active':int(config("ACTIVE_SMA"))
+        }
+
+        return True
 
     def init_metrics_rsi(self):
 
@@ -79,9 +103,13 @@ class EntityMethodologyTrends():
 
         if all(candles[i] < candles[i + 1] for i in range(len(candles) - 1)):
 
+            self.set_type_entry(self.get_type_entry_long())
+
             return self.get_type_entry_long()  # Tendencia alcista
 
         if all(candles[i] > candles[i + 1] for i in range(len(candles) - 1)):
+
+            self.set_type_entry(self.get_type_entry_short())
 
             return self.get_type_entry_short()  # Tendencia bajista
 
@@ -99,7 +127,7 @@ class EntityMethodologyTrends():
 
         return True
     
-    async def check_rsi(self,rsi): 
+    def check_rsi(self,rsi): 
 
         if not(self.metrics_rsi['active']):
 
@@ -110,3 +138,13 @@ class EntityMethodologyTrends():
             return True
 
         return False
+    
+    def check_sma(self,sma,last_candle):
+
+        print("sma",sma,"last_candle",last_candle)
+
+        if not(self.metrics_sma['active']):
+
+            return True
+
+        return True

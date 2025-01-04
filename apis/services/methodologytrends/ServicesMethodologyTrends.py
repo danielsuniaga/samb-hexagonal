@@ -16,7 +16,11 @@ class ServicesMethodologyTrends():
 
         return await self.check_candles_entity(candles)
     
-    async def check_rsi(self,rsi):
+    def check_rsi(self,rsi):
 
-        return await self.entity.check_rsi(rsi)
+        return self.entity.check_rsi(rsi)
+    
+    def check_sma(self,sma,last_candle):
+
+        return self.entity.check_sma(sma,last_candle)
 

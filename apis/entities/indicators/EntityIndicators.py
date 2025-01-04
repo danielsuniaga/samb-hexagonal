@@ -10,6 +10,8 @@ class EntityIndicators():
 
     sma_short = None
 
+    candle_last = None
+
     def __init__(self):
 
         self.init_type_rsi()
@@ -17,6 +19,14 @@ class EntityIndicators():
         self.init_candles_rsi()
 
         self.init_sma_short()
+
+        self.init_candle_last()
+
+    def init_candle_last(self):
+
+        self.candle_last = int(config("CANDLE_LAST"))
+
+        return True
 
     def init_sma_short(self):
 
@@ -43,7 +53,7 @@ class EntityIndicators():
 
         return True
     
-    async def get_candles_indicators(self,candles,candles_indicators):
+    def get_candles_indicators(self,candles,candles_indicators):
 
         if len(candles) < candles_indicators:
 
@@ -51,11 +61,11 @@ class EntityIndicators():
         
         return candles[:candles_indicators]
     
-    async def get_candles_close(self,array_candles):
+    def get_candles_close(self,array_candles):
 
         return [candle['close'] for candle in array_candles]
     
-    async def generate_rsi_entity(self,candles,periodos):
+    def generate_rsi_entity(self,candles,periodos):
 
         gains = []
 
@@ -88,7 +98,6 @@ class EntityIndicators():
 
         avg_loss = sum(losses) / periodos  # Promedio de pérdidas en los últimos 10 períodos
 
-        # Evitar división por cero
         if avg_loss == 0:
 
             return 100
@@ -99,16 +108,32 @@ class EntityIndicators():
 
         return rsi
 
-    async def generate_rsi(self,candles):
+    def generate_rsi(self,candles):
 
-        candles_rsi = await self.get_candles_indicators(candles['candles'],self.candles_rsi)
+        candles_rsi = self.get_candles_indicators(candles['candles'],self.candles_rsi)
 
-        candles_rsi_close = await self.get_candles_close(candles_rsi)
+        candles_rsi_close = self.get_candles_close(candles_rsi)
 
-        return await self.generate_rsi_entity(candles_rsi_close,self.type_rsi)
+        return self.generate_rsi_entity(candles_rsi_close,self.type_rsi)
     
-    async def generate_sma(self,candles,indicators):
+    def generate_sma_entity(self,candles,indicators):
 
-        print("candles",candles,"indicators",indicators)
+        sma = sum(candles[-indicators:]) / indicators
+
+        return sma
+    
+    def generate_sma(self,candles,indicators):
+
+        candles_sma = self.get_candles_indicators(candles['candles'],indicators['candle'])
+
+        candles_sma_close = self.get_candles_close(candles_sma)
         
-        return True
+        return self.generate_sma_entity(candles_sma_close,indicators['value'])
+    
+    def generate_candle_last(self,candles):
+
+        candles_last = self.get_candles_indicators(candles['candles'],self.candle_last)
+
+        candles_last_close = self.get_candles_close(candles_last)
+
+        return candles_last_close[0]

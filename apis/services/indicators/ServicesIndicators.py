@@ -8,14 +8,18 @@ class ServicesIndicators():
 
         self.entity = EntityIndicators.EntityIndicators()
 
-    async def generate_rsi(self,candles):
+    def generate_rsi(self,candles):
 
-        return await self.entity.generate_rsi(candles)
+        return self.entity.generate_rsi(candles)
     
-    async def generate_sma(self,candles,indicators): 
+    def generate_sma(self,candles,indicators): 
 
-        return await self.entity.generate_sma(candles,indicators)
+        return self.entity.generate_sma(candles,indicators)
     
     def get_sma_short(self):
 
         return self.entity.get_sma_short()
+    
+    def get_candles_last(self,candles):
+
+        return self.entity.generate_candle_last(candles)
