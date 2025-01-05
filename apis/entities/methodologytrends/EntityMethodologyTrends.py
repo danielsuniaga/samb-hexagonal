@@ -12,7 +12,7 @@ class EntityMethodologyTrends():
 
     metrics_sma = None
 
-    type_entry = None
+    type_entry_positions = None
 
     def __init__(self):
 
@@ -26,7 +26,7 @@ class EntityMethodologyTrends():
 
     def set_type_entry(self,type_entry):
         
-        self.type_entry = type_entry
+        self.type_entry_positions = type_entry
 
         return True
     
@@ -87,7 +87,7 @@ class EntityMethodologyTrends():
 
         return self.candle_removed
 
-    async def get_candles_trends(self,candles):
+    def get_candles_trends(self,candles):
 
         if len(candles) < self.candle_removed:
 
@@ -95,11 +95,11 @@ class EntityMethodologyTrends():
         
         return candles[:self.candle_removed]
     
-    async def get_candles_close(self,array_candles):
+    def get_candles_close(self,array_candles):
 
         return [candle['close'] for candle in array_candles]
     
-    async def check_candles_trends(self,candles):
+    def check_candles_trends(self,candles):
 
         if all(candles[i] < candles[i + 1] for i in range(len(candles) - 1)):
 
@@ -115,15 +115,15 @@ class EntityMethodologyTrends():
 
         return 0
     
-    async def check_candles(self,candles):
+    def check_candles(self,candles):
 
-        candles_trends = await self.get_candles_trends(candles['candles'])
+        candles_trends = self.get_candles_trends(candles['candles'])
 
-        candles_trends_close = await self.get_candles_close(candles_trends)
+        candles_trends_close = self.get_candles_close(candles_trends)
 
         candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
 
-        result = await self.check_candles_trends(candles_trends_close)
+        result = self.check_candles_trends(candles_trends_close)
 
         return True
     
@@ -139,12 +139,50 @@ class EntityMethodologyTrends():
 
         return False
     
-    def check_sma(self,sma,last_candle):
+    def check_sma_long(self,sma,last_candle):   
 
-        print("sma",sma,"last_candle",last_candle)
+        if(sma<last_candle):
+
+            return True
+        
+        return False
+    
+    def check_sma_short(self,sma,last_candle):
+
+        if(sma>last_candle):
+
+            return True
+        
+        return False
+    
+    def check_sma(self,sma,last_candle):
 
         if not(self.metrics_sma['active']):
 
             return True
+        
+        if(self.type_entry_positions == self.get_type_entry_long()):
 
-        return True
+            return self.check_sma_long(sma,last_candle)
+        
+        if(self.type_entry_positions == self.get_type_entry_short()):
+            
+            return not(self.check_sma_short(sma,last_candle))
+
+        return False
+    
+    def check_result_indicators(self,result_indicators):
+
+        if result_indicators['rsi'] and result_indicators['sma_short'] and result_indicators['sma_long']:
+
+            return True
+        
+        return False
+    
+    def check_monetary_filters(self,monetary_filter):
+        
+        if monetary_filter['profit'] > monetary_filter['sum_entrys_dates'] and monetary_filter['loss'] < monetary_filter['sum_entrys_dates']:
+
+            return True
+        
+        return False

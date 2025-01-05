@@ -31,3 +31,7 @@ class ServicesDate():
     def get_day(self):
 
         return self.entity.get_day()
+    
+    def get_current_date_only(self):     
+
+        return self.entity.get_current_date_only()

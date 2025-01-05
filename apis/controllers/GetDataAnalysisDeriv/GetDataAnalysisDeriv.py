@@ -10,6 +10,7 @@ import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 import apis.services.methodologytrends.ServicesMethodologyTrends as ServicesMethodologyTrends
 import apis.services.indicators.ServicesIndicators as ServicesIndicators
+import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
 
 class ControllerGetDataAnalysisDeriv: 
 
@@ -35,6 +36,8 @@ class ControllerGetDataAnalysisDeriv:
 
     ServicesIndicators = None
 
+    ServicesEntrysResults = None
+
     def __init__(self):
 
         self.ServicesDates = ServicesDate.ServicesDate()
@@ -57,11 +60,15 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesIndicators = ServicesIndicators.ServicesIndicators()
 
+        self.ServicesEntrysResults = ServicesEntrysResults.ServicesEntrysResults()
+
         self.ServicesDeriv.init_services_manager_days(self.ServicesManagerDays)
 
         self.ServicesDeriv.init_services_methodology_trends(self.ServicesMethodologyTrends)
 
         self.ServicesDeriv.init_services_indicators(self.ServicesIndicators)
+
+        self.ServicesDeriv.init_services_entrys_results(self.ServicesEntrysResults)
 
     async def GetDataAnalysisDeriv(self,request):
 

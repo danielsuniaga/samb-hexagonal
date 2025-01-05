@@ -20,6 +20,10 @@ class ServicesIndicators():
 
         return self.entity.get_sma_short()
     
+    def get_sma_long(self):
+
+        return self.entity.get_sma_long()
+    
     def get_candles_last(self,candles):
 
         return self.entity.generate_candle_last(candles)

@@ -40,6 +40,12 @@ class EntityDates():
 
         return hour.strftime("%H%M%S")
     
+    def get_current_date_only(self):
+
+        now = self.get_current_utc5()
+
+        return now.strftime("%Y%m%d")
+    
     def get_day(self):
 
         now = self.get_current_utc5()

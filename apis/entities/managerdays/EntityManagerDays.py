@@ -21,6 +21,18 @@ class EntityManagerDays():
     def get_mode(self):
 
         return self.mode
+    
+    def get_money(self):
+
+        return self.money
+    
+    def get_profit(self):
+
+        return self.profit
+    
+    def get_loss(self):
+
+        return self.loss
 
     def set_money(self,value):
 
@@ -30,12 +42,12 @@ class EntityManagerDays():
     
     def set_profit(self,value):
 
-        self.profit = value
+        self.profit = float(value)
 
         return True
     
     def set_loss(self,value):
 
-        self.loss = value
+        self.loss = float(value)
 
         return True

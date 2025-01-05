@@ -14,10 +14,18 @@ class ServicesDeriv():
 
     ServicesIndicators = None
 
+    ServicesEntrysResults = None
+
     def __init__(self):
 
         self.entity = EntityDeriv.EntityDeriv()
 
+    def init_services_entrys_results(self,value):
+
+        self.ServicesEntrysResults = value
+
+        return True
+    
     def init_services_indicators(self,value):
 
         self.ServicesIndicators = value
@@ -90,6 +98,10 @@ class ServicesDeriv():
 
         return self.ServicesDates.get_current_date_mil_dynamic()
     
+    def get_current_date_only(self):
+
+        return self.ServicesDates.get_current_date_only()
+    
     def get_events(self):
 
         return self.ServicesEvents.get_events()
@@ -98,9 +110,9 @@ class ServicesDeriv():
 
         return await self.entity.get_candles()
     
-    async def check_candles(self,candles):
+    def check_candles(self,candles):
 
-        return await self.ServicesMethodologyTrends.check_candles(candles)
+        return self.ServicesMethodologyTrends.check_candles(candles)
     
     def get_rsi(self,candles):
 
@@ -128,25 +140,94 @@ class ServicesDeriv():
 
         return self.ServicesIndicators.get_candles_last(candle)
     
-    async def check_indicators(self,result,candles):
+    def get_sma_long(self,candles):
+
+        indicators = self.ServicesIndicators.get_sma_long()
+
+        return self.ServicesIndicators.generate_sma(candles,indicators)
+    
+    def init_data_indicators(self,candles):
+
+        return {
+            'rsi':self.get_rsi(candles),
+            'sma_short':self.get_sma_short(candles),
+            'sma_long':self.get_sma_long(candles),
+            'last_candle':self.get_candle_last(candles),
+        }
+    
+    def init_result_indicators(self,indicators):
+
+        return {
+            'rsi':self.check_rsi(indicators['rsi']),
+            'sma_short':self.check_sma(indicators['sma_short'],indicators['last_candle']),
+            'sma_long':self.check_sma(indicators['sma_long'],indicators['last_candle']),
+        }
+    
+    def check_result_indicators(self,result_indicators):
+
+        return self.ServicesMethodologyTrends.check_result_indicators(result_indicators)
+    
+    def check_indicators(self,result,candles):
+
+        if not result:
+
+            return False
+
+        result_indicators = self.init_result_indicators(self.init_data_indicators(candles))
+
+        return self.check_result_indicators(result_indicators)
+    
+    def sum_entrys_dates(self):
+
+        return self.ServicesEntrysResults.get_sums_entrys_date(self.get_current_date_only())
+    
+    def get_profit(self):
+
+        return self.ServicesManagerDays.get_profit()
+    
+    def get_loss(self): 
+
+        return self.ServicesManagerDays.get_loss()
+    
+    def init_data_monetary_filter(self):
+
+        return {
+            'sum_entrys_dates':self.sum_entrys_dates(),
+            'profit':self.get_profit(),
+            'loss':self.get_loss(),
+        }
+    
+    def check_monetary_filter_services(self,result):
+
+        return self.ServicesMethodologyTrends.check_monetary_filters(result)
+        
+    def check_monetary_filter(self,result):
 
         if not result:
 
             return False
         
-        rsi = self.get_rsi(candles)
+        data = self.init_data_monetary_filter()
 
-        result_rsi = self.check_rsi(rsi)
+        return self.check_monetary_filter_services(data)
+    
+    def get_money(self):
 
-        last_candle = self.get_candle_last(candles)
-        
-        sma_short = self.get_sma_short(candles)
+        return self.ServicesManagerDays.get_money()
+    
+    def init_data_add_entry(self):
 
-        result_sma_short = self.check_sma(sma_short,last_candle)
+        return {
+            'amount':self.get_money(),
+        }
+    
+    async def add_entry_broker(self,result):
 
-        print("rsi",rsi,"result_rsi",result_rsi,"sma_short",sma_short,"last_candle",last_candle)
+        if not result:
 
-        return True
+            return False
+
+        return await self.entity.add_entry(self.init_data_add_entry())
 
     async def loops(self):
 
@@ -156,10 +237,18 @@ class ServicesDeriv():
 
         self.set_events_field('get_candles',self.get_current_date_mil_dynamic())
 
-        result = await self.check_candles(result_candles)
+        result = self.check_candles(result_candles)
 
         self.set_events_field('check_candles',self.get_current_date_mil_dynamic())
 
-        result = await self.check_indicators(result,result_candles)
+        result = self.check_indicators(result,result_candles)
+
+        self.set_events_field('generate_indicators',self.get_current_date_mil_dynamic())
+
+        result = self.check_monetary_filter(result)
+
+        self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())
+
+        result = await self.add_entry_broker(result)
 
         return result

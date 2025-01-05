@@ -196,4 +196,53 @@ class EntityDeriv():
         except Exception as err:
 
             return {'status': False, 'msj': f'Error al obtener velas: {err}'}
+        
+    async def generate_proposal(self,data):
+
+        if self.api is None:
+
+            return {'status': False, 'message': 'API no inicializada'}
+
+        try:
+
+            print("amount",data['amount'])
+
+            # if amount <= 0:
+
+            #     return {'status': False, 'message': 'El monto debe ser mayor que 0'}
+
+            # proposal_data = self.get_proposal_data(amount,contract_type,duration,duration_unit,symbol)
+
+            # proposal_response = await self.api.proposal(proposal_data)
+
+            # if proposal_response is None:
+
+            #     return {'status': False, 'message': 'La respuesta de la API es None'}
+
+            # if 'proposal' in proposal_response:
+
+            #     return {
+            #         'status': True,
+            #         'message': 'Propuesta generada correctamente',
+            #         'proposal_id': proposal_response["proposal"]["id"],
+            #         'proposal_details': proposal_response,
+            #     }
+            
+            # else:
+
+            #     error_message = proposal_response.get("error", {}).get("message", "Respuesta desconocida")
+
+            #     return {'status': False, 'message': f'Error al generar la propuesta: {error_message}'}
+
+        except Exception as err:
+
+            return {'status': False, 'message': f'Error al generar la propuesta: {err}'}
+
+        return True
+        
+    async def add_entry(self,data):
+
+        result_proposal = await self.generate_proposal(data)
+
+        return True
 

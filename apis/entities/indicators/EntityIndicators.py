@@ -10,6 +10,8 @@ class EntityIndicators():
 
     sma_short = None
 
+    sma_long = None
+
     candle_last = None
 
     def __init__(self):
@@ -20,7 +22,22 @@ class EntityIndicators():
 
         self.init_sma_short()
 
+        self.init_sma_long()
+
         self.init_candle_last()
+
+    def init_sma_long(self):     
+
+        self.sma_long = {
+            'value':int(config("SMA_LONG")),
+            'candle':int(config("CANDLE_SMA_LONG"))
+        }
+
+        return True
+    
+    def get_sma_long(self):
+
+        return self.sma_long
 
     def init_candle_last(self):
 

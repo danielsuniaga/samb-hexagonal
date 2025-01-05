@@ -8,13 +8,13 @@ class ServicesMethodologyTrends():
 
         self.entity = EntityMethodologyTrends.EntityMethodologyTrends()
 
-    async def check_candles_entity(self,candles):
+    def check_candles_entity(self,candles):
 
-        return await self.entity.check_candles(candles)
+        return self.entity.check_candles(candles)
 
-    async def check_candles(self,candles):
+    def check_candles(self,candles):
 
-        return await self.check_candles_entity(candles)
+        return self.check_candles_entity(candles)
     
     def check_rsi(self,rsi):
 
@@ -23,4 +23,12 @@ class ServicesMethodologyTrends():
     def check_sma(self,sma,last_candle):
 
         return self.entity.check_sma(sma,last_candle)
+    
+    def check_result_indicators(self,result_indicators):
+
+        return self.entity.check_result_indicators(result_indicators)
+    
+    def check_monetary_filters(self,monetary_filter):
+
+        return self.entity.check_monetary_filters(monetary_filter)
 
