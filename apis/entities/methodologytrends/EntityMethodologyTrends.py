@@ -24,6 +24,10 @@ class EntityMethodologyTrends():
 
         self.init_metrics_sma()
 
+    def get_type_entry_positions(self):
+
+        return self.type_entry_positions    
+
     def set_type_entry(self,type_entry):
         
         self.type_entry_positions = type_entry

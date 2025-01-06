@@ -215,10 +215,26 @@ class ServicesDeriv():
 
         return self.ServicesManagerDays.get_money()
     
+    def get_type_entry(self):
+
+        return self.ServicesMethodologyTrends.get_type_entry_positions()
+    
+    def get_duration(self):
+        
+        return self.entity.get_duration()
+    
+    def get_duration_unit(self):    
+
+        return self.entity.get_duration_unit()
+    
     def init_data_add_entry(self):
 
         return {
-            'amount':self.get_money(),
+            'amount':int(self.get_money()),
+            'contract_type':self.get_type_entry(),
+            'duration':int(self.get_duration()),
+            'duration_unit':self.get_duration_unit(),
+            'symbol':self.get_par()
         }
     
     async def add_entry_broker(self,result):

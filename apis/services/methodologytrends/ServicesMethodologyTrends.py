@@ -31,4 +31,8 @@ class ServicesMethodologyTrends():
     def check_monetary_filters(self,monetary_filter):
 
         return self.entity.check_monetary_filters(monetary_filter)
+    
+    def get_type_entry_positions(self):
+
+        return self.entity.get_type_entry_positions()
 

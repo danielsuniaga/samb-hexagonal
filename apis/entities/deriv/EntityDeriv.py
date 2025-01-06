@@ -2,6 +2,8 @@ from deriv_api import DerivAPI
 
 from decouple import config
 
+import asyncio
+
 class EntityDeriv():
 
     id_app = None
@@ -18,6 +20,12 @@ class EntityDeriv():
 
     granularity = None
 
+    duration = None
+
+    duration_unit = None
+
+    duration_seconds = None
+
     def __init__(self):
 
         self.init_par()
@@ -29,6 +37,57 @@ class EntityDeriv():
         self.init_style()
 
         self.init_granularity()
+
+        self.init_duration()
+
+        self.init_duration_unit()
+
+        self.init_proposal_env()
+
+        self.init_duration_seconds()
+
+    def init_proposal_env(self):
+
+        self.proposal_env = {
+            'basis':config("PROPOSAL_BASIS"),
+            'currency':config("PROPOSAL_CURRENCY")
+        }
+
+        return True
+    
+    def get_proposal_env_basis(self):
+
+        return self.proposal_env['basis']
+    
+    def get_proposal_env_currency(self):
+
+        return self.proposal_env['currency']
+
+    def init_duration_unit(self):     
+
+        self.duration_unit = config("DURATION_UNIT")
+
+        return True
+    
+    def init_duration_seconds(self):
+        
+        self.duration_seconds = (int(config("DURATION"))*60)+5
+
+        return True
+    
+    def get_duration_unit(self):     
+
+        return self.duration_unit
+
+    def init_duration(self):
+
+        self.duration = int(config("DURATION"))
+
+        return True
+    
+    def get_duration(self):
+
+        return self.duration
 
     def init_granularity(self):
 
@@ -197,6 +256,19 @@ class EntityDeriv():
 
             return {'status': False, 'msj': f'Error al obtener velas: {err}'}
         
+    def get_proposal_data(self,amount,contract_type,duration,duration_unit,symbol):
+
+        return {
+                "proposal": 1,
+                "amount": amount,
+                "basis": self.get_proposal_env_basis(),
+                "contract_type": contract_type,
+                "currency": self.get_proposal_env_currency(),
+                "duration": duration,
+                "duration_unit": duration_unit,
+                "symbol": symbol
+            }
+        
     async def generate_proposal(self,data):
 
         if self.api is None:
@@ -205,44 +277,153 @@ class EntityDeriv():
 
         try:
 
-            print("amount",data['amount'])
+            if data['amount'] <= 0:
 
-            # if amount <= 0:
+                return {'status': False, 'message': 'El monto debe ser mayor que 0'}
 
-            #     return {'status': False, 'message': 'El monto debe ser mayor que 0'}
+            proposal_data = self.get_proposal_data(data['amount'],data['contract_type'],data['duration'],data['duration_unit'],data['symbol'])
 
-            # proposal_data = self.get_proposal_data(amount,contract_type,duration,duration_unit,symbol)
+            proposal_response = await self.api.proposal(proposal_data)
 
-            # proposal_response = await self.api.proposal(proposal_data)
+            if proposal_response is None:
 
-            # if proposal_response is None:
+                return {'status': False, 'message': 'La respuesta de la API es None'}
 
-            #     return {'status': False, 'message': 'La respuesta de la API es None'}
+            if 'proposal' in proposal_response:
 
-            # if 'proposal' in proposal_response:
-
-            #     return {
-            #         'status': True,
-            #         'message': 'Propuesta generada correctamente',
-            #         'proposal_id': proposal_response["proposal"]["id"],
-            #         'proposal_details': proposal_response,
-            #     }
+                return {
+                    'status': True,
+                    'message': 'Propuesta generada correctamente',
+                    'proposal_id': proposal_response["proposal"]["id"],
+                    'proposal_details': proposal_response,
+                }
             
-            # else:
+            else:
 
-            #     error_message = proposal_response.get("error", {}).get("message", "Respuesta desconocida")
+                error_message = proposal_response.get("error", {}).get("message", "Respuesta desconocida")
 
-            #     return {'status': False, 'message': f'Error al generar la propuesta: {error_message}'}
+                return {'status': False, 'message': f'Error al generar la propuesta: {error_message}'}
 
         except Exception as err:
 
             return {'status': False, 'message': f'Error al generar la propuesta: {err}'}
 
         return True
+    
+    async def execute_proposal(self, proposal_id):
+
+        if self.api is None:
+
+            return {'status': False, 'message': 'API no inicializada'}
+
+        if proposal_id is None:
+
+            return {'status': False, 'message': 'proposal_id es None'}
+
+        try:
+
+            execution_response = await self.api.buy({"buy": proposal_id, "price": 100})
+
+            if execution_response is None:
+
+                return {'status': False, 'message': 'La respuesta de la API es None'}
+
+            if 'buy' in execution_response:
+
+                return {
+                    'status': True,
+                    'message': 'Posición ejecutada correctamente',
+                    'execution_details': execution_response,
+                }
+            
+            else:
+
+                error_message = execution_response.get("error", {}).get("message", "Respuesta desconocida")
+
+                return {'status': False, 'message': f'Error al ejecutar la posición: {error_message}'}
+
+        except Exception as err:
+            
+            return {'status': False, 'message': f'Error al ejecutar la posición: {err}'}
         
-    async def add_entry(self,data):
+    async def generate_duration_contract(self):
+    
+        await asyncio.sleep(self.duration_seconds)
 
-        result_proposal = await self.generate_proposal(data)
+    async def check_position_result(self, contract_id):
 
-        return True
+        if self.api is None:
+            
+            return {'status': False, 'message': 'API no inicializada'}
+
+        try:
+
+            response = await self.api.proposal_open_contract(
+                {"proposal_open_contract": 1, "contract_id": contract_id}
+            )
+            if not response or 'proposal_open_contract' not in response:
+
+                return {'status': False, 'message': 'La respuesta no contiene información válida sobre el contrato'}
+
+            contract_info = response['proposal_open_contract']
+
+            if not contract_info.get('is_sold'):
+
+                return {'status': False, 'message': 'El contrato aún no ha sido vendido o completado'}
+
+            status = contract_info.get('status', 'unknown')
+
+            profit_or_loss = contract_info.get('profit', 0)
+
+            if status == 'won':
+                
+                return self.get_won_contract(profit_or_loss, contract_info)
+            
+            elif status == 'lost':
+
+                return self.get_lost_contract(profit_or_loss, contract_info)
+            
+            else:
+
+                return {'status': False, 'message': f'Estado desconocido: {status}'}
+
+        except Exception as err:
+
+            return {'status': False, 'message': f'Error al consultar contrato: {err}'}
+        
+    def get_won_contract(self, profit, contract_info):
+
+        return {
+            'status': True,
+            'message': 'La posición fue exitosa',
+            'profit': profit,
+            'contract_details': contract_info,
+        }
+
+    def get_lost_contract(self, loss, contract_info):
+
+        return {
+            'status': False,
+            'message': 'La posición fue perdedora',
+            'loss': loss,
+            'contract_details': contract_info,
+        }
+        
+    async def add_entry(self, data):
+
+        result = await self.generate_proposal(data)
+
+        if not result['status']:
+            return False
+
+        result = await self.execute_proposal(result['proposal_id'])
+
+        if not result['status']:
+            return False
+
+        await self.generate_duration_contract()
+
+        return await self.check_position_result(result['execution_details']['buy']['contract_id'])
+    
+
 
