@@ -245,6 +245,28 @@ class ServicesDeriv():
 
         return await self.entity.add_entry(self.init_data_add_entry())
 
+    def set_result_positions(self,result):
+
+        return self.ServicesMethodologyTrends.set_result_entrys(result)
+    
+    def set_candles_positions(self,candles):
+
+        return self.ServicesMethodologyTrends.set_result_candles(candles)
+    
+    def add_entry_persistence(self,result,candles):
+
+        print("add_entry_persistence candles",candles)
+
+        if not result:
+
+            return False
+        
+        self.set_result_positions(result)
+
+        self.set_candles_positions(candles)
+        
+        return True
+    
     async def loops(self):
 
         self.set_events_field('init_loop',self.get_current_date_mil_dynamic())
@@ -266,5 +288,9 @@ class ServicesDeriv():
         self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())
 
         result = await self.add_entry_broker(result)
+
+        self.set_events_field('add_positions_brokers',self.get_current_date_mil_dynamic())
+
+        result = self.add_entry_persistence(result,result_candles)
 
         return result

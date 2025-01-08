@@ -14,6 +14,8 @@ class EntityMethodologyTrends():
 
     type_entry_positions = None
 
+    result_entrys = None
+
     def __init__(self):
 
         self.init_candle_removed()
@@ -23,6 +25,14 @@ class EntityMethodologyTrends():
         self.init_metrics_rsi()
 
         self.init_metrics_sma()
+
+    def set_result_entrys_result(self,result_entrys):
+        
+        self.result_entrys = {
+            'result':result_entrys
+        }
+
+        return True
 
     def get_type_entry_positions(self):
 

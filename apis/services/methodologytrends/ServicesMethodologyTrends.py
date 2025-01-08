@@ -35,4 +35,12 @@ class ServicesMethodologyTrends():
     def get_type_entry_positions(self):
 
         return self.entity.get_type_entry_positions()
+    
+    def set_result_entrys(self,result):
+
+        return self.entity.set_result_entrys_result(result)
+    
+    def set_result_candles(self,result):
+
+        return self.entity.set_result_entrys_candles(result)
 
