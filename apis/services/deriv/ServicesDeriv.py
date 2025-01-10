@@ -16,10 +16,38 @@ class ServicesDeriv():
 
     ServicesEntrysResults = None
 
+    ServicesEntrys = None
+
+    ServicesCronjobs = None
+
+    ServicesPlatform = None
+
     def __init__(self):
 
         self.entity = EntityDeriv.EntityDeriv()
 
+    def init_services_platform(self,value):
+
+        self.ServicesPlatform = value
+
+        return True
+
+    def init_services_cronjobs(self,value):
+        
+        self.ServicesCronjobs = value
+
+        return True
+    
+    def get_id_cronjobs(self):
+
+        return self.ServicesCronjobs.get_id_cronjobs()
+
+    def init_services_entrys(self,value):
+
+        self.ServicesEntrys = value
+
+        return True
+    
     def init_services_entrys_results(self,value):
 
         self.ServicesEntrysResults = value
@@ -55,6 +83,10 @@ class ServicesDeriv():
         self.ServicesManagerDays = value
 
         return True
+    
+    def get_current_date_hour(self):
+
+        return self.ServicesDates.get_current_date_hour()
     
     def get_type_manager_days(self,day):
 
@@ -167,6 +199,10 @@ class ServicesDeriv():
 
         return self.ServicesMethodologyTrends.check_result_indicators(result_indicators)
     
+    def add_result_indicators(self,result_indicators):
+
+        return self.ServicesMethodologyTrends.add_indicator(result_indicators)
+    
     def check_indicators(self,result,candles):
 
         if not result:
@@ -175,6 +211,8 @@ class ServicesDeriv():
 
         result_indicators = self.init_result_indicators(self.init_data_indicators(candles))
 
+        self.add_result_indicators(result_indicators)
+        
         return self.check_result_indicators(result_indicators)
     
     def sum_entrys_dates(self):
@@ -253,17 +291,96 @@ class ServicesDeriv():
 
         return self.ServicesMethodologyTrends.set_result_candles(candles)
     
-    def add_entry_persistence(self,result,candles):
+    def add_entrys(self,result):
 
-        print("add_entry_persistence candles",candles)
+        return self.ServicesEntrys.add_entrys(result)
+    
+    def add_result_positions_mode(self,data,mode):
+
+        return self.entity.add_result_positions(data,mode,'mode')
+    
+    def get_mode(self):
+
+        return self.ServicesManagerDays.get_mode()
+    
+    def get_candle_removed(self):
+
+        return self.ServicesMethodologyTrends.get_candle_removed()
+    
+    def add_result_positions_candle_analisys(self,data,candle):
+
+        return self.entity.add_result_positions(data,candle,'candle_analisys')
+    
+    def get_condition_entry(self):
+
+        return self.ServicesMethodologyTrends.get_condition_entry()
+    
+    def add_result_positions_condition_entry(self,data,condition):
+        
+        return self.entity.add_result_positions(data,condition,'condition_entry')
+    
+    def add_result_positions_amount(self,data,amount):
+
+        return self.entity.add_result_positions(data,amount,'amount')
+    
+    def add_result_positions_current_date(self,data,date):
+
+        return self.entity.add_result_positions(data,date,'current_date')
+    
+    def add_result_positions_id_cronjobs(self,data,id_cronjobs):
+
+        return self.entity.add_result_positions(data,id_cronjobs,'id_cronjobs') 
+
+    
+    def get_re_platform(self):
+
+        return self.ServicesPlatform.get_re_platform_deriv()
+    
+    def add_result_positions_re_platform(self,data,re_platform):    
+
+        return self.entity.add_result_positions(data,re_platform,'re_entry_platform')
+    
+    def init_set_result_positions(self,result):
+
+        return [
+            (self.add_result_positions_mode, self.get_mode()),
+            (self.add_result_positions_candle_analisys, self.get_candle_removed()),
+            (self.add_result_positions_condition_entry, self.get_condition_entry()),
+            (self.add_result_positions_amount, self.get_money()),
+            (self.add_result_positions_current_date, self.get_current_date_hour()),
+            (self.add_result_positions_id_cronjobs, self.get_id_cronjobs()),
+            (self.add_result_positions_re_platform, self.get_re_platform())
+        ]
+    
+    def set_result_positions(self,result):
+
+        result_positions_methods = self.init_set_result_positions(result)
+
+        for method, value in result_positions_methods:
+
+            result = method(result, value)
+
+        return result
+    
+    def get_indicators(self):
+
+        return self.ServicesMethodologyTrends.get_indicators()
+    
+    def add_entry_persistence(self,result,candles):
 
         if not result:
 
             return False
         
+        result = self.set_result_positions(result)
+        
         self.set_result_positions(result)
 
         self.set_candles_positions(candles)
+
+        result = self.add_entrys(result)
+
+        print(self.get_indicators())
         
         return True
     

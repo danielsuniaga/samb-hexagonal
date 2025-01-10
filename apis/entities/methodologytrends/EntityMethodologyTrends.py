@@ -16,6 +16,10 @@ class EntityMethodologyTrends():
 
     result_entrys = None
 
+    condition_entry = None
+
+    indicators = None
+
     def __init__(self):
 
         self.init_candle_removed()
@@ -26,10 +30,39 @@ class EntityMethodologyTrends():
 
         self.init_metrics_sma()
 
+        self.init_condition_entry()
+
+    def add_indicators(self,value):
+
+        self.indicators = value
+
+        return True
+    
+    def get_indicators(self):
+
+        return self.indicators
+
+    def init_condition_entry(self):
+
+        self.condition_entry = config("CONDITION_ENTRY")
+
+    def get_condition_entry(self):
+        
+        return self.condition_entry
+
+
     def set_result_entrys_result(self,result_entrys):
         
         self.result_entrys = {
             'result':result_entrys
+        }
+
+        return True
+    
+    def set_result_entrys_candles(self,result_candles):
+        
+        self.result_entrys = {
+            'candles':result_candles
         }
 
         return True

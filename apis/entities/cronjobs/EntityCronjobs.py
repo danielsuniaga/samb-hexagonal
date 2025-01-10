@@ -12,6 +12,8 @@ class EntityCronjobs():
 
     default_execute = None
 
+    id_cronjobs = None
+
     def __init__(self):
 
         self.init_condition()
@@ -21,6 +23,16 @@ class EntityCronjobs():
         self.init_id_financial_asset()
 
         self.init_default_execute()
+
+    def set_id_cronjobs(self,id_cronjobs):
+
+        self.id_cronjobs = id_cronjobs
+
+        return True
+    
+    def get_id_cronjobs(self):
+
+        return self.id_cronjobs
 
     def init_default_execute(self):
 

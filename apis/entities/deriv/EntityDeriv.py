@@ -46,6 +46,12 @@ class EntityDeriv():
 
         self.init_duration_seconds()
 
+    def add_result_positions(self,data,result,index):
+
+        data[index] = result
+
+        return data
+
     def init_proposal_env(self):
 
         self.proposal_env = {

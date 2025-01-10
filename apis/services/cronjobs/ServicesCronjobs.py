@@ -17,10 +17,22 @@ class ServicesCronjobs():
     def add_repository(self,data):
 
         return self.repository.add(data)
+    
+    def set_id_cronjobs(self,id_cronjobs):
+
+        return self.entity.set_id_cronjobs(id_cronjobs)
 
     def generate_cronjobs_id(self):
 
-        return self.entity.generate_cronjobs_id()
+        result =  self.entity.generate_cronjobs_id()
+
+        self.set_id_cronjobs(result)
+
+        return result
+    
+    def get_id_cronjobs(self):
+
+        return self.entity.get_id_cronjobs()
     
     def get_condition(self):
 

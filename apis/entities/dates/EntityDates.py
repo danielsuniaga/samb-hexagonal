@@ -46,6 +46,12 @@ class EntityDates():
 
         return now.strftime("%Y%m%d")
     
+    def get_current_date_hour(self):
+
+        now = self.get_current_utc5()
+
+        return now.strftime("%Y%m%d%H%M%S")
+    
     def get_day(self):
 
         now = self.get_current_utc5()

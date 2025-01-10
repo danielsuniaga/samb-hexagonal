@@ -8,6 +8,14 @@ class ServicesMethodologyTrends():
 
         self.entity = EntityMethodologyTrends.EntityMethodologyTrends()
 
+    def get_condition_entry(self):
+        
+        return self.entity.get_condition_entry()
+
+    def get_candle_removed(self):    
+
+        return self.entity.get_candle_removed()
+
     def check_candles_entity(self,candles):
 
         return self.entity.check_candles(candles)
@@ -43,4 +51,12 @@ class ServicesMethodologyTrends():
     def set_result_candles(self,result):
 
         return self.entity.set_result_entrys_candles(result)
+    
+    def add_indicator(self,indicators):
+
+        return self.entity.add_indicators(indicators)
+    
+    def get_indicators(self):
+
+        return self.entity.get_indicators()
 
