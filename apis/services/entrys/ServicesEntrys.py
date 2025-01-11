@@ -41,9 +41,19 @@ class ServicesEntrys():
     def add_entrys_repository(self,data):
 
         return self.repository.add(data)
+    
+    def add_data_entity(self,data):
+        
+        return self.entity.set_data(data)
+    
+    def get_data_entity(self):
+        
+        return self.entity.get_data()
 
     def add_entrys(self,entrys):
 
         data = self.init_data_entrys(entrys)
+
+        self.add_data_entity(data)
 
         return self.add_entrys_repository(data)

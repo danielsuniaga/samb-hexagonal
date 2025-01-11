@@ -23,3 +23,15 @@ class RepositoryEntrysResults():
             return {'status':False,'msj':"Incidencia en la lectura de las samb_entrys_results leidas  "+str(err)}
         
         return {'status':True,'data':result[0],'msj':'Success'}
+    
+    def add(self,data):
+
+        try:
+
+            self.cursor_db.execute("INSERT INTO samb_entrys_results(samb_entrys_results.id,samb_entrys_results.result,samb_entrys_results.registration_date,samb_entrys_results.update_date,samb_entrys_results.condition,samb_entrys_results.id_entrys_id)VALUES(%s,%s,%s,%s,%s,%s)",[data['id_entry_result'],data['result_entry'],data['current_date'],data['current_date'],data['condition'],data['id_entry']])
+
+        except Exception as err:
+
+            return {'status': False, 'message':'No se realizo la escritura en samb_entrys_results '+str(err)}
+        
+        return {'status':True,'msj':'Success'}

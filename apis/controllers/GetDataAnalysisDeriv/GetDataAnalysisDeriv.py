@@ -14,6 +14,8 @@ import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResult
 import apis.services.entrys.ServicesEntrys as ServicesEntrys
 import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.platform.ServicesPlatform as ServicesPlatform  
+import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
+import apis.services.movements.ServicesMovements as ServicesMovements
 class ControllerGetDataAnalysisDeriv: 
 
     cursor = None
@@ -46,6 +48,10 @@ class ControllerGetDataAnalysisDeriv:
 
     ServicesPlatform = None
 
+    ServicesIndicatorsEntrys = None
+
+    ServicesMovements = None
+
     def __init__(self):
 
         self.ServicesDates = ServicesDate.ServicesDate()
@@ -76,6 +82,10 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesPlatform = ServicesPlatform.ServicesPlatform()
 
+        self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys()
+
+        self.ServicesMovements = ServicesMovements.ServicesMovements()  
+
         self.ServicesDeriv.init_services_manager_days(self.ServicesManagerDays)
 
         self.ServicesDeriv.init_services_methodology_trends(self.ServicesMethodologyTrends)
@@ -89,6 +99,10 @@ class ControllerGetDataAnalysisDeriv:
         self.ServicesDeriv.init_services_cronjobs(self.ServicesCronjobs)
 
         self.ServicesDeriv.init_services_platform(self.ServicesPlatform)
+
+        self.ServicesDeriv.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
+
+        self.ServicesDeriv.init_services_movements(self.ServicesMovements)
 
     async def GetDataAnalysisDeriv(self,request):
 

@@ -22,9 +22,25 @@ class ServicesDeriv():
 
     ServicesPlatform = None
 
+    ServicesIndicatorsEntrys = None 
+
+    ServicesMovements = None
+
     def __init__(self):
 
         self.entity = EntityDeriv.EntityDeriv()
+
+    def init_services_movements(self,value):
+
+        self.ServicesMovements = value
+
+        return True 
+
+    def init_services_indicators_entrys(self,value):
+
+        self.ServicesIndicatorsEntrys = value
+
+        return True
 
     def init_services_platform(self,value):
 
@@ -208,10 +224,12 @@ class ServicesDeriv():
         if not result:
 
             return False
+        
+        data_indicators = self.init_data_indicators(candles)
 
-        result_indicators = self.init_result_indicators(self.init_data_indicators(candles))
+        result_indicators = self.init_result_indicators(data_indicators)
 
-        self.add_result_indicators(result_indicators)
+        self.add_result_indicators(data_indicators)
         
         return self.check_result_indicators(result_indicators)
     
@@ -366,11 +384,59 @@ class ServicesDeriv():
 
         return self.ServicesMethodologyTrends.get_indicators()
     
+    def get_data_entrys(self):
+        
+        return self.ServicesEntrys.get_data_entity()
+
+    def add_result_positions_data_entrys(self,result,data):
+
+        return self.entity.add_result_positions(result,data,'data_entry')
+    
+    def set_result_indicators(self,result):
+
+        result = self.add_result_positions_current_date(result,self.get_current_date_hour())
+
+        result = self.add_result_positions_data_entrys(result,self.get_data_entrys())
+
+        return result
+    
+    def add_entrys_results_persistence(self,data):
+
+        return True
+    
+    def add_movements_persistence(self,data):
+
+        result = self.ServicesMovements.add_persistence(data)
+
+        if not result['status']:
+
+            return False
+
+        return True
+    
+    def add_indicators_entrys_persistence(self):
+
+        data = self.set_result_indicators(self.get_indicators())
+
+        result = self.ServicesIndicatorsEntrys.add_persistence(data)
+
+        if not result['status']:
+
+            return False
+
+        return self.add_movements_persistence(data)
+    
+    def set_candles_movements(self,candles):
+        
+        return self.ServicesMovements.set_candles(candles)
+    
     def add_entry_persistence(self,result,candles):
 
         if not result:
 
             return False
+        
+        self.set_candles_movements(candles)
         
         result = self.set_result_positions(result)
         
@@ -380,9 +446,11 @@ class ServicesDeriv():
 
         result = self.add_entrys(result)
 
-        print(self.get_indicators())
+        if not result['status']:
+            
+            return False
         
-        return True
+        return self.add_indicators_entrys_persistence()
     
     async def loops(self):
 
