@@ -59,4 +59,8 @@ class ServicesMethodologyTrends():
     def get_indicators(self):
 
         return self.entity.get_indicators()
+    
+    def get_result_entrys_result(self):
+
+        return self.entity.get_result_entrys_result()
 

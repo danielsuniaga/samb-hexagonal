@@ -26,9 +26,17 @@ class ServicesDeriv():
 
     ServicesMovements = None
 
+    ServicesTelegram = None
+
     def __init__(self):
 
         self.entity = EntityDeriv.EntityDeriv()
+
+    def init_services_telegram(self,value):
+
+        self.ServicesTelegram = value
+
+        return True
 
     def init_services_movements(self,value):
 
@@ -301,7 +309,7 @@ class ServicesDeriv():
 
         return await self.entity.add_entry(self.init_data_add_entry())
 
-    def set_result_positions(self,result):
+    def set_result_positions_entity(self,result):
 
         return self.ServicesMethodologyTrends.set_result_entrys(result)
     
@@ -400,7 +408,21 @@ class ServicesDeriv():
 
         return result
     
-    def add_entrys_results_persistence(self,data):
+    def get_result_entrys_result(self):
+
+        return self.ServicesMethodologyTrends.get_result_entrys_result()
+    
+    def add_entrys_results_persistence(self):
+
+        data = self.get_result_entrys_result()
+
+        data_indicators = self.set_result_indicators(self.get_indicators())
+
+        result = self.ServicesEntrysResults.add_persistence(data,data_indicators)
+
+        if not result['status']:
+
+            return False
 
         return True
     
@@ -412,7 +434,7 @@ class ServicesDeriv():
 
             return False
 
-        return True
+        return self.add_entrys_results_persistence()
     
     def add_indicators_entrys_persistence(self):
 
@@ -440,7 +462,7 @@ class ServicesDeriv():
         
         result = self.set_result_positions(result)
         
-        self.set_result_positions(result)
+        self.set_result_positions_entity(result)
 
         self.set_candles_positions(candles)
 
@@ -452,30 +474,52 @@ class ServicesDeriv():
         
         return self.add_indicators_entrys_persistence()
     
+    def init_data_set_events_field_result(self,date,result=0):
+
+        return date+" Result: "+str(result)+" "
+    
+    def generate_message_add_entry(self):
+        
+        return self.ServicesTelegram.generate_message_add_entry()
+    
+    def send_report_management(self,result):
+
+        if not result:
+
+            return False
+        
+        mensaje = self.generate_message_add_entry()
+
+        return self.ServicesTelegram.send_message(mensaje,self.get_current_date_hour())
+    
     async def loops(self):
 
-        self.set_events_field('init_loop',self.get_current_date_mil_dynamic())
+        self.set_events_field('init_loop',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
 
         result_candles = await self.get_candles()
 
-        self.set_events_field('get_candles',self.get_current_date_mil_dynamic())
+        self.set_events_field('get_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
 
         result = self.check_candles(result_candles)
 
-        self.set_events_field('check_candles',self.get_current_date_mil_dynamic())
+        self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = self.check_indicators(result,result_candles)
 
-        self.set_events_field('generate_indicators',self.get_current_date_mil_dynamic())
+        self.set_events_field('generate_indicators',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = self.check_monetary_filter(result)
 
-        self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())
+        self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = await self.add_entry_broker(result)
 
-        self.set_events_field('add_positions_brokers',self.get_current_date_mil_dynamic())
+        self.set_events_field('add_positions_brokers',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = self.add_entry_persistence(result,result_candles)
 
-        return result
+        self.set_events_field('add_persistence',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+
+        self.send_report_management(result)
+
+        return True

@@ -16,6 +16,7 @@ import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.platform.ServicesPlatform as ServicesPlatform  
 import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
 import apis.services.movements.ServicesMovements as ServicesMovements
+import apis.services.telegram.ServicesTelegram as ServicesTelegram
 class ControllerGetDataAnalysisDeriv: 
 
     cursor = None
@@ -52,7 +53,15 @@ class ControllerGetDataAnalysisDeriv:
 
     ServicesMovements = None
 
+    ServicesTelegram = None
+
     def __init__(self):
+
+        self.initialize_services()
+
+        self.initialize_deriv_services_interns()
+
+    def initialize_services(self):
 
         self.ServicesDates = ServicesDate.ServicesDate()
 
@@ -78,13 +87,15 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesEntrys = ServicesEntrys.ServicesEntrys()
 
-        self.ServicesCronjobs = ServicesCronjobs.ServicesCronjobs()
-
         self.ServicesPlatform = ServicesPlatform.ServicesPlatform()
 
         self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys()
 
-        self.ServicesMovements = ServicesMovements.ServicesMovements()  
+        self.ServicesMovements = ServicesMovements.ServicesMovements()
+
+        self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
+
+    def initialize_deriv_services_interns(self):
 
         self.ServicesDeriv.init_services_manager_days(self.ServicesManagerDays)
 
@@ -104,63 +115,95 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesDeriv.init_services_movements(self.ServicesMovements)
 
-    async def GetDataAnalysisDeriv(self,request):
+        self.ServicesDeriv.init_services_telegram(self.ServicesTelegram)
 
-        self.ServicesEvents.set_events_field('start_endpoint',self.ServicesDates.get_current_date_mil_dynamic())
+    async def GetDataAnalysisDeriv(self, request):
 
-        id_cronjobs = self.ServicesCronjobs.generate_cronjobs_id()
+        now, date, hour, id_cronjobs = self.initialize_request_data()
+
+        resultado = self.verify_services(request, hour, date, id_cronjobs)
+        
+        if not resultado['status']:
+
+            return resultado
+
+        if not await self.initialize_deriv_services(date):
+
+            return self.ServicesSmtp.send_notification_email(date, "Initialization failed")
+
+        await self.process_deriv_services()
+
+        return self.finalize_request(now, id_cronjobs)
+
+    def initialize_request_data(self):
 
         now = self.ServicesDates.get_current_utc5()
 
         date = self.ServicesDates.get_current_date(now)
 
         hour = self.ServicesDates.get_current_hour(now)
-        
-        servicios_a_verificar = [
-            lambda: self.ServicesApi.get_api_key(request),  
-            lambda: self.ServicesShedule.get_shedule_result(hour),  
-            lambda: self.ServicesApi.get_api_result(),
-            lambda: self.ServicesCronjobs.add(id_cronjobs,date)
-        ]
 
-        resultado = None
+        self.ServicesDates.set_start_date()
 
-        for servicio in servicios_a_verificar:
- 
-            resultado = servicio() if callable(servicio) else servicio
+        self.ServicesEvents.set_events_field('start_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
 
-            if not resultado['status']:
+        id_cronjobs = self.ServicesCronjobs.generate_cronjobs_id()
 
-                self.ServicesSmtp.send_notification_email(date, resultado['msj'])
+        return now, date, hour, id_cronjobs
 
-                return resultado
-            
-        self.ServicesEvents.set_events_field('init_endpoint',self.ServicesDates.get_current_date_mil_dynamic())
+    async def initialize_deriv_services(self, date):
+
+        self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
 
         result = await self.ServicesDeriv.init()
 
         if not result['status']:
 
-            return self.ServicesSmtp.send_notification_email(date, result['msj'])
-        
-        self.ServicesEvents.set_events_field('init_broker',self.ServicesDates.get_current_date_mil_dynamic())
+            return False
+
+        self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
         await self.ServicesDeriv.set_balance(self.ServicesDates.get_day())
 
-        self.ServicesEvents.set_events_field('config_broker',self.ServicesDates.get_current_date_mil_dynamic())
+        self.ServicesEvents.set_events_field('config_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
         self.ServicesDeriv.init_services_events(self.ServicesEvents)
 
         self.ServicesDeriv.init_services_dates(self.ServicesDates)
 
-        result = await self.ServicesDeriv.loops()
+        return True
 
-        print("result_loops",result)
+    async def process_deriv_services(self):
 
-        result = await self.ServicesDeriv.closed()
+        await self.ServicesDeriv.loops()
 
-        if not result['status']:
+        await self.ServicesDeriv.closed()
 
-            return self.ServicesSmtp.send_notification_email(date, result['msj'])
+    def finalize_request(self, now, id_cronjobs):
 
-        return result
+        now = self.ServicesDates.get_current_utc5()
+
+        self.ServicesDates.set_end_date()
+
+        return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
+
+    def verify_services(self, request, hour, date, id_cronjobs):
+
+        servicios_a_verificar = [
+            lambda: self.ServicesApi.get_api_key(request),
+            lambda: self.ServicesShedule.get_shedule_result(hour),
+            lambda: self.ServicesApi.get_api_result(),
+            lambda: self.ServicesCronjobs.add(id_cronjobs, date)
+        ]
+
+        for servicio in servicios_a_verificar:
+
+            resultado = servicio() if callable(servicio) else servicio
+
+            if not resultado['status']:
+
+                self.ServicesSmtp.send_notification_email(date, resultado['message'])
+                
+                return resultado
+
+        return {'status': True}

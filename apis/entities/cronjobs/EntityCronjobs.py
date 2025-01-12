@@ -14,6 +14,8 @@ class EntityCronjobs():
 
     id_cronjobs = None
 
+    success_condition = None
+
     def __init__(self):
 
         self.init_condition()
@@ -23,6 +25,18 @@ class EntityCronjobs():
         self.init_id_financial_asset()
 
         self.init_default_execute()
+
+        self.init_success_condition()
+
+    def init_success_condition(self):
+
+        self.success_condition = config("SUCCESS_CONDITION")
+
+        return True 
+    
+    def get_success_condition(self):
+        
+        return self.success_condition
 
     def set_id_cronjobs(self,id_cronjobs):
 

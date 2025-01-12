@@ -66,3 +66,26 @@ class ServicesCronjobs():
         data = self.init_add_repository(id_cronjobs,date)
 
         return self.add_repository(data)
+    
+    def get_success_condition(self):
+
+        return self.entity.get_success_condition()
+    
+    def init_data_set_ejecution(self,date,time_execution,id_cronjobs):
+
+        return {
+            'success_condition':self.get_success_condition(),
+            'end_date':date,
+            'execute_time':time_execution,
+            'id_cronjobs':id_cronjobs
+        }
+    
+    def set_ejecution_repository(self,data):
+
+        return self.repository.set(data)
+    
+    def set_ejecution(self,date,time_execution,id_cronjobs):
+
+        data_persistence = self.init_data_set_ejecution(date,time_execution,id_cronjobs)
+
+        return self.set_ejecution_repository(data_persistence)

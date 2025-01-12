@@ -32,6 +32,17 @@ class EntityMethodologyTrends():
 
         self.init_condition_entry()
 
+        self.init_entrys_results()
+
+    def init_entrys_results(self):
+
+        self.result_entrys = {
+            'result':None,
+            'candles':None
+        }
+
+        return True 
+
     def add_indicators(self,value):
 
         self.indicators = value
@@ -53,19 +64,19 @@ class EntityMethodologyTrends():
 
     def set_result_entrys_result(self,result_entrys):
         
-        self.result_entrys = {
-            'result':result_entrys
-        }
+        self.result_entrys['result'] = result_entrys
 
         return True
     
     def set_result_entrys_candles(self,result_candles):
         
-        self.result_entrys = {
-            'candles':result_candles
-        }
+        self.result_entrys['candles'] = result_candles
 
         return True
+    
+    def get_result_entrys_result(self):
+
+        return self.result_entrys['result']
 
     def get_type_entry_positions(self):
 
@@ -168,7 +179,7 @@ class EntityMethodologyTrends():
 
         candles_trends_close = self.get_candles_close(candles_trends)
 
-        candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
+        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
 
         result = self.check_candles_trends(candles_trends_close)
 

@@ -194,7 +194,7 @@ class EntityDeriv():
 
             return {'status': False, 'message':'Se genero una excepcion al chequear sincronizcion con deriv: '+str(err)}
         
-        return {'status': True, 'msj':'Conexion exitosa con deriv'}
+        return {'status': True, 'message':'Conexion exitosa con deriv'}
 
     async def init(self):
 
@@ -208,7 +208,7 @@ class EntityDeriv():
         
         except Exception as err:
 
-            return {'status': False, 'msj':'Se genero una excepcion al inicializar la conexion con deriv: '+str(err)}
+            return {'status': False, 'message':'Se genero una excepcion al inicializar la conexion con deriv: '+str(err)}
         
         return await self.check(False)
     
@@ -216,7 +216,7 @@ class EntityDeriv():
 
         if not self.api:
 
-            return {'status': False, 'msj': 'No hay conexión activa con deriv para cerrar'}
+            return {'status': False, 'message': 'No hay conexión activa con deriv para cerrar'}
         
         try:
 
@@ -224,9 +224,9 @@ class EntityDeriv():
         
         except Exception as err:
 
-            return {'status': False, 'msj': f'Se generó una excepción al cerrar la conexión con Deriv: {err}'}
+            return {'status': False, 'message': f'Se generó una excepción al cerrar la conexión con Deriv: {err}'}
         
-        return {'status': True, 'msj': 'Conexión con Deriv cerrada correctamente'}
+        return {'status': True, 'message': 'Conexión con Deriv cerrada correctamente'}
     
     async def init_data_ticks_history(self):
 
@@ -242,7 +242,7 @@ class EntityDeriv():
 
         if self.api is None:
 
-            return {'status': False, 'msj': 'API no inicializada'}
+            return {'status': False, 'message': 'API no inicializada'}
 
         try:
 
@@ -260,7 +260,7 @@ class EntityDeriv():
 
         except Exception as err:
 
-            return {'status': False, 'msj': f'Error al obtener velas: {err}'}
+            return {'status': False, 'message': f'Error al obtener velas: {err}'}
         
     def get_proposal_data(self,amount,contract_type,duration,duration_unit,symbol):
 
