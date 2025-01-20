@@ -12,7 +12,7 @@ class TestGetDataAnalysisDeriv(unittest.IsolatedAsyncioTestCase):
 
         self.controller = ControllerGetDataAnalysisDeriv.ControllerGetDataAnalysisDeriv()
 
-    async def GetDataAnalysisDeriv(self):
+    async def TestGetDataAnalysisDeriv(self):
 
         request = "4842ff1da2c8faefab30d9c36bdac82a641a9edbce8fcc604982a2e00846b55b"
         
