@@ -125,7 +125,8 @@ class ControllerGetDataAnalysisDeriv:
         
         if not resultado['status']:
 
-            return resultado
+            return 
+        
 
         if not await self.initialize_deriv_services(date):
 
@@ -190,7 +191,6 @@ class ControllerGetDataAnalysisDeriv:
     def verify_services(self, request, hour, date, id_cronjobs):
 
         servicios_a_verificar = [
-            lambda: self.ServicesApi.get_api_key(request),
             lambda: self.ServicesShedule.get_shedule_result(hour),
             lambda: self.ServicesApi.get_api_result(),
             lambda: self.ServicesCronjobs.add(id_cronjobs, date)

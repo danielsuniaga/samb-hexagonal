@@ -16,4 +16,4 @@ class RepositoryFramework:
 
             return {'status': False, 'message':'No se realizo la escritura en samb_framework: '+str(err)}
 
-        return {'status':True,'msj':'Success'}
+        return {'status':True,'message':'Success'}
