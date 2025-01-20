@@ -4,7 +4,7 @@ import unittest
 
 import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
 
-class TestGetEndPoint(TestCase):
+class TestGetEndPoint(unittest.IsolatedAsyncioTestCase):
 
     controller = None
 
@@ -12,8 +12,8 @@ class TestGetEndPoint(TestCase):
 
         self.controller = ControllerGetEndPoint.ControllerGetEndPoint()
 
-    def test_GetEndPoint(self):
+    async def test_GetEndPoint(self):
 
-        result = self.controller.GetEndPoint()
+        result = await  self.controller.GetEndPoint()
 
         print("controller:",result)

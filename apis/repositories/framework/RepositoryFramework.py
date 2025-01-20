@@ -1,14 +1,12 @@
 from django.db import connection
-
 class RepositoryFramework: 
 
     cursor_db = None
 
     def __init__(self):
-        
         self.cursor_db = connection.cursor()
 
-    def add(self,data):
+    async def add(self,data):
 
         try:
 
