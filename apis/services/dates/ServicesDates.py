@@ -15,6 +15,10 @@ class ServicesDate():
     def set_start_date(self):
 
         return self.entity.set_start_date()
+    
+    def set_end_date(self):
+        
+        return self.entity.set_end_date()
 
     def get_current_date_mil_dynamic(self):
 
@@ -27,3 +31,19 @@ class ServicesDate():
     def get_current_hour(self,now):
 
         return self.entity.get_current_hour(now)
+    
+    def get_day(self):
+
+        return self.entity.get_day()
+    
+    def get_current_date_hour(self):
+
+        return self.entity.get_current_date_hour()
+    
+    def get_current_date_only(self):     
+
+        return self.entity.get_current_date_only()
+    
+    def get_time_execution(self):
+
+        return self.entity.get_time_execution()

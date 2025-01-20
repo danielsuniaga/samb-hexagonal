@@ -1,0 +1,156 @@
+from decouple import config
+
+from decimal import Decimal
+
+class EntityIndicators():
+
+    type_rsi = None
+
+    candles_rsi = None
+
+    sma_short = None
+
+    sma_long = None
+
+    candle_last = None
+
+    def __init__(self):
+
+        self.init_type_rsi()
+
+        self.init_candles_rsi()
+
+        self.init_sma_short()
+
+        self.init_sma_long()
+
+        self.init_candle_last()
+
+    def init_sma_long(self):     
+
+        self.sma_long = {
+            'value':int(config("SMA_LONG")),
+            'candle':int(config("CANDLE_SMA_LONG"))
+        }
+
+        return True
+    
+    def get_sma_long(self):
+
+        return self.sma_long
+
+    def init_candle_last(self):
+
+        self.candle_last = int(config("CANDLE_LAST"))
+
+        return True
+
+    def init_sma_short(self):
+
+        self.sma_short = {
+            'value':int(config("SMA_SHORT")),
+            'candle':int(config("CANDLE_SMA_SHORT"))
+        }
+
+        return True
+
+    def get_sma_short(self):
+
+        return self.sma_short
+
+    def init_type_rsi(self):
+
+        self.type_rsi = int(config("TYPE_RSI"))
+
+        return True
+    
+    def init_candles_rsi(self):
+
+        self.candles_rsi = int(config("CANDLE_RSI"))
+
+        return True
+    
+    def get_candles_indicators(self,candles,candles_indicators):
+
+        if len(candles) < candles_indicators:
+
+            return candles
+        
+        return candles[:candles_indicators]
+    
+    def get_candles_close(self,array_candles):
+
+        return [candle['close'] for candle in array_candles]
+    
+    def generate_rsi_entity(self,candles,periodos):
+
+        gains = []
+
+        losses = []
+
+        # Calcular cambios en los precios y clasificar en ganancias y pérdidas
+        for i in range(1, len(candles)):
+
+            change = Decimal(candles[i]) - Decimal(candles[i - 1])
+
+            if change > 0:
+
+                gains.append(change)
+
+                losses.append(0)
+
+            elif change < 0:
+
+                gains.append(0)
+
+                losses.append(-change)
+
+            else:
+
+                gains.append(0)
+
+                losses.append(0)
+
+        avg_gain = sum(gains) / periodos  # Promedio de ganancias en los últimos 10 períodos
+
+        avg_loss = sum(losses) / periodos  # Promedio de pérdidas en los últimos 10 períodos
+
+        if avg_loss == 0:
+
+            return 100
+
+        rs = avg_gain / avg_loss
+
+        rsi = 100 - (100 / (1 + rs))
+
+        return rsi
+
+    def generate_rsi(self,candles):
+
+        candles_rsi = self.get_candles_indicators(candles['candles'],self.candles_rsi)
+
+        candles_rsi_close = self.get_candles_close(candles_rsi)
+
+        return self.generate_rsi_entity(candles_rsi_close,self.type_rsi)
+    
+    def generate_sma_entity(self,candles,indicators):
+
+        sma = sum(candles[-indicators:]) / indicators
+
+        return sma
+    
+    def generate_sma(self,candles,indicators):
+
+        candles_sma = self.get_candles_indicators(candles['candles'],indicators['candle'])
+
+        candles_sma_close = self.get_candles_close(candles_sma)
+        
+        return self.generate_sma_entity(candles_sma_close,indicators['value'])
+    
+    def generate_candle_last(self,candles):
+
+        candles_last = self.get_candles_indicators(candles['candles'],self.candle_last)
+
+        candles_last_close = self.get_candles_close(candles_last)
+
+        return candles_last_close[0]

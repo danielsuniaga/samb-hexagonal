@@ -26,8 +26,11 @@ websocket-client==0.56.0
 wheel==0.37.1
 wrapt==1.14.1
 python-decouple==3.5
-cryptography==2.7
-pandas==2.0.3
-scikit-learn==1.2.2
-matplotlib==3.7.0
-seaborn==0.12.2
+git+https://github.com/Lu-Yi-Hsun/iqoptionapi.git
+cryptography>=3.4.7
+pandas>=1.3.0
+scikit-learn>=0.24.0
+matplotlib>=3.4.3
+python_deriv_api==0.1.6
+pytest==6.2.5
+pytest-django==4.5.2

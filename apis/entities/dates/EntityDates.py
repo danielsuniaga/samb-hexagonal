@@ -6,11 +6,30 @@ import time
 
 class EntityDates():
 
-    start_date = None
+    dates_endpoints = None
+
+    def __init__(self):
+
+        self.init_dates_endpoints()
+
+    def init_dates_endpoints(self):
+
+        self.dates_endpoints = {
+            'start':time.time(),
+            'end':time.time()
+        }
+
+        return True
 
     def set_start_date(self):
 
-        self.start_date = time.time()
+        self.dates_endpoints['start'] = time.time()
+
+        return True
+    
+    def set_end_date(self):
+
+        self.dates_endpoints['end'] = time.time()
 
         return True
 
@@ -39,3 +58,25 @@ class EntityDates():
     def get_current_hour(self,hour):
 
         return hour.strftime("%H%M%S")
+    
+    def get_current_date_only(self):
+
+        now = self.get_current_utc5()
+
+        return now.strftime("%Y%m%d")
+    
+    def get_current_date_hour(self):
+
+        now = self.get_current_utc5()
+
+        return now.strftime("%Y%m%d%H%M%S")
+    
+    def get_day(self):
+
+        now = self.get_current_utc5()
+
+        return now.weekday()
+    
+    def get_time_execution(self):
+
+        return self.dates_endpoints['end'] - self.dates_endpoints['start']
