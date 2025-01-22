@@ -16,6 +16,6 @@ class RepositoryShedule():
 
         except Exception as err:
 
-            return {'status':False,'msj':"Incidencia en la lectura de Shedule "+str(err)}
+            return {'status':False,'message':"Incidencia en la lectura de Shedule "+str(err)}
         
-        return {'status':True,'msj':'Success'} if self.count>0 else {'status':False,'msj': "Horario no contemplado"}
+        return {'status':True,'message':'Success'} if self.count>0 else {'status':False,'message': "Horario no contemplado"}
