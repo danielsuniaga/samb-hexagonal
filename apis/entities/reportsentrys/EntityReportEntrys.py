@@ -193,14 +193,14 @@ class EntityReportEntrys():
 
             name = entry['name']
 
-            r_usd = entry['data']['R']['USD']
+            r_usd = round(entry['data']['R']['USD'], 2)
 
             r_ent = entry['data']['R']['ENT']
 
-            d_usd = entry['data']['D']['USD']
+            d_usd = round(entry['data']['D']['USD'],2)
 
             d_ent = entry['data']['D']['ENT']
 
             report_lines.append(f"{name}: R({r_usd},{r_ent}), D({d_usd},{d_ent})")
-            
+
         return report_lines
