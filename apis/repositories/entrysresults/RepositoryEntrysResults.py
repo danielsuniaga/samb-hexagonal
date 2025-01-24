@@ -1,3 +1,4 @@
+from queue import Full
 from django.db import connection
 
 class RepositoryEntrysResults():
@@ -35,3 +36,63 @@ class RepositoryEntrysResults():
             return {'status': False, 'message':'No se realizo la escritura en samb_entrys_results '+str(err)}
         
         return {'status':True,'msj':'Success'}
+    
+    def get_entrys_results_curdate(self):
+
+        try:
+
+            query = "SELECT samb_entrys.type_account AS type_account, SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) AS positive_count, SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END) AS negative_count, IFNULL(SUM(samb_entrys_results.result), 0) AS result,(SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) - SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END)) AS quantities FROM samb_entrys_results INNER JOIN samb_entrys ON samb_entrys.id = samb_entrys_results.id_entrys_id WHERE DATE(samb_entrys_results.registration_date) = CURDATE() GROUP BY samb_entrys.type_account;"
+
+            self.cursor_db.execute(query)
+
+            rows = self.cursor_db.fetchall()
+
+            columns = [col[0] for col in self.cursor_db.description]
+
+            result = [dict(zip(columns, row)) for row in rows]
+
+            return {'status':True,'message':'Success','result':result}
+            
+        except Exception as err:
+
+            return {'status':False,'message':err,'result':'data not found'}
+        
+    def get_entrys_results_total(self):
+
+        try:
+
+            query = "SELECT samb_entrys.type_account AS type_account, SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) AS positive_count, SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END) AS negative_count, IFNULL(SUM(samb_entrys_results.result), 0) AS result,(SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) - SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END)) AS quantities FROM samb_entrys_results INNER JOIN samb_entrys ON samb_entrys.id = samb_entrys_results.id_entrys_id GROUP BY samb_entrys.type_account;"
+
+            self.cursor_db.execute(query)
+
+            rows = self.cursor_db.fetchall()
+
+            columns = [col[0] for col in self.cursor_db.description]
+
+            result = [dict(zip(columns, row)) for row in rows]
+
+            return {'status':True,'message':'Success','result':result}
+            
+        except Exception as err:
+
+            return {'status':False,'message':err,'result':'data not found'}
+        
+    def get_entrys_results_nom(self,day):
+
+        try:
+
+            query = "SELECT samb_entrys.type_account AS type_account, SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) AS positive_count, SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END) AS negative_count, IFNULL(SUM(samb_entrys_results.result), 0) AS result,(SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) - SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END)) AS quantities FROM samb_entrys_results INNER JOIN samb_entrys ON samb_entrys.id = samb_entrys_results.id_entrys_id WHERE DAYOFWEEK(samb_entrys_results.registration_date) = %s GROUP BY samb_entrys.type_account;"
+
+            self.cursor_db.execute(query,day)
+
+            rows = self.cursor_db.fetchall()
+
+            columns = [col[0] for col in self.cursor_db.description]
+
+            result = [dict(zip(columns, row)) for row in rows]
+
+            return {'status':True,'message':'Success','result':result}
+            
+        except Exception as err:
+
+            return {'status':False,'message':err,'result':'data not found'}

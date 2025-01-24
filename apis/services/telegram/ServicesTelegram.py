@@ -60,3 +60,7 @@ class ServicesTelegram():
         data = self.init_data_add_persistence(result['message'],mensaje,date)
 
         return self.add_persistences(data)
+    
+    def send_message_report(self,mensaje):
+
+        return self.send_message_entity(mensaje)

@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from asgiref.sync import async_to_sync
 
-
 import apis.controllers.GetDataAnalysisDeriv.GetDataAnalysisDeriv as ControllerGetDataAnalysisDeriv
 import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
+import apis.controllers.GetDailyReportEntrys.GetDailyReportEntrys as ControllerGetDailyReportEntrys
 
 class GetDataAnalysisDeriv(APIView):
 
@@ -45,3 +45,17 @@ class GetEndPoint(APIView):
         result = await self.controller.GetEndPoint()
 
         return result
+    
+class GetDailyReportEntrys(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDailyReportEntrys.ControllerGetDailyReportEntrys()   
+
+    def post(self, request, format=None):
+
+        result = self.controller.GetDailyReportEntrys()
+
+        return Response(result)

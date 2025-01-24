@@ -58,3 +58,53 @@ class ServicesEntrysResults():
         data_persistence = self.init_data_add_persistence(data,data_indicators)
 
         return self.add_persistence_repository(data_persistence)
+    
+    def get_entrys_results_curdate_repository(self):
+
+        return self.repository.get_entrys_results_curdate()
+    
+    def init_data_get_entrys_results(self, result, data):
+
+        if not result['status']:
+
+            return False
+        
+        account_types = {'PRACTICE': 'D', 'REAL': 'R'}
+        
+        for item in result['result']:
+
+            account_type = account_types.get(item['type_account'])
+
+            if account_type:
+
+                data[account_type]['USD'] = float(item['result'])
+
+                data[account_type]['ENT'] = item['quantities']
+        
+        return data
+    
+    def get_data_entrys_results_curdate(self,data):
+
+        result = self.get_entrys_results_curdate_repository()
+
+        return self.init_data_get_entrys_results(result,data)
+    
+    def get_entrys_results_total_repository(self):
+
+        return self.repository.get_entrys_results_total()
+    
+    def get_data_entrys_results_total(self,data):   
+
+        result = self.get_entrys_results_total_repository()
+
+        return self.init_data_get_entrys_results(result,data)
+    
+    def get_entrys_results_nom_repository(self,day):
+
+        return self.repository.get_entrys_results_nom(day)
+    
+    def get_data_entrys_results_nom(self,data):
+
+        result = self.get_entrys_results_nom_repository(data['IND'])
+
+        return self.init_data_get_entrys_results(result,data)

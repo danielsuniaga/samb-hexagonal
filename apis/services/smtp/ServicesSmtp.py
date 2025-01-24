@@ -53,3 +53,19 @@ class ServicesSmtp():
         result_send = self.send_email(mensaje)
 
         return True
+    
+    def set_subject(self,subject):
+
+        return self.entity.set_subject(subject)
+    
+    def get_reports_subject_daily(self):
+        
+        return self.entity.get_reports_subject_daily()
+    
+    def send_notification_email_reports(self,mensaje):
+
+        subject = self.get_reports_subject_daily()
+
+        self.set_subject(subject)
+
+        return self.send_email(mensaje)

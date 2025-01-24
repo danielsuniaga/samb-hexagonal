@@ -28,6 +28,8 @@ class EntitySmtp():
 
     server = None
 
+    subject_reports = None
+
     def __init__(self):
 
         self.init_condition()
@@ -49,6 +51,20 @@ class EntitySmtp():
         self.set_message_body()
 
         self.init_from_email()
+
+        self.init_subject_reports()
+
+    def init_subject_reports(self):
+
+        self.subject_reports = {
+            "daily":"Daily report ("+config("PROJECT_NAME")+") | SAMB | TRADING",
+        }
+
+        return True
+    
+    def get_reports_subject_daily(self):
+
+        return self.subject_reports["daily"]
 
     def init_server(self):
 
@@ -86,9 +102,15 @@ class EntitySmtp():
 
         return True
     
+    def set_subject(self,subject):
+
+        self.subject = subject
+
+        return True
+    
     def set_message_body(self):
 
-        self.cuerpo = """ <tr> <td bgcolor="#ffffff" style="padding: 20px 30px 5px 30px;"> <table border="0" cellpadding="0" cellspacing="0" width="100%"> <tr> <td style="color: #340049; font-family: Arial, sans-serif; font-size: 24px;"><b>EXCEPCIONES</b></td> </tr> <tr> <td style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;text-align: justify;">"""+self.message+"""</td> </tr> <tr> <td> <table border="0" cellpadding="0" cellspacing="0" width="100%"> <tr> <td width="260" valign="top"> </td> <td style="font-size: 4; line-height: 0;" width="20"> &nbsp; </td> <td width="260" valign="top"> </td> </tr> </table> </td> </tr> </table> </td> </tr>  """
+        self.cuerpo = """ <tr> <td bgcolor="#ffffff" style="padding: 20px 30px 5px 30px;"> <table border="0" cellpadding="0" cellspacing="0" width="100%"> <tr> <td style="color: #340049; font-family: Arial, sans-serif; font-size: 24px;"><b>Details</b></td> </tr> <tr> <td style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;text-align: justify;">"""+self.message+"""</td> </tr> <tr> <td> <table border="0" cellpadding="0" cellspacing="0" width="100%"> <tr> <td width="260" valign="top"> </td> <td style="font-size: 4; line-height: 0;" width="20"> &nbsp; </td> <td width="260" valign="top"> </td> </tr> </table> </td> </tr> </table> </td> </tr>  """
         
         return True
 
