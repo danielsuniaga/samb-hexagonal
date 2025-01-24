@@ -6,11 +6,27 @@ class EntityReportEntrys():
 
     data_reports = None
 
+    titles_reports = None
+
     def __init__(self):
 
         self.init_types_reports()
 
         self.init_data_reports()
+
+        self.init_titles_reports()
+
+    def init_titles_reports(self):
+
+        self.titles_reports = {
+            "daily": "DAILY REPORTS (" + config("PROJECT_NAME") + ")",
+        }
+
+        return True
+    
+    def get_titles_reports_daily(self):
+
+        return self.titles_reports['daily']
 
     def init_data_reports(self):
 
@@ -18,6 +34,7 @@ class EntityReportEntrys():
             {
                 'name':'CUR',
                 'data':{
+                    'IND':0,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -31,6 +48,7 @@ class EntityReportEntrys():
             {
                 'name':'SUN',
                 'data':{
+                    'IND':1,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -44,6 +62,7 @@ class EntityReportEntrys():
             {
                 'name':'MON',
                 'data':{
+                    'IND':2,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -57,6 +76,7 @@ class EntityReportEntrys():
             {
                 'name':'TUE',
                 'data':{
+                    'IND':3,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -70,6 +90,7 @@ class EntityReportEntrys():
             {
                 'name':'WED',
                 'data':{
+                    'IND':4,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -83,6 +104,7 @@ class EntityReportEntrys():
             {
                 'name':'THU',
                 'data':{
+                    'IND':5,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -96,6 +118,7 @@ class EntityReportEntrys():
             {
                 'name':'FRI',
                 'data':{
+                    'IND':6,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -109,6 +132,7 @@ class EntityReportEntrys():
             {
                 'name':'SAT',
                 'data':{
+                    'IND':7,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -122,6 +146,7 @@ class EntityReportEntrys():
             {
                 'name':'TOT',
                 'data':{
+                    'IND':8,
                     'R':{
                         'USD':0,
                         'ENT':0,
@@ -151,17 +176,31 @@ class EntityReportEntrys():
     def get_types_reports_daily(self):
         
         return self.types_reports['daily']
-    
-    def generate_message(self):
 
-        message = " DAILY REPORTS ("+config("PROJECT_NAME")+")\n"
+    def generate_message(self, data):
 
-        days = ["CUR", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN", "TOT"]
+        message = self.get_titles_reports_daily()+" \n"
 
-        report_lines = [f"{day}:{{R(0,0), D(0,0)}}" for day in days]
+        report_lines = self.generate_report_lines(data)
 
-        max_length = max(len(line) for line in report_lines)
+        return message + "\n".join(report_lines) + "\n"
 
-        centered_lines = [line.center(max_length) for line in report_lines]
+    def generate_report_lines(self, data):
 
-        return message + "\n".join(centered_lines) + "\n"
+        report_lines = []
+
+        for entry in data:
+
+            name = entry['name']
+
+            r_usd = entry['data']['R']['USD']
+
+            r_ent = entry['data']['R']['ENT']
+
+            d_usd = entry['data']['D']['USD']
+
+            d_ent = entry['data']['D']['ENT']
+
+            report_lines.append(f"{name}: R({r_usd},{r_ent}), D({d_usd},{d_ent})")
+            
+        return report_lines

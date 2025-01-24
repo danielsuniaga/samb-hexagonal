@@ -1,7 +1,5 @@
 from django.db import connection
 
-from asgiref.sync import sync_to_async
-
 class RepositoryCronjobs():
 
     cursor_db = None

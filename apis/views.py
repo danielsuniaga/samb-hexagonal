@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from asgiref.sync import async_to_sync
 
-
 import apis.controllers.GetDataAnalysisDeriv.GetDataAnalysisDeriv as ControllerGetDataAnalysisDeriv
 import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
 import apis.controllers.GetDailyReportEntrys.GetDailyReportEntrys as ControllerGetDailyReportEntrys

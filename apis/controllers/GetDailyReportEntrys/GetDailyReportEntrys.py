@@ -2,6 +2,7 @@ import apis.services.reportentrys.ServicesReportEntrys as ServicesReportEntrys
 import apis.services.reports.ServicesReports as ServicesReports 
 import apis.services.dates.ServicesDates as ServicesDate
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
+import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
 
 class ControllerGetDailyReportEntrys:
 
@@ -12,6 +13,8 @@ class ControllerGetDailyReportEntrys:
     ServicesDates = None
 
     ServicesTelegram = None
+
+    ServicesEntrysResults = None
 
     def __init__(self):
 
@@ -29,6 +32,8 @@ class ControllerGetDailyReportEntrys:
 
         self.ServicesTelegram = ServicesTelegram.ServicesTelegram() 
 
+        self.ServicesEntrysResults = ServicesEntrysResults.ServicesEntrysResults()
+
         return True
 
     def initialize_services_interns(self):
@@ -38,6 +43,8 @@ class ControllerGetDailyReportEntrys:
         self.ServicesReportEntrys.init_services_dates(self.ServicesDates)
 
         self.ServicesReportEntrys.init_services_telegram(self.ServicesTelegram)
+
+        self.ServicesReportEntrys.init_services_reportsentrys(self.ServicesEntrysResults)
 
         return True
 

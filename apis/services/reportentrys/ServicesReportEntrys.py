@@ -10,9 +10,17 @@ class ServicesReportEntrys():
 
     ServicesTelegram = None
 
+    ServicesEntrysResults = None
+
     def __init__(self):
 
         self.entity = EntityReportEntrys.EntityReportEntrys()
+
+    def init_services_reportsentrys(self, value):   
+
+        self.ServicesEntrysResults = value
+
+        return True
 
     def init_services_telegram(self, value):    
 
@@ -46,9 +54,9 @@ class ServicesReportEntrys():
 
         return self.ServicesReports.add_persistence(type_reports,self.get_current_date_hour())
     
-    def generate_message(self):
+    def generate_message(self,data):
 
-        return self.entity.generate_message()
+        return self.entity.generate_message(data)
     
     def send_message(self,mensaje):
 
@@ -56,31 +64,27 @@ class ServicesReportEntrys():
     
     def generate_data_report_cur(self,data):
 
-        return True
+        return self.ServicesEntrysResults.get_data_entrys_results_curdate(data)
     
     def generate_data_report_tot(self,data):
 
-        return True
+        return self.ServicesEntrysResults.get_data_entrys_results_total(data)
     
     def generate_data_report_nom(self,data):
 
-        return True
+        return self.ServicesEntrysResults.get_data_entrys_results_nom(data)
     
     def check_data_reports(self,data):
 
-        for item in data:
+        if data['name'] == 'CUR':
 
-            if item['name'] == 'CUR':
+            return self.generate_data_report_cur(data['data'])
 
-                return self.generate_data_report_cur(item['data'])
+        if data['name'] == 'TOT':   
 
-            if item['name'] == 'TOT':   
+            return self.generate_data_report_tot(data['data'])
 
-                return self.generate_data_report_tot(item['data'])
-
-            return self.generate_data_report_nom(item['data'])
-        
-        return False
+        return self.generate_data_report_nom(data['data'])
     
     def generate_data_reports_daily(self):
 
@@ -90,9 +94,7 @@ class ServicesReportEntrys():
 
             item['data'] = self.check_data_reports(item)
 
-        print(data)
-
-        return True
+        return data
 
     def get_daily_report_entrys(self):
 
@@ -104,6 +106,6 @@ class ServicesReportEntrys():
         
         data = self.generate_data_reports_daily()
         
-        message = self.generate_message()
+        message = self.generate_message(data)
         
         return self.send_message(message)
