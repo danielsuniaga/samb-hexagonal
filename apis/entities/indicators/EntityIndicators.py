@@ -4,6 +4,8 @@ from decimal import Decimal
 
 class EntityIndicators():
 
+    ids_indicators = None
+
     type_rsi = None
 
     candles_rsi = None
@@ -25,6 +27,22 @@ class EntityIndicators():
         self.init_sma_long()
 
         self.init_candle_last()
+
+        self.init_ids_indicators()
+
+    def init_ids_indicators(self):
+
+        self.ids_indicators = {
+            'rsi10':config("RSI10"),
+            'sma10':config("SMA10"),
+            'sma30':config("SMA30"),
+        }
+
+        return True
+    
+    def get_ids_indicators(self):
+        
+        return self.ids_indicators
 
     def init_sma_long(self):     
 

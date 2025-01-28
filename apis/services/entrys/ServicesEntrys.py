@@ -57,3 +57,7 @@ class ServicesEntrys():
         self.add_data_entity(data)
 
         return self.add_entrys_repository(data)
+    
+    def get_data_dataset_entrys(self):
+
+        return self.repository.get_entrys_dataset()
