@@ -32,13 +32,21 @@ class ServicesDatasets():
         
         return self.entity.check_directory(directory)
     
-    def get_data_dataset_entrys(self):
+    def get_data_dataset_entrys(self,data_indicators):
 
-        return self.ServicesEntrys.get_data_dataset_entrys()
+        return self.ServicesEntrys.get_data_dataset_entrys(data_indicators)
     
     def get_ids_indicators(self):
         
         return self.ServicesIndicators.get_ids_indicators()
+    
+    def generate_dataframe_with_data(self,data):
+        
+        return self.entity.generate_dataframe_with_data(data)
+    
+    def add_dataset_entity(self,dataframe):
+
+        return self.entity.add_dataset(dataframe)
 
     def add_dataset(self):
 
@@ -50,6 +58,6 @@ class ServicesDatasets():
         
         result = self.get_data_dataset_entrys(data_indicators)
 
-        print(result)
+        dataframe = self.generate_dataframe_with_data(result)
         
-        return True
+        return self.add_dataset_entity(dataframe)

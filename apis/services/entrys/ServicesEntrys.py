@@ -58,6 +58,20 @@ class ServicesEntrys():
 
         return self.add_entrys_repository(data)
     
-    def get_data_dataset_entrys(self):
+    def init_get_data_dataset_entrys(self,data):
 
-        return self.repository.get_entrys_dataset()
+        if not data['status']:
+
+            return False
+        
+        return data['data']
+    
+    def get_entrys_dataset_repository(self,data):
+
+        return self.repository.get_entrys_dataset(data)
+    
+    def get_data_dataset_entrys(self,data_indicators):
+
+        result = self.get_entrys_dataset_repository(data_indicators)
+
+        return self.init_get_data_dataset_entrys(result)

@@ -38,15 +38,24 @@ class ControllerAddModelRegressionLogistic():
         self.ServicesDatasets.init_services_indicators(self.ServicesIndicators)
 
         return True
+    
+    def init_services_datasets(self):
+
+        return [
+            lambda: self.ServicesGeneralModelLogisticRegression.get_active_model(),
+            lambda: self.ServicesDatasets.add_dataset()
+        ]
 
     def AddModelRegressionLogistic(self):
 
-        result = self.ServicesGeneralModelLogisticRegression.get_active_model()
+        servicios_a_verificar = self.init_services_datasets()
 
-        if not result:
+        for servicio in servicios_a_verificar:
 
-            return False
-        
-        result = self.ServicesDatasets.add_dataset()
-        
-        return result
+            resultado = servicio() if callable(servicio) else servicio
+
+            if not resultado:
+                
+                return False
+
+        return True
