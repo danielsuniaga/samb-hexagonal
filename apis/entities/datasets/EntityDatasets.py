@@ -53,3 +53,37 @@ class EntityDatasets():
         dataframe.to_csv(path,index=False)
 
         return True
+    
+    def get_csv(self,path): 
+
+        return pd.read_csv(path)
+    
+    def check_dataset(self,data):
+
+        if 'entry_registration_date' in data.columns:
+                    
+            data['entry_registration_date'] = data['entry_registration_date'].astype(str)
+            
+            data['year'] = data['entry_registration_date'].str[:4].astype(int)
+            
+            data['month'] = data['entry_registration_date'].str[4:6].astype(int)
+
+            data['day'] = data['entry_registration_date'].str[6:8].astype(int)
+
+            data['hour'] = data['entry_registration_date'].str[8:10].astype(int)
+
+            data['minute'] = data['entry_registration_date'].str[10:12].astype(int)
+            
+            data.drop(columns=['entry_registration_date'], inplace=True)
+
+            data.drop(columns=['id_entry_id'], inplace=True)
+
+        return data
+    
+    def get_dataset(self):
+
+        path = self.get_config_add_dataset_route()
+
+        data = self.get_csv(path)
+
+        return self.check_dataset(data)

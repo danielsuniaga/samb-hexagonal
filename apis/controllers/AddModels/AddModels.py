@@ -1,13 +1,13 @@
 import apis.services.datasets.ServicesDatasets as ServicesDatasets
-import apis.services.generalmodellosgisticregression.ServicesGeneralModelLogisticRegression as ServicesGeneralModelLogisticRegression
+import apis.services.models.ServicesModels as ServicesModels
 import apis.services.entrys.ServicesEntrys as ServicesEntrys
 import apis.services.indicators.ServicesIndicators as ServicesIndicators
 
-class ControllerAddModelRegressionLogistic():
+class ControllerAddModels():
 
     ServicesDatasets = None
 
-    ServicesGeneralModelLogisticRegression = None
+    ServicesModels = None
 
     ServicesEntrys = None
 
@@ -23,7 +23,7 @@ class ControllerAddModelRegressionLogistic():
         
         self.ServicesDatasets = ServicesDatasets.ServicesDatasets()
 
-        self.ServicesGeneralModelLogisticRegression = ServicesGeneralModelLogisticRegression.ServicesGeneralModelLogisticRegression()
+        self.ServicesModels = ServicesModels.ServicesModels()
 
         self.ServicesEntrys = ServicesEntrys.ServicesEntrys()
 
@@ -37,16 +37,22 @@ class ControllerAddModelRegressionLogistic():
 
         self.ServicesDatasets.init_services_indicators(self.ServicesIndicators)
 
+        self.ServicesModels.init_services_datasets(self.ServicesDatasets)
+
         return True
     
     def init_services_datasets(self):
 
         return [
-            lambda: self.ServicesGeneralModelLogisticRegression.get_active_model(),
+            lambda: self.ServicesModels.get_active_model(),
             lambda: self.ServicesDatasets.add_dataset()
         ]
+    
+    def generate_training_model(self):
 
-    def AddModelRegressionLogistic(self):
+        return self.ServicesModels.generate_training_model()
+
+    def AddModels(self):
 
         servicios_a_verificar = self.init_services_datasets()
 
@@ -58,4 +64,4 @@ class ControllerAddModelRegressionLogistic():
                 
                 return False
 
-        return True
+        return self.generate_training_model()

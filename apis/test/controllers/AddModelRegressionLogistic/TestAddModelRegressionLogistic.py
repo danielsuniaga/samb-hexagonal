@@ -2,7 +2,7 @@ from unittest import TestCase, mock
 
 import unittest
 
-import apis.controllers.AddModelRegressionLogistic.AddModelRegressionLogistic as ControllerAddModelRegressionLogistic
+import apis.controllers.AddModels.AddModels as ControllerAddModels
 
 class TestAddModelRegressionLogistic(TestCase):
     
@@ -10,10 +10,10 @@ class TestAddModelRegressionLogistic(TestCase):
 
     def setUp(self):
 
-        self.controller = ControllerAddModelRegressionLogistic.ControllerAddModelRegressionLogistic()
+        self.controller = ControllerAddModels.ControllerAddModels()
 
     def test_AddModelRegressionLogistic(self):
 
-        result = self.controller.AddModelRegressionLogistic()
+        result = self.controller.AddModels()
 
         print("controller:",result)

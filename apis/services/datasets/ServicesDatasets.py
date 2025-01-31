@@ -61,3 +61,7 @@ class ServicesDatasets():
         dataframe = self.generate_dataframe_with_data(result)
         
         return self.add_dataset_entity(dataframe)
+    
+    def get_dataset(self):
+
+        return self.entity.get_dataset()

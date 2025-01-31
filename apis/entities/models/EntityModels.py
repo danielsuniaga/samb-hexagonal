@@ -1,6 +1,6 @@
 from decouple import config
 
-class EntityGeneralModelLogisticRegression():
+class EntityModels():
 
     config=None
 
