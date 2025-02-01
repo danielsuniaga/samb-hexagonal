@@ -8,11 +8,12 @@ from sklearn.tree import DecisionTreeClassifier
 
 from sklearn.ensemble import RandomForestClassifier
 
-from sklearn.metrics import accuracy_score, classification_report,confusion_matrix, ConfusionMatrixDisplay,precision_score,recall_score,f1_score
+from sklearn.metrics import accuracy_score,precision_score,recall_score,f1_score
 from sklearn.preprocessing import StandardScaler
 
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import MinMaxScaler
+
+import pickle
 
 class EntityModels():
 
@@ -25,15 +26,34 @@ class EntityModels():
     def init_config(self):
 
         self.config = {
-            'active':int(config("ACTIVE_GENERAL_ML_LOGISTIC_REGRESSION")),
+            'active':int(config("ACTIVE_GENERAL_ML")),
+            'directory_general':config("DIRECTORY_ML_GENERAL"),
+            'name_project':config("PROJECT_NAME"),
             'id_models':
                 {
-                    'regression_logistic':config("ID_MODEL_REGRESSION_LOGISTIC"),
-                    'decision_tree':config("ID_MODEL_DECISION_TREE"),
-                    'random_forest':config("ID_MODEL_RANDOM_FOREST"),
-                    'mlp':config("ID_MODEL_MLP")
+                    'regression_logistic':config("ID_REGRESSION_LOGISTIC"),
+                    'decision_tree':config("ID_DECISION_TREE"),
+                    'random_forest':config("ID_RANDOM_FOREST"),
+                    'mlp':config("ID_MLP")
+                },
+            'name_models':
+                {
+                    'regression_logistic':config("NAME_REGRESSION_LOGISTIC"),
+                    'decision_tree':config("NAME_DECISION_TREE"),
+                    'random_forest':config("NAME_RANDOM_FOREST"),
+                    'mlp':config("NAME_MLP")
                 }
         }
+
+        return True
+    
+    def get_config_name_project(self):
+        
+        return self.config['name_project']
+    
+    def get_config_directory_general(self):
+        
+        return self.config['directory_general']
 
     def get_config_active(self):
         
@@ -80,18 +100,13 @@ class EntityModels():
             recall = recall_score(y_test, y_pred, average='weighted')
 
             f1 = f1_score(y_test, y_pred, average='weighted')
-
-            report = classification_report(y_test, y_pred)
-
-            confusion = confusion_matrix(y_test, y_pred)
             
             results[name] = {
+            'id': self.config['id_models'][name],
             'accuracy': accuracy,
             'precision': precision,
             'recall': recall,
-            'f1_score': f1,
-            'classification_report': report,
-            'confusion_matrix': confusion
+            'f1_score': f1
             }
         
         return results
@@ -133,3 +148,40 @@ class EntityModels():
         model.fit(x, y)
 
         return model
+    
+    def  add_models_directory(self, data):
+
+        for name, model in data.items():
+
+            path = self.get_config_directory_general()+self.config['name_models'][name]
+
+            try:
+
+                with open(path, 'wb') as model_file:
+
+                    pickle.dump(model, model_file)
+
+            except Exception as e:
+
+                return False
+
+        return True
+    
+
+    def get_head_message_reports(self):
+
+        return f"DAILY REPORTS ML ({self.get_config_name_project()})\n"
+    
+    def generate_message_reports(self, results):
+
+        message = self.get_head_message_reports()
+        
+        for model_name, metrics in results.items():
+
+            message += f"{model_name.upper()}: "
+            message += f"Accuracy({metrics['accuracy']:.3f}), "
+            message += f"Precision({metrics['precision']:.3f}), "
+            message += f"Recall({metrics['recall']:.3f}), "
+            message += f"F1 Score({metrics['f1_score']:.3f})\n"
+        
+        return message

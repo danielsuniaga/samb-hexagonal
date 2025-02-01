@@ -71,7 +71,7 @@ class AddModels(APIView):
 
     def post(self, request, format=None):
 
-        result = self.controller.AddModels(request)
+        result = self.controller.AddModels()
 
         return Response(result)
         

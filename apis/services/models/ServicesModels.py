@@ -45,15 +45,19 @@ class ServicesModels():
         model_regression_logistic,model_decision_tree,model_random_forest,model_mlp = self.train_models(x,y)
 
         return {
-            'model_regression_logistic':model_regression_logistic,
-            'model_decision_tree':model_decision_tree,
-            'model_random_forest':model_random_forest,
-            'model_mlp':model_mlp
+            'regression_logistic':model_regression_logistic,
+            'decision_tree':model_decision_tree,
+            'random_forest':model_random_forest,
+            'mlp':model_mlp
         }
     
     def evaluate_models(self,models,X_test,y_test):
 
         return self.entity.evaluate_models(models,X_test,y_test)
+    
+    def add_models_directory(self, data):
+
+        return self.entity.add_models_directory(data)
     
     def generate_training_model(self):
 
@@ -63,6 +67,16 @@ class ServicesModels():
 
         models = self.init_models(X_train, y_train)
 
+        self.add_models_directory(models)
+
         results = self.evaluate_models(models, X_test, y_test)
         
         return results
+    
+    def generate_message_reports(self,results):
+
+        return self.entity.generate_message_reports(results)
+    
+    def get_directory_general(self):
+
+        return self.entity.get_config_directory_general()
