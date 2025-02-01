@@ -70,10 +70,8 @@ class EntityDatasets():
 
             data['day'] = data['entry_registration_date'].str[6:8].astype(int)
 
-            data['hour'] = data['entry_registration_date'].str[8:10].astype(int)
+            data['hour'] = data['entry_registration_date'].str[8:10].astype(int) 
 
-            data['minute'] = data['entry_registration_date'].str[10:12].astype(int)
-            
             data.drop(columns=['entry_registration_date'], inplace=True)
 
             data.drop(columns=['id_entry_id'], inplace=True)

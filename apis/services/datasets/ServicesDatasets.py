@@ -47,6 +47,10 @@ class ServicesDatasets():
     def add_dataset_entity(self,dataframe):
 
         return self.entity.add_dataset(dataframe)
+    
+    def get_data_dataset_entrys_min(self,data_indicators):
+        
+        return self.ServicesEntrys.get_entrys_dataset_min(data_indicators)
 
     def add_dataset(self):
 
@@ -56,7 +60,7 @@ class ServicesDatasets():
         
         data_indicators = self.get_ids_indicators()
         
-        result = self.get_data_dataset_entrys(data_indicators)
+        result = self.get_data_dataset_entrys_min(data_indicators)
 
         dataframe = self.generate_dataframe_with_data(result)
         

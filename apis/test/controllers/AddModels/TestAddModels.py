@@ -4,7 +4,7 @@ import unittest
 
 import apis.controllers.AddModels.AddModels as ControllerAddModels
 
-class TestAddModelRegressionLogistic(TestCase):
+class TestAddModels(TestCase):
     
     controller = None
 
@@ -12,7 +12,7 @@ class TestAddModelRegressionLogistic(TestCase):
 
         self.controller = ControllerAddModels.ControllerAddModels()
 
-    def test_AddModelRegressionLogistic(self):
+    def test_AddModels(self):
 
         result = self.controller.AddModels()
 

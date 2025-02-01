@@ -75,3 +75,14 @@ class ServicesEntrys():
         result = self.get_entrys_dataset_repository(data_indicators)
 
         return self.init_get_data_dataset_entrys(result)
+    
+    def get_entrys_dataset_min_repository(self,data):
+        
+        return self.repository.get_entrys_dataset_min(data)
+    
+    def get_entrys_dataset_min(self,data):
+
+        result = self.get_entrys_dataset_min_repository(data)
+
+        return self.init_get_data_dataset_entrys(result)
+    

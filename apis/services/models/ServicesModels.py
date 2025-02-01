@@ -34,12 +34,35 @@ class ServicesModels():
     
     def init_data(self,data):
 
-        return True
+        return self.entity.init_data(data)
+    
+    def train_models(self,x,y):
+        
+        return self.entity.train_models(x,y)
+    
+    def init_models(self,x,y):
+
+        model_regression_logistic,model_decision_tree,model_random_forest,model_mlp = self.train_models(x,y)
+
+        return {
+            'model_regression_logistic':model_regression_logistic,
+            'model_decision_tree':model_decision_tree,
+            'model_random_forest':model_random_forest,
+            'model_mlp':model_mlp
+        }
+    
+    def evaluate_models(self,models,X_test,y_test):
+
+        return self.entity.evaluate_models(models,X_test,y_test)
     
     def generate_training_model(self):
 
         data = self.get_dataset()
 
-        print(data)
+        X_train, X_test, y_train, y_test = self.init_data(data)
+
+        models = self.init_models(X_train, y_train)
+
+        results = self.evaluate_models(models, X_test, y_test)
         
-        return True
+        return results
