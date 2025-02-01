@@ -7,6 +7,7 @@ from asgiref.sync import async_to_sync
 import apis.controllers.GetDataAnalysisDeriv.GetDataAnalysisDeriv as ControllerGetDataAnalysisDeriv
 import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
 import apis.controllers.GetDailyReportEntrys.GetDailyReportEntrys as ControllerGetDailyReportEntrys
+import apis.controllers.AddModels.AddModels as ControllerAddModels
 
 class GetDataAnalysisDeriv(APIView):
 
@@ -59,3 +60,18 @@ class GetDailyReportEntrys(APIView):
         result = self.controller.GetDailyReportEntrys()
 
         return Response(result)
+    
+class AddModels(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerAddModels.ControllerAddModels()
+
+    def post(self, request, format=None):
+
+        result = self.controller.AddModels()
+
+        return Response(result)
+        

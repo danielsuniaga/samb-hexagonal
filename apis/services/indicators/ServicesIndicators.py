@@ -27,3 +27,7 @@ class ServicesIndicators():
     def get_candles_last(self,candles):
 
         return self.entity.generate_candle_last(candles)
+    
+    def get_ids_indicators(self):
+
+        return self.entity.get_ids_indicators()
