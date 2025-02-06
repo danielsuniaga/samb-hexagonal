@@ -1,0 +1,69 @@
+import apis.entities.reportscrons.EntityReportsCrons as EntityReportsCrons  
+
+class ServicesReportCrons():
+
+    entity = None
+
+    ServicesDates = None
+
+    ServicesReports = None
+
+    ServicesCronjobs = None
+
+    def __init__(self):
+
+        self.entity = EntityReportsCrons.EntityReportsCrons()
+
+    def init_services_cronjobs(self, value):
+
+        self.ServicesCronjobs = value
+
+        return True
+
+    def init_services_reports(self, value):
+
+        self.ServicesReports = value
+
+        return True
+
+    def init_services_dates(self, value):
+
+        self.ServicesDates = value
+
+        return True
+
+    def get_types_reports_daily(self):
+
+        return self.entity.get_types_reports_daily()
+    
+    def get_current_date_hour(self):
+
+        return self.ServicesDates.get_current_date_hour()
+    
+    def add_persistence_daily_reports_crons(self):
+
+        type_reports = self.get_types_reports_daily()
+
+        return self.ServicesReports.add_persistence(type_reports,self.get_current_date_hour())
+    
+    def get_data_cronjobs_curdate(self):
+
+        return self.ServicesCronjobs.get_data_cronjobs_curdate()
+    
+    def generate_data_message(self,data):
+
+        data_curdate = self.get_data_cronjobs_curdate()
+
+        return True
+
+    def get_daily_report_crons(self):
+
+        result_persistence = self.add_persistence_daily_reports_crons()
+
+        if not result_persistence['status']:
+
+            return result_persistence
+        
+        data_message = self.generate_data_message()
+        
+        return True

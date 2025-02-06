@@ -89,3 +89,9 @@ class ServicesCronjobs():
         data_persistence = self.init_data_set_ejecution(date,time_execution,id_cronjobs)
 
         return self.set_ejecution_repository(data_persistence)
+    
+    def get_data_cronjobs_curdate(self):
+
+        result = self.repository.get_data_cronjobs_curdate()
+
+        return True

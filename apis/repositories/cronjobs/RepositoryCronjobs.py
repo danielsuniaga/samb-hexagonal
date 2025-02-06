@@ -31,3 +31,17 @@ class RepositoryCronjobs():
             return {'status': False, 'message':'No se realizo la sobreescritura en samb_cronjobs'+str(err)}
 
         return {'status':True,'msj':'Success'}
+    
+    def get_data_cronjobs_curdate(self):
+
+        try:
+
+            self.cursor_db.execute("SELECT * FROM samb_cronjobs WHERE samb_cronjobs.start_date = CURDATE()")
+
+            result = self.cursor_db.fetchall()
+
+        except Exception as err:
+
+            return {'status': False, 'message':'No se realizo la lectura en samb_cronjobs'+str(err),'data':None}
+
+        return {'status':True,'message':'Success','data':result}
