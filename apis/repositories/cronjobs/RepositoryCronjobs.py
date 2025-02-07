@@ -32,16 +32,16 @@ class RepositoryCronjobs():
 
         return {'status':True,'msj':'Success'}
     
-    def get_data_cronjobs_curdate(self):
+    def get_data_cronjobs_curdate(self,data):
 
         try:
-
-            self.cursor_db.execute("SELECT * FROM samb_cronjobs WHERE samb_cronjobs.start_date = CURDATE()")
+            self.cursor_db.execute("SELECT COUNT(samb_cronjobs.id) AS cuantity, IFNULL(MAX(samb_cronjobs.execution_time),0) AS max_execution_time FROM samb_cronjobs WHERE DATE(samb_cronjobs.start_date) = CURDATE() AND samb_cronjobs.condition = %s",
+            [data['state']])
 
             result = self.cursor_db.fetchall()
 
         except Exception as err:
+            
+            return {'status': False, 'message': 'No se realizo la lectura en samb_cronjobs' + str(err), 'data': None}
 
-            return {'status': False, 'message':'No se realizo la lectura en samb_cronjobs'+str(err),'data':None}
-
-        return {'status':True,'message':'Success','data':result}
+        return {'status': True, 'message': 'Success', 'data': result}

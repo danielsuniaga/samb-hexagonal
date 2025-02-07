@@ -90,8 +90,18 @@ class ServicesCronjobs():
 
         return self.set_ejecution_repository(data_persistence)
     
-    def get_data_cronjobs_curdate(self):
+    def init_data_get_data_cronjobs_curdate(self,data,result):
 
-        result = self.repository.get_data_cronjobs_curdate()
+        if result['status']:
 
-        return True
+            data['data']['quantities'] = result['data'][0][0]
+
+            data['data']['max_durations'] = result['data'][0][1]
+
+        return data
+    
+    def get_data_cronjobs_curdate(self,data):
+
+        result = self.repository.get_data_cronjobs_curdate(data)
+
+        return self.init_data_get_data_cronjobs_curdate(data,result)

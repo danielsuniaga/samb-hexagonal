@@ -46,15 +46,29 @@ class ServicesReportCrons():
 
         return self.ServicesReports.add_persistence(type_reports,self.get_current_date_hour())
     
-    def get_data_cronjobs_curdate(self):
+    def get_data_cronjobs_curdate(self,data):
 
-        return self.ServicesCronjobs.get_data_cronjobs_curdate()
+        return self.ServicesCronjobs.get_data_cronjobs_curdate(data)
     
-    def generate_data_message(self,data):
+    def get_data_reports(self):
 
-        data_curdate = self.get_data_cronjobs_curdate()
+        return self.entity.get_data_reports()
+    
+    def check_data_reports(self,data):
 
-        return True
+        return self.get_data_cronjobs_curdate(data)
+    
+    def generate_data_reports_daily(self):
+
+        data = self.get_data_reports()
+
+        for item in data:
+
+            item['data'] = self.check_data_reports(item)
+
+        print(data)
+
+        return data
 
     def get_daily_report_crons(self):
 
@@ -64,6 +78,6 @@ class ServicesReportCrons():
 
             return result_persistence
         
-        data_message = self.generate_data_message()
+        data = self.generate_data_reports_daily()
         
         return True
