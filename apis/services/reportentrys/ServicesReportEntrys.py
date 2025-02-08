@@ -92,7 +92,7 @@ class ServicesReportEntrys():
 
         for item in data:
 
-            item['data'] = self.check_data_reports(item)
+            item = self.check_data_reports(item)
 
         return data
 

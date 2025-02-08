@@ -35,13 +35,18 @@ class RepositoryCronjobs():
     def get_data_cronjobs_curdate(self,data):
 
         try:
-            self.cursor_db.execute("SELECT COUNT(samb_cronjobs.id) AS cuantity, IFNULL(MAX(samb_cronjobs.execution_time),0) AS max_execution_time FROM samb_cronjobs WHERE DATE(samb_cronjobs.start_date) = CURDATE() AND samb_cronjobs.condition = %s",
+
+            self.cursor_db.execute("SELECT COUNT(samb_cronjobs.id) AS quantities, IFNULL(MAX(samb_cronjobs.execution_time),0) AS max_durations FROM samb_cronjobs WHERE DATE(samb_cronjobs.start_date) = CURDATE() AND samb_cronjobs.condition = %s",
             [data['state']])
 
-            result = self.cursor_db.fetchall()
+            rows = self.cursor_db.fetchall()
 
-        except Exception as err:
+            columns = [col[0] for col in self.cursor_db.description]
+
+            result = [dict(zip(columns, row)) for row in rows]
+
+            return {'status':True,'message':'Success','result':result[0]}
             
-            return {'status': False, 'message': 'No se realizo la lectura en samb_cronjobs' + str(err), 'data': None}
+        except Exception as err:
 
-        return {'status': True, 'message': 'Success', 'data': result}
+            return {'status':False,'message':"Incidencia en la lectura de las samb_entrys_results leidas  "+str(err)}

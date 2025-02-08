@@ -10,9 +10,25 @@ class ServicesReportCrons():
 
     ServicesCronjobs = None
 
+    ServicesTelegram = None
+
+    ServicesDeriv = None
+
     def __init__(self):
 
         self.entity = EntityReportsCrons.EntityReportsCrons()
+
+    def init_services_deriv(self, value):
+
+        self.ServicesDeriv = value
+
+        return True
+
+    def init_services_telegram(self, value):
+
+        self.ServicesTelegram = value
+
+        return True
 
     def init_services_cronjobs(self, value):
 
@@ -56,7 +72,9 @@ class ServicesReportCrons():
     
     def check_data_reports(self,data):
 
-        return self.get_data_cronjobs_curdate(data)
+        result = self.get_data_cronjobs_curdate(data)
+
+        return result
     
     def generate_data_reports_daily(self):
 
@@ -64,11 +82,17 @@ class ServicesReportCrons():
 
         for item in data:
 
-            item['data'] = self.check_data_reports(item)
-
-        print(data)
+            item = self.check_data_reports(item)
 
         return data
+    
+    def generate_message(self,data):
+
+        return self.entity.generate_message(data)
+    
+    def send_message(self,mensaje):
+
+        return self.ServicesTelegram.send_message_report(mensaje)
 
     def get_daily_report_crons(self):
 
@@ -79,5 +103,7 @@ class ServicesReportCrons():
             return result_persistence
         
         data = self.generate_data_reports_daily()
+
+        message = self.generate_message(data)
         
-        return True
+        return self.send_message(message)

@@ -84,6 +84,10 @@ class EntityDeriv():
     def get_duration_unit(self):     
 
         return self.duration_unit
+    
+    def get_duration_seconds(self):
+
+        return self.duration_seconds
 
     def init_duration(self):
 

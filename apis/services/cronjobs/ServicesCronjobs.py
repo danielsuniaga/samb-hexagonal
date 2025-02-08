@@ -94,9 +94,9 @@ class ServicesCronjobs():
 
         if result['status']:
 
-            data['data']['quantities'] = result['data'][0][0]
+            data['data']['quantities'] = result['result']['quantities']
 
-            data['data']['max_durations'] = result['data'][0][1]
+            data['data']['max_durations'] = result['result']['max_durations']
 
         return data
     

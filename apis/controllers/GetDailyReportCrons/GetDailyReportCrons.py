@@ -2,6 +2,8 @@ import apis.services.reportcrons.ServicesReportCrons as ServicesReportCrons
 import apis.services.dates.ServicesDates as ServicesDates 
 import apis.services.reports.ServicesReports as ServicesReports
 import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
+import apis.services.telegram.ServicesTelegram as ServicesTelegram
+import apis.services.deriv.ServicesDeriv as ServicesDeriv
 
 class ControllerGetDailyReportCrons:
 
@@ -12,6 +14,10 @@ class ControllerGetDailyReportCrons:
     ServicesReports = None
 
     ServicesCronjobs = None
+
+    ServicesTelegram = None
+
+    ServicesDeriv = None
 
     def __init__(self):
 
@@ -29,6 +35,10 @@ class ControllerGetDailyReportCrons:
 
         self.ServicesCronjobs = ServicesCronjobs.ServicesCronjobs() 
 
+        self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
+
+        self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
+
         return True 
     
     def initiliaze_services_interns(self):
@@ -39,6 +49,10 @@ class ControllerGetDailyReportCrons:
 
         self.ServicesReportCrons.init_services_cronjobs(self.ServicesCronjobs)  
 
+        self.ServicesReportCrons.init_services_telegram(self.ServicesTelegram)
+
+        self.ServicesReportCrons.init_services_deriv(self.ServicesDeriv)
+        
         return True
     
     def get_daily_report_crons(self):
