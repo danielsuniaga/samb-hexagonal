@@ -86,9 +86,9 @@ class ServicesReportCrons():
 
         return data
     
-    def generate_message(self,data):
+    def generate_message(self,data,duration_seconds):
 
-        return self.entity.generate_message(data)
+        return self.entity.generate_message(data,duration_seconds)
     
     def send_message(self,mensaje):
 
@@ -104,6 +104,12 @@ class ServicesReportCrons():
         
         data = self.generate_data_reports_daily()
 
-        message = self.generate_message(data)
+        duration_seconds = self.get_duration_seconds()
+
+        message = self.generate_message(data,duration_seconds)
         
         return self.send_message(message)
+    
+    def get_duration_seconds(self):
+
+        return self.ServicesDeriv.get_duration_seconds()

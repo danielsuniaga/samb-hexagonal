@@ -66,9 +66,19 @@ class EntityReportsCrons():
 
         return self.types_reports['daily']
     
-    def generate_message(self, data):
+    def generate_max_durations(self,max_durations,duration_seconds):
+
+        if duration_seconds > max_durations:
+
+            return max_durations
+
+        return max_durations-duration_seconds
+    
+    def generate_message(self,data,duration):
 
         message = self.get_titles_reports_daily() + "\n"
+
+        duration_seconds = float(duration)
 
         for report in data:
 
@@ -76,7 +86,7 @@ class EntityReportsCrons():
 
             quantities = report['data']['quantities']
 
-            max_durations = round(float(report['data']['max_durations']), 2)
+            max_durations = round(self.generate_max_durations(float(report['data']['max_durations']),duration_seconds), 2)
 
             message += f"{state} : quantities({quantities}), max durations({max_durations})\n"
 
