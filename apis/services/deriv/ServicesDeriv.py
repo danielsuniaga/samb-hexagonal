@@ -523,3 +523,7 @@ class ServicesDeriv():
         self.send_report_management(result)
 
         return True
+    
+    def get_duration_seconds(self):
+
+        return self.entity.get_duration_seconds()   

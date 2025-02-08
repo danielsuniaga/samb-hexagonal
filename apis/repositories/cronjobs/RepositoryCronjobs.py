@@ -31,3 +31,22 @@ class RepositoryCronjobs():
             return {'status': False, 'message':'No se realizo la sobreescritura en samb_cronjobs'+str(err)}
 
         return {'status':True,'msj':'Success'}
+    
+    def get_data_cronjobs_curdate(self,data):
+
+        try:
+
+            self.cursor_db.execute("SELECT COUNT(samb_cronjobs.id) AS quantities, IFNULL(MAX(samb_cronjobs.execution_time),0) AS max_durations FROM samb_cronjobs WHERE DATE(samb_cronjobs.start_date) = CURDATE() AND samb_cronjobs.condition = %s",
+            [data['state']])
+
+            rows = self.cursor_db.fetchall()
+
+            columns = [col[0] for col in self.cursor_db.description]
+
+            result = [dict(zip(columns, row)) for row in rows]
+
+            return {'status':True,'message':'Success','result':result[0]}
+            
+        except Exception as err:
+
+            return {'status':False,'message':"Incidencia en la lectura de las samb_entrys_results leidas  "+str(err)}

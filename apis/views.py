@@ -8,6 +8,7 @@ import apis.controllers.GetDataAnalysisDeriv.GetDataAnalysisDeriv as ControllerG
 import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
 import apis.controllers.GetDailyReportEntrys.GetDailyReportEntrys as ControllerGetDailyReportEntrys
 import apis.controllers.AddModels.AddModels as ControllerAddModels
+import apis.controllers.GetDailyReportCrons.GetDailyReportCrons as ControllerGetDailyReportCrons
 
 class GetDataAnalysisDeriv(APIView):
 
@@ -58,6 +59,20 @@ class GetDailyReportEntrys(APIView):
     def post(self, request, format=None):
 
         result = self.controller.GetDailyReportEntrys()
+
+        return Response(result)
+    
+class GetDailyReportCrons(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDailyReportCrons.ControllerGetDailyReportCrons()
+
+    def post(self, request, format=None):
+
+        result = self.controller.GetDailyReportCrons()
 
         return Response(result)
     
