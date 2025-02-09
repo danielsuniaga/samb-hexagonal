@@ -10,10 +10,12 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_NAME}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      TZ: America/Bogota  # Ajusta esta zona horaria según tu ubicación
     volumes:
       - ./dump:/docker-entrypoint-initdb.d
       - ./conf:/etc/mysql/conf.d
       - persistent:/var/lib/mysql
+    command: --default-time-zone='-05:00'  # Esto fuerza a MySQL a usar UTC-5
   web:
     container_name: ${PROJECT_NAME}
     build: .
@@ -35,8 +37,10 @@ services:
       - '${PHPMYADMIN_PORT_EXTERNAL}:${PHPMYADMIN_PORT_INTERNAL}'
     networks:
       - default
+
 networks:
   default:
+
 volumes:
   persistent:
   persistent_models:
