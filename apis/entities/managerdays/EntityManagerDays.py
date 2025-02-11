@@ -10,13 +10,19 @@ class EntityManagerDays():
 
     mode = None
 
+    mode_env = None
+
     def __init__(self):
 
-        self.init_mode()
+        self.init_modes()
 
-    def init_mode(self):
+    def init_modes(self):
 
         self.mode = config("MODE")
+
+        self.mode_env = config("MODE")
+
+        return True
 
     def get_mode(self):
 
@@ -51,3 +57,13 @@ class EntityManagerDays():
         self.loss = float(value)
 
         return True
+    
+    def set_mode(self,value):
+            
+        self.mode = value
+
+        return True
+    
+    def get_mode_env(self):
+
+        return self.mode_env
