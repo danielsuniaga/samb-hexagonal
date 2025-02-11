@@ -30,6 +30,10 @@ class ServicesManagerDays():
 
         return self.entity.set_loss(value)
     
+    def set_mode(self,value):
+            
+        return self.entity.set_mode(value)
+    
     def set_data_manager(self,data):
 
         self.set_money(data['money'])
@@ -37,6 +41,8 @@ class ServicesManagerDays():
         self.set_profit(data['profit'])
 
         self.set_loss(data['loss'])
+
+        self.set_mode(data['type'])
 
         return True
     
@@ -52,9 +58,13 @@ class ServicesManagerDays():
 
         return self.entity.get_loss()
     
+    def get_mode_env(self):
+
+        return self.entity.get_mode_env()
+    
     def check_mode_operativity(self,data):
 
-        if(data['type']==self.get_mode()):
+        if(data['type']==self.get_mode_env()):
 
             return False   
 
