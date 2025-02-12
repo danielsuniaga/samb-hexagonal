@@ -42,6 +42,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -56,6 +60,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -70,6 +78,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -84,6 +96,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -98,6 +114,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -112,6 +132,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -126,6 +150,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -140,6 +168,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             },
@@ -154,6 +186,10 @@ class EntityReportEntrys():
                     'D':{
                         'USD':0,
                         'ENT':0,
+                    },
+                    'E':{
+                        'DEM':0,
+                        'REA':0,
                     }
                 }
             }
@@ -197,10 +233,14 @@ class EntityReportEntrys():
 
             r_ent = entry['data']['R']['ENT']
 
-            d_usd = round(entry['data']['D']['USD'],2)
+            d_usd = round(entry['data']['D']['USD'], 2)
 
             d_ent = entry['data']['D']['ENT']
 
-            report_lines.append(f"{name}: R({r_usd},{r_ent}), D({d_usd},{d_ent})")
+            e_dem = entry['data']['E']['DEM']
+
+            e_rea = entry['data']['E']['REA']
+
+            report_lines.append(f"{name}: R({r_usd},{r_ent}), D({d_usd},{d_ent}), E({e_dem},{e_rea})")
 
         return report_lines

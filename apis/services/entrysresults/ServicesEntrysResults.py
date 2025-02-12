@@ -62,24 +62,20 @@ class ServicesEntrysResults():
     def get_entrys_results_curdate_repository(self):
 
         return self.repository.get_entrys_results_curdate()
-    
     def init_data_get_entrys_results(self, result, data):
 
         if not result['status']:
-
             return False
         
         account_types = {'PRACTICE': 'D', 'REAL': 'R'}
         
         for item in result['result']:
-
             account_type = account_types.get(item['type_account'])
-
             if account_type:
-
                 data[account_type]['USD'] = float(item['result'])
-
                 data[account_type]['ENT'] = item['quantities']
+                data['E']['DEM'] += item['total'] if account_type == 'D' else 0
+                data['E']['REA'] += item['total'] if account_type == 'R' else 0
         
         return data
     
