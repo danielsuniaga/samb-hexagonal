@@ -20,6 +20,8 @@ class EntityMethodologyTrends():
 
     indicators = None
 
+    id = None
+
     def __init__(self):
 
         self.init_candle_removed()
@@ -33,6 +35,18 @@ class EntityMethodologyTrends():
         self.init_condition_entry()
 
         self.init_entrys_results()
+
+        self.init_id()
+
+    def init_id(self):
+
+        self.id = config("ID_METHODOLOGY_TRENDS")
+
+        return True
+    
+    def get_id(self):
+
+        return self.id  
 
     def init_entrys_results(self):
 

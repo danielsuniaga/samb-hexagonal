@@ -56,6 +56,8 @@ class ServicesEntrys():
 
         self.add_data_entity(data)
 
+        print("data:", data)
+
         return self.add_entrys_repository(data)
     
     def init_get_data_dataset_entrys(self,data):

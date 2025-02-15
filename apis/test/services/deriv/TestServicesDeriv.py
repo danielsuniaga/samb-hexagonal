@@ -78,7 +78,7 @@ class TestServicesDeriv(unittest.IsolatedAsyncioTestCase):
 
         self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
         
-        self.ServicesCronjobs.set_id_cronjobs("0028747aa80a4dcb8524cb2229138924")
+        self.ServicesCronjobs.set_id_cronjobs("000497e5e7cc401fb6022257c7b7ca80")
 
         self.ServicesManagerDays.set_money(2)
 
