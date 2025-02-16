@@ -3,7 +3,7 @@ import apis.services.dates.ServicesDates as ServicesDates
 import apis.services.reports.ServicesReports as ServicesReports
 import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
-import apis.services.deriv.ServicesDeriv as ServicesDeriv
+# import apis.services.deriv.ServicesDeriv as ServicesDeriv
 
 class ControllerGetDailyReportCrons:
 
@@ -37,7 +37,7 @@ class ControllerGetDailyReportCrons:
 
         self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
 
-        self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
+        # self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
 
         return True 
     
