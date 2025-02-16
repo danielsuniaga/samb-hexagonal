@@ -35,6 +35,7 @@ class ServicesEntrys():
             'condition': self.get_condition(),
             'id_cronjobs': data['id_cronjobs'],
             'id_entry_platform': data['contract_details']['account_id'],
+            'id_methodology': data['id_methodology'],
             're_entry_platform': data['re_entry_platform']
         }
     
@@ -55,8 +56,6 @@ class ServicesEntrys():
         data = self.init_data_entrys(entrys)
 
         self.add_data_entity(data)
-
-        print("data:", data)
 
         return self.add_entrys_repository(data)
     

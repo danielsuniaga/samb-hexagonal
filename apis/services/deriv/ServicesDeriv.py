@@ -504,22 +504,24 @@ class ServicesDeriv():
     async def loops(self):
 
         self.set_events_field('init_loop',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
-
+        
         result_candles = await self.get_candles()
 
         self.set_events_field('get_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
-
+        
         result = self.check_candles(result_candles)
 
         self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
+        
         result = self.check_indicators(result,result_candles)
-
+        
         self.set_events_field('generate_indicators',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = self.check_monetary_filter(result)
 
         self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+
 
         result = await self.add_entry_broker(result)
 
