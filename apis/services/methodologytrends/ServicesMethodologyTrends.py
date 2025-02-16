@@ -63,4 +63,8 @@ class ServicesMethodologyTrends():
     def get_result_entrys_result(self):
 
         return self.entity.get_result_entrys_result()
+    
+    def get_id(self):
+
+        return self.entity.get_id()
 

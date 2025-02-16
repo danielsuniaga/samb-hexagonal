@@ -418,7 +418,7 @@ class EntityDeriv():
             'loss': loss,
             'contract_details': contract_info,
         }
-        
+
     async def add_entry(self, data):
 
         result = await self.generate_proposal(data)

@@ -355,7 +355,11 @@ class ServicesDeriv():
     
     def add_result_positions_id_cronjobs(self,data,id_cronjobs):
 
-        return self.entity.add_result_positions(data,id_cronjobs,'id_cronjobs') 
+        return self.entity.add_result_positions(data,id_cronjobs,'id_cronjobs')
+
+    def add_result_positions_id_methodology(self,data,id_methodology):
+
+        return self.entity.add_result_positions(data,id_methodology,'id_methodology') 
 
     
     def get_re_platform(self):
@@ -366,6 +370,10 @@ class ServicesDeriv():
 
         return self.entity.add_result_positions(data,re_platform,'re_entry_platform')
     
+    def get_id_methodology(self):
+
+        return self.ServicesMethodologyTrends.get_id()
+    
     def init_set_result_positions(self,result):
 
         return [
@@ -375,7 +383,8 @@ class ServicesDeriv():
             (self.add_result_positions_amount, self.get_money()),
             (self.add_result_positions_current_date, self.get_current_date_hour()),
             (self.add_result_positions_id_cronjobs, self.get_id_cronjobs()),
-            (self.add_result_positions_re_platform, self.get_re_platform())
+            (self.add_result_positions_re_platform, self.get_re_platform()),
+            (self.add_result_positions_id_methodology, self.get_id_methodology()),
         ]
     
     def set_result_positions(self,result):
@@ -495,22 +504,24 @@ class ServicesDeriv():
     async def loops(self):
 
         self.set_events_field('init_loop',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
-
+        
         result_candles = await self.get_candles()
 
         self.set_events_field('get_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
-
+        
         result = self.check_candles(result_candles)
 
         self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
+        
         result = self.check_indicators(result,result_candles)
-
+        
         self.set_events_field('generate_indicators',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = self.check_monetary_filter(result)
 
         self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+
 
         result = await self.add_entry_broker(result)
 
