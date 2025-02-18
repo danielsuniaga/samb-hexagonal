@@ -2,15 +2,15 @@ from unittest import TestCase, mock
 
 import unittest
 
-import apis.controllers.GetDataAnalysisDeriv.GetDataAnalysisDeriv as ControllerGetDataAnalysisDeriv
+import apis.controllers.GetDataAnalysisDerivTrends.GetDataAnalysisDerivTrends as ControllerGetDataAnalysisDerivTrends
 
-class TestGetDataAnalysisDeriv(unittest.IsolatedAsyncioTestCase):
+class TestGetDataAnalysisDerivTrends(unittest.IsolatedAsyncioTestCase):
 
     controller = None
 
     def setUp(self):
 
-        self.controller = ControllerGetDataAnalysisDeriv.ControllerGetDataAnalysisDeriv()
+        self.controller = ControllerGetDataAnalysisDerivTrends.ControllerGetDataAnalysisDerivTrends()
 
     async def TestGetDataAnalysisDeriv(self):
 

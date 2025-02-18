@@ -6,7 +6,7 @@ import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.api.ServicesApi as ServicesApi
 import apis.services.smtp.ServicesSmtp as ServicesSmtp
 import apis.services.shedule.ServicesShedule as ServicesShedule
-import apis.services.deriv.ServicesDeriv as ServicesDeriv
+import apis.services.checktrends.ServicesCkeckTrends as ServicesCkeckTrends
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 import apis.services.methodologytrends.ServicesMethodologyTrends as ServicesMethodologyTrends
 import apis.services.indicators.ServicesIndicators as ServicesIndicators
@@ -17,7 +17,9 @@ import apis.services.platform.ServicesPlatform as ServicesPlatform
 import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
 import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
-class ControllerGetDataAnalysisDeriv: 
+import apis.services.deriv.ServicesDeriv as ServicesDeriv   
+
+class ControllerGetDataAnalysisDerivTrends: 
 
     cursor = None
 
@@ -33,7 +35,7 @@ class ControllerGetDataAnalysisDeriv:
 
     ServicesShedule = None
 
-    ServicesDeriv = None
+    ServicesCkeckTrends = None
 
     ServicesManagerDays = None
 
@@ -55,11 +57,13 @@ class ControllerGetDataAnalysisDeriv:
 
     ServicesTelegram = None
 
+    ServicesDeriv = None
+
     def __init__(self):
 
         self.initialize_services()
 
-        self.initialize_deriv_services_interns()
+        self.initialize_check_trends_services_interns()
 
     def initialize_services(self):
 
@@ -75,7 +79,7 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesShedule = ServicesShedule.ServicesShedule()
 
-        self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
+        self.ServicesCkeckTrends = ServicesCkeckTrends.ServicesCkeckTrends()
 
         self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
 
@@ -95,27 +99,31 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
 
-    def initialize_deriv_services_interns(self):
+        self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
 
-        self.ServicesDeriv.init_services_manager_days(self.ServicesManagerDays)
+    def initialize_check_trends_services_interns(self):
 
-        self.ServicesDeriv.init_services_methodology_trends(self.ServicesMethodologyTrends)
+        self.ServicesCkeckTrends.init_services_manager_days(self.ServicesManagerDays)
 
-        self.ServicesDeriv.init_services_indicators(self.ServicesIndicators)
+        self.ServicesCkeckTrends.init_services_methodology_trends(self.ServicesMethodologyTrends)
 
-        self.ServicesDeriv.init_services_entrys_results(self.ServicesEntrysResults)
+        self.ServicesCkeckTrends.init_services_indicators(self.ServicesIndicators)
 
-        self.ServicesDeriv.init_services_entrys(self.ServicesEntrys)
+        self.ServicesCkeckTrends.init_services_entrys_results(self.ServicesEntrysResults)
 
-        self.ServicesDeriv.init_services_cronjobs(self.ServicesCronjobs)
+        self.ServicesCkeckTrends.init_services_entrys(self.ServicesEntrys)
 
-        self.ServicesDeriv.init_services_platform(self.ServicesPlatform)
+        self.ServicesCkeckTrends.init_services_cronjobs(self.ServicesCronjobs)
 
-        self.ServicesDeriv.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
+        self.ServicesCkeckTrends.init_services_platform(self.ServicesPlatform)
 
-        self.ServicesDeriv.init_services_movements(self.ServicesMovements)
+        self.ServicesCkeckTrends.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
 
-        self.ServicesDeriv.init_services_telegram(self.ServicesTelegram)
+        self.ServicesCkeckTrends.init_services_movements(self.ServicesMovements)
+
+        self.ServicesCkeckTrends.init_services_telegram(self.ServicesTelegram)
+
+        self.ServicesCkeckTrends.init_services_deriv(self.ServicesDeriv)
 
     async def GetDataAnalysisDeriv(self, request):
 
@@ -156,7 +164,7 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
 
-        result = await self.ServicesDeriv.init()
+        result = await self.ServicesCkeckTrends.init()
 
         if not result['status']:
 
@@ -164,21 +172,21 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
-        await self.ServicesDeriv.set_balance(self.ServicesDates.get_day())
+        await self.ServicesCkeckTrends.set_balance(self.ServicesDates.get_day())
 
         self.ServicesEvents.set_events_field('config_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
-        self.ServicesDeriv.init_services_events(self.ServicesEvents)
+        self.ServicesCkeckTrends.init_services_events(self.ServicesEvents)
 
-        self.ServicesDeriv.init_services_dates(self.ServicesDates)
+        self.ServicesCkeckTrends.init_services_dates(self.ServicesDates)
 
         return True
 
     async def process_deriv_services(self):
 
-        await self.ServicesDeriv.loops()
+        await self.ServicesCkeckTrends.loops()
 
-        await self.ServicesDeriv.closed()
+        await self.ServicesCkeckTrends.closed()
 
     def finalize_request(self, now, id_cronjobs):
 
