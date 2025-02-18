@@ -1,9 +1,7 @@
 import apis.entities.deriv.EntityDeriv as EntityDeriv
 
 class ServicesCkeckTrends():
-
-    entity = None
-
+    
     ServicesManagerDays = None
 
     ServicesEvents = None
@@ -29,10 +27,6 @@ class ServicesCkeckTrends():
     ServicesTelegram = None
 
     ServicesDeriv = None
-
-    def __init__(self):
-
-        self.entity = EntityDeriv.EntityDeriv()
 
     def init_services_deriv(self,value):
 
@@ -343,7 +337,7 @@ class ServicesCkeckTrends():
     
     def add_result_positions_candle_analisys(self,data,candle):
 
-        return self.entity.add_result_positions(data,candle,'candle_analisys')
+        return self.ServicesDeriv.add_result_positions_candle_analisys(data,candle)
     
     def get_condition_entry(self):
 
@@ -351,24 +345,23 @@ class ServicesCkeckTrends():
     
     def add_result_positions_condition_entry(self,data,condition):
         
-        return self.entity.add_result_positions(data,condition,'condition_entry')
+        return self.ServicesDeriv.add_result_positions_condition_entry(data,condition)
     
     def add_result_positions_amount(self,data,amount):
 
-        return self.entity.add_result_positions(data,amount,'amount')
+        return self.ServicesDeriv.add_result_positions_amount(data,amount)
     
     def add_result_positions_current_date(self,data,date):
 
-        return self.entity.add_result_positions(data,date,'current_date')
+        return self.ServicesDeriv.add_result_positions_current_date(data,date)
     
     def add_result_positions_id_cronjobs(self,data,id_cronjobs):
 
-        return self.entity.add_result_positions(data,id_cronjobs,'id_cronjobs')
+        return self.ServicesDeriv.add_result_positions_id_cronjobs(data,id_cronjobs)
 
     def add_result_positions_id_methodology(self,data,id_methodology):
 
-        return self.entity.add_result_positions(data,id_methodology,'id_methodology') 
-
+        return self.ServicesDeriv.add_result_positions_id_methodology(data,id_methodology) 
     
     def get_re_platform(self):
 
@@ -376,7 +369,7 @@ class ServicesCkeckTrends():
     
     def add_result_positions_re_platform(self,data,re_platform):    
 
-        return self.entity.add_result_positions(data,re_platform,'re_entry_platform')
+        return self.ServicesDeriv.add_result_positions_re_platform(data,re_platform)
     
     def get_id_methodology(self):
 
@@ -415,7 +408,7 @@ class ServicesCkeckTrends():
 
     def add_result_positions_data_entrys(self,result,data):
 
-        return self.entity.add_result_positions(result,data,'data_entry')
+        return self.ServicesDeriv.add_result_positions_data_entrys(result,data)
     
     def set_result_indicators(self,result):
 
@@ -520,7 +513,6 @@ class ServicesCkeckTrends():
         result = self.check_candles(result_candles)
 
         self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
-
         
         result = self.check_indicators(result,result_candles)
         
@@ -529,7 +521,6 @@ class ServicesCkeckTrends():
         result = self.check_monetary_filter(result)
 
         self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
-
 
         result = await self.add_entry_broker(result)
 
@@ -545,4 +536,4 @@ class ServicesCkeckTrends():
     
     def get_duration_seconds(self):
 
-        return self.entity.get_duration_seconds()   
+        return self.ServicesDeriv.get_duration_seconds()   

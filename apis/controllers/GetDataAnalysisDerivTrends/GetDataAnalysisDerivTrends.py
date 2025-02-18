@@ -18,7 +18,8 @@ import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndica
 import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
 import apis.services.deriv.ServicesDeriv as ServicesDeriv   
-class ControllerGetDataAnalysisDeriv: 
+
+class ControllerGetDataAnalysisDerivTrends: 
 
     cursor = None
 
@@ -122,7 +123,7 @@ class ControllerGetDataAnalysisDeriv:
 
         self.ServicesCkeckTrends.init_services_telegram(self.ServicesTelegram)
 
-        self.ServicesCheckTrends.init_services_deriv(self.ServicesDeriv)
+        self.ServicesCkeckTrends.init_services_deriv(self.ServicesDeriv)
 
     async def GetDataAnalysisDeriv(self, request):
 
