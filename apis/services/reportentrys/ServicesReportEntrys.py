@@ -12,9 +12,17 @@ class ServicesReportEntrys():
 
     ServicesEntrysResults = None
 
+    ServicesMethodologys = None
+
     def __init__(self):
 
         self.entity = EntityReportEntrys.EntityReportEntrys()
+
+    def init_services_methodologys(self, value):
+
+        self.ServicesMethodologys = value
+
+        return True
 
     def init_services_reportsentrys(self, value):   
 
@@ -95,6 +103,10 @@ class ServicesReportEntrys():
             item = self.check_data_reports(item)
 
         return data
+    
+    def get_methodologys(self):
+
+        return self.ServicesMethodologys.get_methodologys()
 
     def get_daily_report_entrys(self):
 
@@ -105,6 +117,8 @@ class ServicesReportEntrys():
             return result_persistence
         
         data = self.generate_data_reports_daily()
+
+        methodologys = self.get_methodologys()
         
         message = self.generate_message(data)
         
