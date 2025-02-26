@@ -62,7 +62,8 @@ To use the system, follow these steps:
 - Utilize one of the four machine learning models (Logistic Regression, Decision Tree, Random Forest, Neural Network) to make informed trading decisions.
 
 ### Management Reports
-- Schedule the sending of session reports via email.
+- Schedule the sending of session reports via telegram.
+- - Schedule the sending of crons reports via teelgram.
 
 ## License
 This project is licensed under the MIT License.
