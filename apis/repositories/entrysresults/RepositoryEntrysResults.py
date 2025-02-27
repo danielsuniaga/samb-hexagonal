@@ -37,11 +37,11 @@ class RepositoryEntrysResults():
         
         return {'status':True,'msj':'Success'}
     
-    def get_entrys_results_curdate(self):
+    def get_entrys_results_curdate(self,id_methodology):
 
         try:
 
-            query = "SELECT samb_entrys.type_account AS type_account, count(samb_entrys.id) AS total, SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) AS positive_count, SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END) AS negative_count, IFNULL(SUM(samb_entrys_results.result), 0) AS result,(SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) - SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END)) AS quantities FROM samb_entrys_results INNER JOIN samb_entrys ON samb_entrys.id = samb_entrys_results.id_entrys_id WHERE DATE(samb_entrys_results.registration_date) = CURDATE() GROUP BY samb_entrys.type_account;"
+            query = "SELECT samb_entrys.type_account AS type_account, count(samb_entrys.id) AS total, SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) AS positive_count, SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END) AS negative_count, IFNULL(SUM(samb_entrys_results.result), 0) AS result,(SUM(CASE WHEN samb_entrys_results.result > 0 THEN 1 ELSE 0 END) - SUM(CASE WHEN samb_entrys_results.result < 0 THEN 1 ELSE 0 END)) AS quantities FROM samb_entrys_results INNER JOIN samb_entrys ON samb_entrys.id = samb_entrys_results.id_entrys_id WHERE DATE(samb_entrys_results.registration_date) = CURDATE() AND samb_entrys.id_methodology='%s' GROUP BY samb_entrys.type_account;"
 
             self.cursor_db.execute(query)
 

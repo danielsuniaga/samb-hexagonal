@@ -59,9 +59,10 @@ class ServicesEntrysResults():
 
         return self.add_persistence_repository(data_persistence)
     
-    def get_entrys_results_curdate_repository(self):
+    def get_entrys_results_curdate_repository(self,id_methodology):
 
-        return self.repository.get_entrys_results_curdate()
+        return self.repository.get_entrys_results_curdate(id_methodology)
+    
     def init_data_get_entrys_results(self, result, data):
 
         if not result['status']:
@@ -79,9 +80,9 @@ class ServicesEntrysResults():
         
         return data
     
-    def get_data_entrys_results_curdate(self,data):
+    def get_data_entrys_results_curdate(self,data,id_methodology):
 
-        result = self.get_entrys_results_curdate_repository()
+        result = self.get_entrys_results_curdate_repository(id_methodology)
 
         return self.init_data_get_entrys_results(result,data)
     

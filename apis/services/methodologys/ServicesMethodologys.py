@@ -38,6 +38,4 @@ class ServicesMethodologys:
 
         result = self.get_methodologys_repository(data)
 
-        print("result:",self.init_data_result_get_methodologys(result))
-
-        return True
+        return self.init_data_result_get_methodologys(result)

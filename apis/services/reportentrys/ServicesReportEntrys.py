@@ -70,9 +70,9 @@ class ServicesReportEntrys():
 
         return self.ServicesTelegram.send_message_report(mensaje)
     
-    def generate_data_report_cur(self,data):
+    def generate_data_report_cur(self,data,id_methodology):
 
-        return self.ServicesEntrysResults.get_data_entrys_results_curdate(data)
+        return self.ServicesEntrysResults.get_data_entrys_results_curdate(data,id_methodology)
     
     def generate_data_report_tot(self,data):
 
@@ -82,11 +82,11 @@ class ServicesReportEntrys():
 
         return self.ServicesEntrysResults.get_data_entrys_results_nom(data)
     
-    def check_data_reports(self,data):
+    def check_data_reports(self,data,id_methodology):
 
         if data['name'] == 'CUR':
 
-            return self.generate_data_report_cur(data['data'])
+            return self.generate_data_report_cur(data['data'],id_methodology)
 
         if data['name'] == 'TOT':   
 
@@ -94,13 +94,13 @@ class ServicesReportEntrys():
 
         return self.generate_data_report_nom(data['data'])
     
-    def generate_data_reports_daily(self):
+    def generate_data_reports_daily(self,id_methodology):
 
         data = self.entity.get_data_reports()
 
         for item in data:
 
-            item = self.check_data_reports(item)
+            item = self.check_data_reports(item,id_methodology)
 
         return data
     
@@ -116,10 +116,16 @@ class ServicesReportEntrys():
 
             return result_persistence
         
-        data = self.generate_data_reports_daily()
-
         methodologys = self.get_methodologys()
+
+        result = []
         
-        message = self.generate_message(data)
+        for item in methodologys:
+
+            data = self.generate_data_reports_daily(item['id'])
+
+            message = self.generate_message(data)
+
+            result = self.send_message(message)
         
-        return self.send_message(message)
+        return result
