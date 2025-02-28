@@ -86,22 +86,22 @@ class ServicesEntrysResults():
 
         return self.init_data_get_entrys_results(result,data)
     
-    def get_entrys_results_total_repository(self):
+    def get_entrys_results_total_repository(self,id_methodology):
 
-        return self.repository.get_entrys_results_total()
+        return self.repository.get_entrys_results_total(id_methodology)
     
-    def get_data_entrys_results_total(self,data):   
+    def get_data_entrys_results_total(self,data,id_methodology):   
 
-        result = self.get_entrys_results_total_repository()
+        result = self.get_entrys_results_total_repository(id_methodology)
 
         return self.init_data_get_entrys_results(result,data)
     
-    def get_entrys_results_nom_repository(self,day):
+    def get_entrys_results_nom_repository(self,day,id_methodology):
 
-        return self.repository.get_entrys_results_nom(day)
+        return self.repository.get_entrys_results_nom(day,id_methodology)
     
-    def get_data_entrys_results_nom(self,data):
+    def get_data_entrys_results_nom(self,data,id_methodology):
 
-        result = self.get_entrys_results_nom_repository(data['IND'])
+        result = self.get_entrys_results_nom_repository(data['IND'],id_methodology)
 
         return self.init_data_get_entrys_results(result,data)

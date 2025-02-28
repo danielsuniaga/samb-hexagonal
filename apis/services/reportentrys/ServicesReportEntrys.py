@@ -62,9 +62,9 @@ class ServicesReportEntrys():
 
         return self.ServicesReports.add_persistence(type_reports,self.get_current_date_hour())
     
-    def generate_message(self,data):
+    def generate_message(self,data,name_methodology):
 
-        return self.entity.generate_message(data)
+        return self.entity.generate_message(data,name_methodology)
     
     def send_message(self,mensaje):
 
@@ -74,13 +74,13 @@ class ServicesReportEntrys():
 
         return self.ServicesEntrysResults.get_data_entrys_results_curdate(data,id_methodology)
     
-    def generate_data_report_tot(self,data):
+    def generate_data_report_tot(self,data,id_methodology):
 
-        return self.ServicesEntrysResults.get_data_entrys_results_total(data)
+        return self.ServicesEntrysResults.get_data_entrys_results_total(data,id_methodology)
     
-    def generate_data_report_nom(self,data):
+    def generate_data_report_nom(self,data,id_methodology):
 
-        return self.ServicesEntrysResults.get_data_entrys_results_nom(data)
+        return self.ServicesEntrysResults.get_data_entrys_results_nom(data,id_methodology)
     
     def check_data_reports(self,data,id_methodology):
 
@@ -90,9 +90,9 @@ class ServicesReportEntrys():
 
         if data['name'] == 'TOT':   
 
-            return self.generate_data_report_tot(data['data'])
+            return self.generate_data_report_tot(data['data'],id_methodology)
 
-        return self.generate_data_report_nom(data['data'])
+        return self.generate_data_report_nom(data['data'],id_methodology)
     
     def generate_data_reports_daily(self,id_methodology):
 
@@ -101,6 +101,8 @@ class ServicesReportEntrys():
         for item in data:
 
             item = self.check_data_reports(item,id_methodology)
+
+        print("data:",data)
 
         return data
     
@@ -124,7 +126,7 @@ class ServicesReportEntrys():
 
             data = self.generate_data_reports_daily(item['id'])
 
-            message = self.generate_message(data)
+            message = self.generate_message(data,item['descriptions'])
 
             result = self.send_message(message)
         
