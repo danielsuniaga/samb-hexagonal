@@ -18,6 +18,12 @@ class ServicesReportEntrys():
 
         self.entity = EntityReportEntrys.EntityReportEntrys()
 
+    def init_data_reports(self):    
+
+        self.entity.init_data_reports()
+
+        return True
+
     def init_services_methodologys(self, value):
 
         self.ServicesMethodologys = value
@@ -101,9 +107,7 @@ class ServicesReportEntrys():
         for item in data:
 
             item = self.check_data_reports(item,id_methodology)
-
-        print("data:",data)
-
+            
         return data
     
     def get_methodologys(self):
@@ -123,6 +127,8 @@ class ServicesReportEntrys():
         result = []
         
         for item in methodologys:
+
+            self.init_data_reports()
 
             data = self.generate_data_reports_daily(item['id'])
 
