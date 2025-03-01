@@ -12,9 +12,23 @@ class ServicesReportEntrys():
 
     ServicesEntrysResults = None
 
+    ServicesMethodologys = None
+
     def __init__(self):
 
         self.entity = EntityReportEntrys.EntityReportEntrys()
+
+    def init_data_reports(self):    
+
+        self.entity.init_data_reports()
+
+        return True
+
+    def init_services_methodologys(self, value):
+
+        self.ServicesMethodologys = value
+
+        return True
 
     def init_services_reportsentrys(self, value):   
 
@@ -54,47 +68,51 @@ class ServicesReportEntrys():
 
         return self.ServicesReports.add_persistence(type_reports,self.get_current_date_hour())
     
-    def generate_message(self,data):
+    def generate_message(self,data,name_methodology):
 
-        return self.entity.generate_message(data)
+        return self.entity.generate_message(data,name_methodology)
     
     def send_message(self,mensaje):
 
         return self.ServicesTelegram.send_message_report(mensaje)
     
-    def generate_data_report_cur(self,data):
+    def generate_data_report_cur(self,data,id_methodology):
 
-        return self.ServicesEntrysResults.get_data_entrys_results_curdate(data)
+        return self.ServicesEntrysResults.get_data_entrys_results_curdate(data,id_methodology)
     
-    def generate_data_report_tot(self,data):
+    def generate_data_report_tot(self,data,id_methodology):
 
-        return self.ServicesEntrysResults.get_data_entrys_results_total(data)
+        return self.ServicesEntrysResults.get_data_entrys_results_total(data,id_methodology)
     
-    def generate_data_report_nom(self,data):
+    def generate_data_report_nom(self,data,id_methodology):
 
-        return self.ServicesEntrysResults.get_data_entrys_results_nom(data)
+        return self.ServicesEntrysResults.get_data_entrys_results_nom(data,id_methodology)
     
-    def check_data_reports(self,data):
+    def check_data_reports(self,data,id_methodology):
 
         if data['name'] == 'CUR':
 
-            return self.generate_data_report_cur(data['data'])
+            return self.generate_data_report_cur(data['data'],id_methodology)
 
         if data['name'] == 'TOT':   
 
-            return self.generate_data_report_tot(data['data'])
+            return self.generate_data_report_tot(data['data'],id_methodology)
 
-        return self.generate_data_report_nom(data['data'])
+        return self.generate_data_report_nom(data['data'],id_methodology)
     
-    def generate_data_reports_daily(self):
+    def generate_data_reports_daily(self,id_methodology):
 
         data = self.entity.get_data_reports()
 
         for item in data:
 
-            item = self.check_data_reports(item)
-
+            item = self.check_data_reports(item,id_methodology)
+            
         return data
+    
+    def get_methodologys(self):
+
+        return self.ServicesMethodologys.get_methodologys()
 
     def get_daily_report_entrys(self):
 
@@ -104,8 +122,18 @@ class ServicesReportEntrys():
 
             return result_persistence
         
-        data = self.generate_data_reports_daily()
+        methodologys = self.get_methodologys()
+
+        result = []
         
-        message = self.generate_message(data)
+        for item in methodologys:
+
+            self.init_data_reports()
+
+            data = self.generate_data_reports_daily(item['id'])
+
+            message = self.generate_message(data,item['descriptions'])
+
+            result = self.send_message(message)
         
-        return self.send_message(message)
+        return result

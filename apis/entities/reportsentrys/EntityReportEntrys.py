@@ -213,9 +213,9 @@ class EntityReportEntrys():
         
         return self.types_reports['daily']
 
-    def generate_message(self, data):
+    def generate_message(self, data, name_methodology):
 
-        message = self.get_titles_reports_daily()+" \n"
+        message = self.get_titles_reports_daily()+" ("+name_methodology+") \n"
 
         report_lines = self.generate_report_lines(data)
 

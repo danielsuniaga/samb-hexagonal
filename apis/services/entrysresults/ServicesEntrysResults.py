@@ -59,9 +59,10 @@ class ServicesEntrysResults():
 
         return self.add_persistence_repository(data_persistence)
     
-    def get_entrys_results_curdate_repository(self):
+    def get_entrys_results_curdate_repository(self,id_methodology):
 
-        return self.repository.get_entrys_results_curdate()
+        return self.repository.get_entrys_results_curdate(id_methodology)
+    
     def init_data_get_entrys_results(self, result, data):
 
         if not result['status']:
@@ -79,28 +80,28 @@ class ServicesEntrysResults():
         
         return data
     
-    def get_data_entrys_results_curdate(self,data):
+    def get_data_entrys_results_curdate(self,data,id_methodology):
 
-        result = self.get_entrys_results_curdate_repository()
-
-        return self.init_data_get_entrys_results(result,data)
-    
-    def get_entrys_results_total_repository(self):
-
-        return self.repository.get_entrys_results_total()
-    
-    def get_data_entrys_results_total(self,data):   
-
-        result = self.get_entrys_results_total_repository()
+        result = self.get_entrys_results_curdate_repository(id_methodology)
 
         return self.init_data_get_entrys_results(result,data)
     
-    def get_entrys_results_nom_repository(self,day):
+    def get_entrys_results_total_repository(self,id_methodology):
 
-        return self.repository.get_entrys_results_nom(day)
+        return self.repository.get_entrys_results_total(id_methodology)
     
-    def get_data_entrys_results_nom(self,data):
+    def get_data_entrys_results_total(self,data,id_methodology):   
 
-        result = self.get_entrys_results_nom_repository(data['IND'])
+        result = self.get_entrys_results_total_repository(id_methodology)
+
+        return self.init_data_get_entrys_results(result,data)
+    
+    def get_entrys_results_nom_repository(self,day,id_methodology):
+
+        return self.repository.get_entrys_results_nom(day,id_methodology)
+    
+    def get_data_entrys_results_nom(self,data,id_methodology):
+
+        result = self.get_entrys_results_nom_repository(data['IND'],id_methodology)
 
         return self.init_data_get_entrys_results(result,data)
