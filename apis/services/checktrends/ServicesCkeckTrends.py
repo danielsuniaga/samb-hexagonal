@@ -116,7 +116,9 @@ class ServicesCkeckTrends():
     
     def get_type_manager_days(self,day):
 
-        return self.ServicesManagerDays.get_type_manager_days(day)
+        id_methodology = self.get_id_methodology()
+
+        return self.ServicesManagerDays.get_type_manager_days(day,id_methodology)
 
     async def init(self):
 
