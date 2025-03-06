@@ -116,7 +116,9 @@ class ServicesCkeckTrends():
     
     def get_type_manager_days(self,day):
 
-        return self.ServicesManagerDays.get_type_manager_days(day)
+        id_methodology = self.get_id_methodology()
+
+        return self.ServicesManagerDays.get_type_manager_days(day,id_methodology)
 
     async def init(self):
 
@@ -488,9 +490,15 @@ class ServicesCkeckTrends():
 
         return date+" Result: "+str(result)+" "
     
+    def get_name_methodology(self):
+
+        return self.ServicesMethodologyTrends.get_name()
+    
     def generate_message_add_entry(self):
+
+        name_methodology = self.get_name_methodology()
         
-        return self.ServicesTelegram.generate_message_add_entry()
+        return self.ServicesTelegram.generate_message_add_entry(name_methodology)
     
     def send_report_management(self,result):
 

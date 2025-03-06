@@ -92,6 +92,6 @@ class EntityTelegram():
         
         return {'status': True, 'message':'Success'}
     
-    def generate_message_add_entry(self):
+    def generate_message_add_entry(self,name_methodology):
         
-        return self.get_project_name()+': Registry Entry Success'
+        return self.get_project_name()+': Registry Entry Success ('+name_methodology+')'

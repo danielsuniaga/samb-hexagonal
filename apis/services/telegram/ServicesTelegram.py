@@ -49,9 +49,9 @@ class ServicesTelegram():
 
         return self.entity.send(mensaje)
     
-    def generate_message_add_entry(self):
+    def generate_message_add_entry(self,name_methodology):
 
-        return self.entity.generate_message_add_entry()
+        return self.entity.generate_message_add_entry(name_methodology)
 
     def send_message(self,mensaje,date):
 

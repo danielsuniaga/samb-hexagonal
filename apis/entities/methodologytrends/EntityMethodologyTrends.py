@@ -20,7 +20,7 @@ class EntityMethodologyTrends():
 
     indicators = None
 
-    id = None
+    config = None
 
     def __init__(self):
 
@@ -36,17 +36,24 @@ class EntityMethodologyTrends():
 
         self.init_entrys_results()
 
-        self.init_id()
+        self.init_config()
 
-    def init_id(self):
+    def init_config(self):
 
-        self.id = config("ID_METHODOLOGY_TRENDS")
+        self.config = {
+            'name':config("NAME_METHODOLOGY_TRENDS"),
+            'id':config("ID_METHODOLOGY_TRENDS")
+        }
 
         return True
-    
+
+    def get_name(self):
+
+        return self.config['name']
+
     def get_id(self):
 
-        return self.id  
+        return self.config['id']  
 
     def init_entrys_results(self):
 
