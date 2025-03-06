@@ -20,7 +20,7 @@ class EntityMethodologyTrends():
 
     indicators = None
 
-    id = None
+    config = None
 
     def __init__(self):
 
@@ -36,17 +36,24 @@ class EntityMethodologyTrends():
 
         self.init_entrys_results()
 
-        self.init_id()
+        self.init_config()
 
-    def init_id(self):
+    def init_config(self):
 
-        self.id = config("ID_METHODOLOGY_TRENDS")
+        self.config = {
+            'name':config("NAME_METHODOLOGY_TRENDS"),
+            'id':config("ID_METHODOLOGY_TRENDS")
+        }
 
         return True
-    
+
+    def get_name(self):
+
+        return self.config['name']
+
     def get_id(self):
 
-        return self.id  
+        return self.config['id']  
 
     def init_entrys_results(self):
 
@@ -193,7 +200,7 @@ class EntityMethodologyTrends():
 
         candles_trends_close = self.get_candles_close(candles_trends)
 
-        candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
+        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
 
         result = self.check_candles_trends(candles_trends_close)
 
