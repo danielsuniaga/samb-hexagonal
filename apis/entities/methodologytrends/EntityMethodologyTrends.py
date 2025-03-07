@@ -200,7 +200,7 @@ class EntityMethodologyTrends():
 
         candles_trends_close = self.get_candles_close(candles_trends)
 
-        candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
+        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
 
         result = self.check_candles_trends(candles_trends_close)
 
