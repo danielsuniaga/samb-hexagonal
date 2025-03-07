@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, DatabaseError
 
 class RepositoryMethodologys():
 
@@ -22,8 +22,8 @@ class RepositoryMethodologys():
 
             result_with_columns = [dict(zip(column_names, row)) for row in result]
             
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status': False, 'msj': "Incidencia en la lectura de las samb_metododolgys: " + str(err)}
+            return {'status': False, 'msj': "Incidencia en la lectura de las samb_metododolgys: "}
                 
         return {'status': True, 'data': result_with_columns, 'msj': 'Success'}

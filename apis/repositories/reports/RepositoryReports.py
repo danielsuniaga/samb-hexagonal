@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, DatabaseError
 
 class RepositoryReports():
 
@@ -14,8 +14,8 @@ class RepositoryReports():
 
             self.cursor_db.execute("INSERT INTO samb_reports(samb_reports.id,samb_reports.description,samb_reports.registration_date,samb_reports.update_date,samb_reports.state)VALUES(%s,%s,%s,%s,%s)",[data['id'], data['description'], data['fecha'], data['fecha'], data['condition']])
 
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status': False, 'msj':'No se realizo la escritura en samb_reports'+str(err)}
+            return {'status': False, 'msj':'No se realizo la escritura en samb_reports'}
 
         return {'status':True,'msj':'Success'}
