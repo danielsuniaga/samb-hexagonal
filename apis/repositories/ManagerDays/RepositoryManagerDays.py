@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, DatabaseError
 
 class RepositoryManagerDays():
 
@@ -23,7 +23,8 @@ class RepositoryManagerDays():
 
             result_with_columns = [dict(zip(column_names, row)) for row in result]
             
-        except Exception as err:
-            return {'status':False,'msj':"Incidencia en la lectura de las samb_manager_days leidas  "+str(err)}
+        except DatabaseError:
+
+            return {'status':False,'msj':"Incidencia en la lectura de las samb_manager_days leidas"}
                 
         return {'status':True,'data':result_with_columns[0],'msj':'Success'}

@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection,DatabaseError
 
 class RepositoryCronjobs():
 
@@ -14,9 +14,9 @@ class RepositoryCronjobs():
 
             self.cursor_db.execute("INSERT INTO samb_cronjobs(samb_cronjobs.id,samb_cronjobs.start_date,samb_cronjobs.end_date,samb_cronjobs.condition,samb_cronjobs.id_samb_api_id,samb_cronjobs.id_samb_financial_asset_id,samb_cronjobs.execution_time)VALUES(%s,%s,%s,%s,%s,%s,%s)",[data['id'], data['date'], data['date'], data['condition'],data['id_api'],data['id_financial_asset'],data['default_execute']])
 
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status': False, 'msj':'No se realizo la escritura en samb_cronjobs'+str(err)}
+            return {'status': False, 'msj':'No se realizo la escritura en samb_cronjobs'}
 
         return {'status':True,'msj':'Success'}
     
@@ -26,9 +26,9 @@ class RepositoryCronjobs():
 
             self.cursor_db.execute("UPDATE samb_cronjobs SET samb_cronjobs.condition=%s,samb_cronjobs.end_date=%s,samb_cronjobs.execution_time=%s WHERE samb_cronjobs.id=%s",[data['success_condition'],data['end_date'],data['execute_time'],data['id_cronjobs']])
 
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status': False, 'message':'No se realizo la sobreescritura en samb_cronjobs'+str(err)}
+            return {'status': False, 'message':'No se realizo la sobreescritura en samb_cronjobs'}
 
         return {'status':True,'msj':'Success'}
     
@@ -47,6 +47,6 @@ class RepositoryCronjobs():
 
             return {'status':True,'message':'Success','result':result[0]}
             
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status':False,'message':"Incidencia en la lectura de las samb_entrys_results leidas  "+str(err)}
+            return {'status':False,'message':"Incidencia en la lectura de las samb_entrys_results leidas  "}

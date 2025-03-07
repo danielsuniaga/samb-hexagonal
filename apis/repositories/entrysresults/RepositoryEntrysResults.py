@@ -1,5 +1,5 @@
 from queue import Full
-from django.db import connection
+from django.db import connection,DatabaseError
 
 class RepositoryEntrysResults():
 
@@ -19,9 +19,9 @@ class RepositoryEntrysResults():
 
             result = self.cursor_db.fetchone() 
             
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status':False,'msj':"Incidencia en la lectura de las samb_entrys_results leidas  "+str(err)}
+            return {'status':False,'msj':"Incidencia en la lectura de las samb_entrys_results leidas"}
         
         return {'status':True,'data':result[0],'msj':'Success'}
     
@@ -31,9 +31,9 @@ class RepositoryEntrysResults():
 
             self.cursor_db.execute("INSERT INTO samb_entrys_results(samb_entrys_results.id,samb_entrys_results.result,samb_entrys_results.registration_date,samb_entrys_results.update_date,samb_entrys_results.condition,samb_entrys_results.id_entrys_id)VALUES(%s,%s,%s,%s,%s,%s)",[data['id_entry_result'],data['result_entry'],data['current_date'],data['current_date'],data['condition'],data['id_entry']])
 
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status': False, 'message':'No se realizo la escritura en samb_entrys_results '+str(err)}
+            return {'status': False, 'message':'No se realizo la escritura en samb_entrys_results '}
         
         return {'status':True,'msj':'Success'}
     
@@ -53,9 +53,9 @@ class RepositoryEntrysResults():
 
             return {'status':True,'message':'Success','result':result}
             
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status':False,'message':err,'result':'data not found'}
+            return {'status':False,'message':'No se realizo la lectura de samb_entrys_results','result':'data not found'}
         
     def get_entrys_results_total(self,id_methodology):
 
@@ -73,9 +73,9 @@ class RepositoryEntrysResults():
 
             return {'status':True,'message':'Success','result':result}
             
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status':False,'message':err,'result':'data not found'}
+            return {'status':False,'message':'No se realizo la lectura en samb_entrys_results','result':'data not found'}
         
     def get_entrys_results_nom(self,day,id_methodology):
 
@@ -93,6 +93,6 @@ class RepositoryEntrysResults():
 
             return {'status':True,'message':'Success','result':result}
             
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status':False,'message':err,'result':'data not found'}
+            return {'status':False,'message':'No se realizo la lectura en samb_entrys_results','result':'data not found'}

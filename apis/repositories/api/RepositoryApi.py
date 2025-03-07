@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection,DatabaseError
 
 class RepositoryApi():
 
@@ -14,9 +14,9 @@ class RepositoryApi():
 
             self.count=self.cursor_db.execute("SELECT samb_apis.id AS id FROM samb_apis WHERE samb_apis.description=%s AND samb_apis.condition=%s LIMIT 1",[data['api_description'],data['condition']])
 
-        except Exception as err:
+        except DatabaseError: 
 
-            return {'status':False,'msj':"Incidencia en la lectura de la API "+str(err)}
+            return {'status':False,'msj':"Incidencia en la lectura de la API "}
         
         return {'status':True,'msj':'Success'} if self.count>0 else {'status':False,'msj': "API Desactivada"}
 
@@ -26,8 +26,8 @@ class RepositoryApi():
 
             self.count=self.cursor_db.execute("SELECT samb_config.id AS id FROM samb_config WHERE samb_config.key=%s AND samb_config.value=%s AND samb_config.condition=%s LIMIT 1",[key,value,condition])
 
-        except Exception as err:
+        except DatabaseError: 
 
-            return {'status':False,'msj':"Incidencia en la lectura de key de la API "+str(err)}
+            return {'status':False,'msj':"Incidencia en la lectura de key de la API "}
         
         return {'status':True,'msj':'Success'} if self.count>0 else {'status':False,'msj': "Origen corrupto"}

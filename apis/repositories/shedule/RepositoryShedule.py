@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, DatabaseError
 
 class RepositoryShedule():
 
@@ -14,8 +14,8 @@ class RepositoryShedule():
 
             self.count=self.cursor_db.execute("SELECT samb_shedule.id AS id FROM samb_shedule WHERE samb_shedule.start_date<=%s AND samb_shedule.end_date>=%s AND samb_shedule.description=%s AND samb_shedule.CONDITION=%s LIMIT 1",[int(data['hour']),int(data['hour']),data['shedule_permission'],data['condition']])
 
-        except Exception as err:
+        except DatabaseError:
 
-            return {'status':False,'message':"Incidencia en la lectura de Shedule "+str(err)}
+            return {'status':False,'message':"Incidencia en la lectura de Shedule"}
         
         return {'status':True,'message':'Success'} if self.count>0 else {'status':False,'message': "Horario no contemplado"}

@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection,DatabaseError
 class RepositoryFramework: 
 
     cursor_db = None
@@ -12,8 +12,8 @@ class RepositoryFramework:
 
             self.cursor_db.execute("INSERT INTO samb_framework(samb_framework.id,samb_framework.description,samb_framework.registration_date,samb_framework.condition)values(%s,%s,%s,%s)",[data['id_framework'],data['description'],data['fecha'],data['condition']])
 
-        except Exception as err:
+        except DatabaseError: 
 
-            return {'status': False, 'message':'No se realizo la escritura en samb_framework: '+str(err)}
+            return {'status': False, 'message':'No se realizo la escritura en samb_framework'}
 
         return {'status':True,'message':'Success'}
