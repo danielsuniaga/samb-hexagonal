@@ -17,17 +17,17 @@ class ServicesEntrysResults():
 
         return self.entity.get_condition()
 
-    def get_sums_entrys_date_repository(self,date): 
+    def get_sums_entrys_date_repository(self,date,id_methodology): 
 
-        return self.repository.get_sums_entrys_date(date)
+        return self.repository.get_sums_entrys_date(date,id_methodology)
     
     def init_data_get_sums_entrys_date(self,result):
 
         return float(result['data'])
 
-    def get_sums_entrys_date(self,date):
+    def get_sums_entrys_date(self,date,id_methodology):
 
-        result = self.get_sums_entrys_date_repository(date)
+        result = self.get_sums_entrys_date_repository(date,id_methodology)
 
         return self.init_data_get_sums_entrys_date(result)
     
