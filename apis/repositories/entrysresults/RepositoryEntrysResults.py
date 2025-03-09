@@ -9,13 +9,13 @@ class RepositoryEntrysResults():
         
         self.cursor_db = connection.cursor()
 
-    def get_sums_entrys_date(self,date):
+    def get_sums_entrys_date(self,date,id_methodology):
 
         try:
 
-            query = "SELECT IFNULL(SUM(samb_entrys_results.result), 0) as result FROM samb_entrys_results WHERE date_format(samb_entrys_results.registration_date, %s) = %s"
+            query = "SELECT IFNULL(SUM(samb_entrys_results.result), 0) AS result FROM samb_entrys_results INNER JOIN samb_entrys ON samb_entrys.id=samb_entrys_results.id_entrys_id WHERE DATE_FORMAT(samb_entrys_results.registration_date, %s) = %s AND samb_entrys.id_methodology=%s"
 
-            self.cursor_db.execute(query, ('%Y%m%d', date))
+            self.cursor_db.execute(query, ('%Y%m%d', date, id_methodology))
 
             result = self.cursor_db.fetchone() 
             

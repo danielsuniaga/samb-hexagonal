@@ -247,7 +247,9 @@ class ServicesCkeckTrends():
     
     def sum_entrys_dates(self):
 
-        return self.ServicesEntrysResults.get_sums_entrys_date(self.get_current_date_only())
+        id_methodology = self.get_id_methodology()
+
+        return self.ServicesEntrysResults.get_sums_entrys_date(self.get_current_date_only(),id_methodology)
     
     def get_profit(self):
 
