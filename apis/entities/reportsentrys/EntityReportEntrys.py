@@ -20,6 +20,7 @@ class EntityReportEntrys():
 
         self.titles_reports = {
             "daily": "DAILY REPORTS (" + config("PROJECT_NAME") + ")",
+            "daily_complete_complement": config("REPORT_DAILY_COMPLETE_COMPLEMENT")
         }
 
         return True
@@ -27,6 +28,10 @@ class EntityReportEntrys():
     def get_titles_reports_daily(self):
 
         return self.titles_reports['daily']
+    
+    def get_titles_reports_daily_complete_complement(self):
+            
+        return self.titles_reports['daily_complete_complement']
 
     def init_data_reports(self):
 
