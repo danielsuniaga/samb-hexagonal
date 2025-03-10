@@ -80,13 +80,25 @@ class ServicesReportEntrys():
 
         return self.ServicesEntrysResults.get_data_entrys_results_curdate(data,id_methodology)
     
+    def generate_data_report_cur_complete(self,data):
+
+        return self.ServicesEntrysResults.get_data_entrys_results_curdate_complete(data)
+    
     def generate_data_report_tot(self,data,id_methodology):
 
         return self.ServicesEntrysResults.get_data_entrys_results_total(data,id_methodology)
     
+    def generate_data_report_tot_complete(self,data):
+
+        return self.ServicesEntrysResults.get_data_entrys_results_total_complete(data)
+    
     def generate_data_report_nom(self,data,id_methodology):
 
         return self.ServicesEntrysResults.get_data_entrys_results_nom(data,id_methodology)
+    
+    def generate_data_report_nom_complete(self,data):
+
+        return self.ServicesEntrysResults.get_data_entrys_results_nom_complete(data)
     
     def check_data_reports(self,data,id_methodology):
 
@@ -99,6 +111,18 @@ class ServicesReportEntrys():
             return self.generate_data_report_tot(data['data'],id_methodology)
 
         return self.generate_data_report_nom(data['data'],id_methodology)
+    
+    def check_data_reports_complete(self,data):
+
+        if data['name'] == 'CUR':
+
+            return self.generate_data_report_cur_complete(data['data'])
+
+        if data['name'] == 'TOT':   
+
+            return self.generate_data_report_tot_complete(data['data'])
+
+        return self.generate_data_report_nom_complete(data['data'])
     
     def generate_data_reports_daily(self,id_methodology):
 
@@ -113,6 +137,32 @@ class ServicesReportEntrys():
     def get_methodologys(self):
 
         return self.ServicesMethodologys.get_methodologys()
+    
+    def generate_data_reports_daily_complete(self):
+
+        data = self.entity.get_data_reports()
+
+        for item in data:
+
+            item = self.check_data_reports_complete(item)
+            
+        return data
+    
+    def get_titles_reports_daily_complete_complement(self):
+
+        return self.entity.get_titles_reports_daily_complete_complement()
+    
+    def get_daily_report_entrys_complete(self):
+
+        self.init_data_reports()
+
+        data = self.generate_data_reports_daily_complete()
+
+        message = self.generate_message(data,self.get_titles_reports_daily_complete_complement())
+
+        result = self.send_message(message)
+
+        return True
 
     def get_daily_report_entrys(self):
 
@@ -135,5 +185,7 @@ class ServicesReportEntrys():
             message = self.generate_message(data,item['descriptions'])
 
             result = self.send_message(message)
+
+        self.get_daily_report_entrys_complete()
         
         return result

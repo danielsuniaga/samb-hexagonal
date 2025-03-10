@@ -63,6 +63,10 @@ class ServicesEntrysResults():
 
         return self.repository.get_entrys_results_curdate(id_methodology)
     
+    def get_entrys_results_curdate_repository_complete(self):
+
+        return self.repository.get_entrys_results_curdate_complete()
+    
     def init_data_get_entrys_results(self, result, data):
 
         if not result['status']:
@@ -86,9 +90,19 @@ class ServicesEntrysResults():
 
         return self.init_data_get_entrys_results(result,data)
     
+    def get_data_entrys_results_curdate_complete(self,data):
+
+        result = self.get_entrys_results_curdate_repository_complete()
+
+        return self.init_data_get_entrys_results(result,data)   
+    
     def get_entrys_results_total_repository(self,id_methodology):
 
         return self.repository.get_entrys_results_total(id_methodology)
+    
+    def get_entrys_results_total_repository_complete(self):
+
+        return self.repository.get_entrys_results_total_complete()   
     
     def get_data_entrys_results_total(self,data,id_methodology):   
 
@@ -96,12 +110,28 @@ class ServicesEntrysResults():
 
         return self.init_data_get_entrys_results(result,data)
     
+    def get_data_entrys_results_total_complete(self,data):   
+
+        result = self.get_entrys_results_total_repository_complete()
+
+        return self.init_data_get_entrys_results(result,data)    
+    
     def get_entrys_results_nom_repository(self,day,id_methodology):
 
         return self.repository.get_entrys_results_nom(day,id_methodology)
     
+    def get_entrys_results_nom_repository_complete(self,day):
+
+        return self.repository.get_entrys_results_nom_complete(day)
+    
     def get_data_entrys_results_nom(self,data,id_methodology):
 
         result = self.get_entrys_results_nom_repository(data['IND'],id_methodology)
+
+        return self.init_data_get_entrys_results(result,data)
+    
+    def get_data_entrys_results_nom_complete(self,data):
+
+        result = self.get_entrys_results_nom_repository_complete(data['IND'])
 
         return self.init_data_get_entrys_results(result,data)
