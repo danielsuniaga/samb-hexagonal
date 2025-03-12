@@ -9,8 +9,11 @@ import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
 import apis.controllers.GetDailyReportEntrys.GetDailyReportEntrys as ControllerGetDailyReportEntrys
 import apis.controllers.AddModels.AddModels as ControllerAddModels
 import apis.controllers.GetDailyReportCrons.GetDailyReportCrons as ControllerGetDailyReportCrons
+import apis.controllers.GetDataAnalysisDerivWMA.GetDataAnalysisDerivWMA as ControllerGetDataAnalysisDerivWMA    
 
 class GetDataAnalysisDeriv(APIView):
+
+    controller = None
 
     def __init__(self):
 
@@ -25,6 +28,26 @@ class GetDataAnalysisDeriv(APIView):
     async def async_post(self, request):
 
         result = await self.controller.GetDataAnalysisDeriv(request)
+
+        return result
+    
+class GetDataAnalysisDerivWMA(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDataAnalysisDerivWMA.ControllerGetDataAnalysisDerivWMA()
+
+    def post(self, request, format=None):
+
+        response_data = async_to_sync(self.async_post)(request)
+
+        return Response(response_data)
+        
+    async def async_post(self, request):
+
+        result = await self.controller.GetDataAnalysisDerivWMA(request)
 
         return result
 
