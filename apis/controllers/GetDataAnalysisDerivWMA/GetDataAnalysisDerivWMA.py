@@ -8,6 +8,7 @@ import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.checkwma.ServicesCheckWMA as ServicesCheckWMA
 import apis.services.methodologywma.ServicesMethodologyWMA as ServicesMethodologyWMA
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
+import apis.services.indicators.ServicesIndicators as ServicesIndicators
 
 class ControllerGetDataAnalysisDerivWMA:
 
@@ -30,6 +31,8 @@ class ControllerGetDataAnalysisDerivWMA:
     ServicesMethodologyWMA = None
 
     ServicesManagerDays = None
+
+    ServicesIndicators = None
 
     def __init__(self):
 
@@ -59,6 +62,8 @@ class ControllerGetDataAnalysisDerivWMA:
 
         self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
 
+        self.ServicesIndicators = ServicesIndicators.ServicesIndicators()
+
         return True 
     
     def initialize_services_internal(self):
@@ -68,6 +73,8 @@ class ControllerGetDataAnalysisDerivWMA:
         self.ServicesCheckWMA.init_services_methodology_wma(self.ServicesMethodologyWMA)
 
         self.ServicesCheckWMA.init_services_manager_days(self.ServicesManagerDays)
+
+        self.ServicesCheckWMA.init_services_indicators(self.ServicesIndicators)
 
         return True
 
@@ -92,7 +99,7 @@ class ControllerGetDataAnalysisDerivWMA:
         servicios_a_verificar = [
             lambda: self.ServicesShedule.get_shedule_result(hour),
             lambda: self.ServicesApi.get_api_result(),
-            lambda: self.ServicesCronjobs.add(id_cronjobs, date)
+            lambda: self.ServicesCronjobs.add_wma(id_cronjobs, date)
         ]
 
         for servicio in servicios_a_verificar:

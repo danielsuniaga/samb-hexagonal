@@ -201,7 +201,7 @@ class ControllerGetDataAnalysisDerivTrends:
         servicios_a_verificar = [
             lambda: self.ServicesShedule.get_shedule_result(hour),
             lambda: self.ServicesApi.get_api_result(),
-            lambda: self.ServicesCronjobs.add(id_cronjobs, date)
+            lambda: self.ServicesCronjobs.add_trends(id_cronjobs, date)
         ]
 
         for servicio in servicios_a_verificar:

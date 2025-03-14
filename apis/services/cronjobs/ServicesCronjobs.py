@@ -38,9 +38,13 @@ class ServicesCronjobs():
 
         return self.entity.get_condition()
     
-    def get_id_api(self):
+    def get_id_api_trends(self):
 
-        return self.entity.get_id_api()
+        return self.entity.get_id_api_trends()
+    
+    def get_id_api_wma(self):
+
+        return self.entity.get_id_api_wma()
     
     def get_id_financial_asset(self):
 
@@ -50,20 +54,36 @@ class ServicesCronjobs():
 
         return self.entity.get_default_execute()
     
-    def init_add_repository(self,id_cronjobs,date):
+    def init_add_trends_repository(self,id_cronjobs,date):
 
         return {
             'id':id_cronjobs,
             'date':date,
             'condition':self.get_condition(),
-            'id_api':self.get_id_api(),
+            'id_api':self.get_id_api_trends(),
             'id_financial_asset':self.get_id_financial_asset(),
             'default_execute':self.get_default_execute()
         }
     
-    def add(self,id_cronjobs,date):
+    def init_add_wma_repository(self,id_cronjobs,date):
 
-        data = self.init_add_repository(id_cronjobs,date)
+        return {
+            'id':id_cronjobs,
+            'date':date,
+            'condition':self.get_condition(),
+            'id_api':self.get_id_api_wma(),
+            'id_financial_asset':self.get_id_financial_asset(),
+            'default_execute':self.get_default_execute()
+        }
+    def add_trends(self,id_cronjobs,date):
+
+        data = self.init_add_trends_repository(id_cronjobs,date)
+
+        return self.add_repository(data)
+    
+    def add_wma(self,id_cronjobs,date):
+
+        data = self.init_add_wma_repository(id_cronjobs,date)
 
         return self.add_repository(data)
     
