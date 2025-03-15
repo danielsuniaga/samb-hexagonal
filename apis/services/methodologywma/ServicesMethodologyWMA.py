@@ -27,3 +27,23 @@ class ServicesMethodologyWMA:
     def check_candles(self):
         
         return self.entity.check_candles()
+    
+    def check_rsi(self,rsi):
+            
+        return self.entity.check_rsi(rsi)
+    
+    def check_sma(self,sma,last_candle):
+
+        return self.entity.check_sma(sma,last_candle)
+    
+    def check_result_indicators(self,result_indicators):
+        
+        return self.entity.check_result_indicators(result_indicators)
+    
+    def check_monetary_filters(self,monetary_filter):
+        
+        return self.entity.check_monetary_filters(monetary_filter)
+    
+    def get_type_entry_positions(self):
+
+        return self.entity.get_type_entry_positions()

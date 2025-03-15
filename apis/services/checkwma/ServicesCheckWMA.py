@@ -12,6 +12,14 @@ class ServicesCheckWMA:
 
     ServicesIndicators = None
 
+    ServicesEntrysResults = None
+
+    def init_services_entrys_results(self,value):
+
+        self.ServicesEntrysResults = value
+
+        return  
+
     def init_services_indicators(self,value):
 
         self.ServicesIndicators = value
@@ -132,7 +140,7 @@ class ServicesCheckWMA:
 
         return {
             'rsi':self.get_rsi(candles),
-            'sma_short':self.get_sma_short(candles),
+            'sma_short':self.get_sma_long(candles),
             'sma_long':self.get_sma_long(candles),
             'last_candle':self.get_candle_last(candles),
         }
@@ -165,17 +173,25 @@ class ServicesCheckWMA:
 
         return self.ServicesMethodologyWMA.get_indicators()
     
-    # def check_rsi(self,rsi):
+    def check_rsi(self,rsi):
 
-    #     return self.ServicesMethodologyWMA.check_rsi(rsi)
+        return self.ServicesMethodologyWMA.check_rsi(rsi)
     
-    # def init_result_indicators(self,indicators):
+    def check_sma(self,sma,last_candle):
 
-    #     return {
-    #         'rsi':self.check_rsi(indicators['rsi']),
-    #         'sma_short':self.check_sma(indicators['sma_short'],indicators['last_candle']),
-    #         'sma_long':self.check_sma(indicators['sma_long'],indicators['last_candle']),
-    #     }
+        return self.ServicesMethodologyWMA.check_sma(sma,last_candle)
+    
+    def init_result_indicators(self,indicators):
+
+        return {
+            'rsi':self.check_rsi(indicators['rsi']),
+            'sma_short':self.check_sma(indicators['sma_short'],indicators['last_candle']),
+            'sma_long':self.check_sma(indicators['sma_long'],indicators['last_candle']),
+        }
+    
+    def check_result_indicators(self,result_indicators):
+            
+        return self.ServicesMethodologyWMA.check_result_indicators(result_indicators)
     
     def check_indicators(self,result):
 
@@ -185,9 +201,95 @@ class ServicesCheckWMA:
         
         data_indicators = self.get_indicators_methodology()
 
-        # result_indicators = self.init_result_indicators(data_indicators)
+        result_indicators = self.init_result_indicators(data_indicators)
+        
+        return self.check_result_indicators(result_indicators)
+    
+    def get_current_date_only(self):
 
-        print("data_indicators",data_indicators)
+        return self.ServicesDates.get_current_date_only()
+    
+    def sum_entrys_dates(self):
+
+        id_methodology = self.get_id_methodology()
+
+        return self.ServicesEntrysResults.get_sums_entrys_date(self.get_current_date_only(),id_methodology)
+    
+    def get_profit(self):
+
+        return self.ServicesManagerDays.get_profit()
+    
+    def get_loss(self): 
+
+        return self.ServicesManagerDays.get_loss()
+    
+    def init_data_monetary_filter(self):
+
+        return {
+            'sum_entrys_dates':self.sum_entrys_dates(),
+            'profit':self.get_profit(),
+            'loss':self.get_loss(),
+        }
+    
+    def check_monetary_filter_services(self,result):
+
+        return self.ServicesMethodologyWMA.check_monetary_filters(result)
+       
+    def check_monetary_filter(self,result):
+
+        if not result:
+
+            return False
+    
+        data = self.init_data_monetary_filter()
+
+        return self.check_monetary_filter_services(data)
+    
+    def get_money(self):
+
+        return self.ServicesManagerDays.get_money()
+    
+    def get_type_entry(self):
+
+        return self.ServicesMethodologyWMA.get_type_entry_positions()
+    
+    def get_duration(self):
+        
+        return self.ServicesDeriv.get_duration()
+    
+    def get_duration_unit(self):    
+
+        return self.ServicesDeriv.get_duration_unit()
+    
+    def get_par(self):
+
+        return self.ServicesDeriv.get_par()
+    
+    def init_data_add_entry(self):
+
+        return {
+            'amount':int(self.get_money()),
+            'contract_type':self.get_type_entry(),
+            'duration':int(self.get_duration()),
+            'duration_unit':self.get_duration_unit(),
+            'symbol':self.get_par()
+        }
+    
+    async def add_entry_broker(self,result):
+
+        if not result:
+
+            return False
+        
+        data = self.init_data_add_entry()
+
+        return await self.ServicesDeriv.add_entry(self.init_data_add_entry())
+    
+    def add_entry_persistence(self,result,candles):
+
+        if not result:
+
+            return False
         
         return True
     
@@ -208,16 +310,18 @@ class ServicesCheckWMA:
         self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
         
         result = self.check_indicators(result)
-        
-        print("result",result)
 
-        # self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('generate_indicators',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
-        # result = await self.add_entry_broker(result)
+        result = self.check_monetary_filter(result)
 
-        # self.set_events_field('add_positions_brokers',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
-        # result = self.add_entry_persistence(result,result_candles)
+        result = await self.add_entry_broker(result)
+
+        self.set_events_field('add_positions_brokers',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+
+        result = self.add_entry_persistence(result,result_candles)
 
         # self.set_events_field('add_persistence',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 

@@ -1,5 +1,6 @@
 from decouple import config
 
+from decimal import Decimal
 class EntityMethodologyWMA:
 
     config = None
@@ -14,6 +15,10 @@ class EntityMethodologyWMA:
 
     type_entry = None
 
+    metrics_rsi = None
+
+    metrics_sma = None
+
     def __init__(self):
 
         self.init_config()
@@ -22,6 +27,52 @@ class EntityMethodologyWMA:
 
         self.init_type_entry()
 
+        self.init_metrics_rsi()
+
+        self.init_metrics_sma()
+
+    def init_metrics_sma(self):
+
+        self.metrics_sma = {
+            'active':int(config("ACTIVE_SMA"))
+        }
+
+        return True
+    
+    def get_metrics_sma(self,key):
+            
+        return self.metrics_sma[key]
+    
+    def get_metrics_sma_active(self):
+
+        return self.get_metrics_sma('active')
+
+    def init_metrics_rsi(self):
+
+        self.metrics_rsi = {
+            'min':int(config("RSI_MIN")),
+            'max':int(config("RSI_MAX")),
+            'active':int(config("ACTIVE_RSI"))
+        }
+
+        return True
+    
+    def get_metrics_rsi(self,key):
+
+        return self.metrics_rsi[key]
+    
+    def get_metrics_rsi_min(self):
+
+        return self.get_metrics_rsi('min')
+    
+    def get_metrics_rsi_max(self):
+
+        return self.get_metrics_rsi('max')
+    
+    def get_metrics_rsi_active(self):
+            
+        return self.get_metrics_rsi('active')
+
     def get_type_entry_short(self):
 
         return self.type_entry['short']
@@ -29,7 +80,10 @@ class EntityMethodologyWMA:
     def get_type_entry_long(self):
 
         return self.type_entry['long']
+    
+    def get_type_entry_positions(self):
 
+        return self.type_entry_positions    
 
     def set_indicators(self,indicators):
 
@@ -104,10 +158,10 @@ class EntityMethodologyWMA:
         data = {
             'open_price': 1.0,
             'close_price': 3.0,
-            'sma_long': 2.0
+            'sma_short': 2.0
         }
 
-        if data['open_price'] <= data['sma_long'] <= data['close_price']:
+        if data['open_price'] <= data['sma_short'] <= data['close_price']:
 
             # long
 
@@ -115,7 +169,7 @@ class EntityMethodologyWMA:
 
             return self.get_type_entry_long()
         
-        if data['close_price'] <= data['sma_long'] <= data['open_price']:
+        if data['close_price'] <= data['sma_short'] <= data['open_price']:
 
             # SHORT
 
@@ -139,7 +193,7 @@ class EntityMethodologyWMA:
 
             data['close_price'] = candle['close']
 
-            data['sma_long'] = indicators['sma_long']
+            data['sma_short'] = indicators['sma_short']
 
             result = self.check_candles_wma(data)
 
@@ -148,3 +202,63 @@ class EntityMethodologyWMA:
                 break
 
         return True
+    
+    def check_rsi(self,rsi):
+
+        if not(self.metrics_rsi['active']):
+
+            return True
+
+        if((self.metrics_rsi['min']<Decimal(rsi)) and (Decimal(rsi)<self.metrics_rsi['max'])):
+
+            return True
+
+        return False
+    
+    def check_sma_long(self,sma,last_candle):   
+
+        if(sma<last_candle):
+
+            return True
+        
+        return False
+    
+    def check_sma_short(self,sma,last_candle):
+
+        if(sma>last_candle):
+
+            return True
+        
+        return False
+    
+    def check_sma(self,sma,last_candle):
+
+        if not(self.metrics_sma['active']):
+
+            return True
+        
+        if(self.type_entry_positions == self.get_type_entry_long()):
+
+            return self.check_sma_long(sma,last_candle)
+        
+        if(self.type_entry_positions == self.get_type_entry_short()):
+            
+            return self.check_sma_short(sma,last_candle)
+
+        return False
+    
+    def check_result_indicators(self,result_indicators):
+
+        if result_indicators['rsi'] and result_indicators['sma_short'] and result_indicators['sma_long']:
+
+            return True
+        
+        return False
+    
+    def check_monetary_filters(self,monetary_filter):
+
+        if monetary_filter['profit'] > monetary_filter['sum_entrys_dates'] and monetary_filter['loss'] < monetary_filter['sum_entrys_dates']:
+
+            return True
+        
+        return False

@@ -9,6 +9,7 @@ import apis.services.checkwma.ServicesCheckWMA as ServicesCheckWMA
 import apis.services.methodologywma.ServicesMethodologyWMA as ServicesMethodologyWMA
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 import apis.services.indicators.ServicesIndicators as ServicesIndicators
+import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
 
 class ControllerGetDataAnalysisDerivWMA:
 
@@ -33,6 +34,8 @@ class ControllerGetDataAnalysisDerivWMA:
     ServicesManagerDays = None
 
     ServicesIndicators = None
+
+    ServicesEntrysResults = None
 
     def __init__(self):
 
@@ -64,6 +67,8 @@ class ControllerGetDataAnalysisDerivWMA:
 
         self.ServicesIndicators = ServicesIndicators.ServicesIndicators()
 
+        self.ServicesEntrysResults = ServicesEntrysResults.ServicesEntrysResults()
+
         return True 
     
     def initialize_services_internal(self):
@@ -75,6 +80,8 @@ class ControllerGetDataAnalysisDerivWMA:
         self.ServicesCheckWMA.init_services_manager_days(self.ServicesManagerDays)
 
         self.ServicesCheckWMA.init_services_indicators(self.ServicesIndicators)
+
+        self.ServicesCheckWMA.init_services_entrys_results(self.ServicesEntrysResults)  
 
         return True
 

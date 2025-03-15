@@ -82,7 +82,6 @@ class EntityMethodologyTrends():
         
         return self.condition_entry
 
-
     def set_result_entrys_result(self,result_entrys):
         
         self.result_entrys['result'] = result_entrys
