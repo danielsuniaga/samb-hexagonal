@@ -47,3 +47,11 @@ class ServicesMethodologyWMA:
     def get_type_entry_positions(self):
 
         return self.entity.get_type_entry_positions()
+    
+    def get_candle_removed(self):
+
+        return self.entity.get_candle_removed()
+    
+    def get_condition_entry(self):
+        
+        return self.entity.get_condition_entry()

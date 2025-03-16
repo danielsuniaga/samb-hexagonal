@@ -19,6 +19,8 @@ class EntityMethodologyWMA:
 
     metrics_sma = None
 
+    condition_entry = None
+
     def __init__(self):
 
         self.init_config()
@@ -30,6 +32,12 @@ class EntityMethodologyWMA:
         self.init_metrics_rsi()
 
         self.init_metrics_sma()
+
+        self.init_condition_entry()
+
+    def init_condition_entry(self):
+
+        self.condition_entry = config("CONDITION_ENTRY")
 
     def init_metrics_sma(self):
 
@@ -119,6 +127,14 @@ class EntityMethodologyWMA:
         }
 
         return True
+    
+    def get_condition_entry(self):
+        
+        return self.condition_entry
+    
+    def get_canlde_removed(self):
+            
+        return self.candle_removed
     
     def get_id(self):
 

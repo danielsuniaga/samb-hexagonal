@@ -14,6 +14,14 @@ class ServicesCheckWMA:
 
     ServicesEntrysResults = None
 
+    ServicesMovements = None
+
+    def init_services_movements(self,value):
+
+        self.ServicesMovements = value
+
+        return True
+
     def init_services_entrys_results(self,value):
 
         self.ServicesEntrysResults = value
@@ -185,7 +193,7 @@ class ServicesCheckWMA:
 
         return {
             'rsi':self.check_rsi(indicators['rsi']),
-            'sma_short':self.check_sma(indicators['sma_short'],indicators['last_candle']),
+            'sma_short':self.check_sma(indicators['sma_long'],indicators['last_candle']),
             'sma_long':self.check_sma(indicators['sma_long'],indicators['last_candle']),
         }
     
@@ -285,11 +293,64 @@ class ServicesCheckWMA:
 
         return await self.ServicesDeriv.add_entry(self.init_data_add_entry())
     
+    def set_candles_movements(self,candles):
+        
+        return self.ServicesMovements.set_candles(candles)
+    
+    def add_result_positions_mode(self,data,mode):
+
+        return self.ServicesDeriv.add_result_positions_mode(data,mode)
+    
+    def get_mode(self):
+
+        return self.ServicesManagerDays.get_mode()
+    
+    def add_result_positions_candle_analisys(self,data,candle):
+
+        return self.ServicesDeriv.add_result_positions_candle_analisys(data,candle)
+    
+    def get_candle_removed(self):
+
+        return self.ServicesMethodologyWMA.get_candle_removed()
+    
+    def add_result_positions_condition_entry(self,data,condition):
+        
+        return self.ServicesDeriv.add_result_positions_condition_entry(data,condition)
+    
+    def get_condition_entry(self):
+
+        return self.ServicesMethodologyWMA.get_condition_entry()
+    
+    def init_set_result_positions(self,result):
+
+        return [
+            (self.add_result_positions_mode, self.get_mode()),
+            (self.add_result_positions_candle_analisys, self.get_candle_removed()),
+            (self.add_result_positions_condition_entry, self.get_condition_entry()),
+            (self.add_result_positions_amount, self.get_money()),
+            (self.add_result_positions_current_date, self.get_current_date_hour()),
+            (self.add_result_positions_id_cronjobs, self.get_id_cronjobs()),
+            (self.add_result_positions_re_platform, self.get_re_platform()),
+            (self.add_result_positions_id_methodology, self.get_id_methodology()),
+        ]
+    
+    def set_result_positions(self,result):
+
+        result_positions_methods = self.init_set_result_positions(result)
+
+        for method, value in result_positions_methods:
+
+            result = method(result, value)
+
+        return result
+    
     def add_entry_persistence(self,result,candles):
 
         if not result:
 
             return False
+        
+        self.set_candles_movements(candles)
         
         return True
     
