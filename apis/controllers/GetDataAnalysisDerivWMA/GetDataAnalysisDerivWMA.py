@@ -14,6 +14,7 @@ import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.platform.ServicesPlatform as ServicesPlatform
 import apis.services.entrys.ServicesEntrys as ServicesEntrys
 import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
+import apis.services.telegram.ServicesTelegram as ServicesTelegram
 
 class ControllerGetDataAnalysisDerivWMA:
 
@@ -48,6 +49,8 @@ class ControllerGetDataAnalysisDerivWMA:
     ServicesEntrys = None
 
     ServicesIndicatorsEntrys = None
+
+    ServicesTelegram = None
 
     def __init__(self):
 
@@ -89,6 +92,8 @@ class ControllerGetDataAnalysisDerivWMA:
 
         self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys()
 
+        self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
+
         return True 
     
     def initialize_services_internal(self):
@@ -114,6 +119,8 @@ class ControllerGetDataAnalysisDerivWMA:
         self.ServicesCheckWMA.init_services_entrys(self.ServicesEntrys)
 
         self.ServicesCheckWMA.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
+
+        self.ServicesCheckWMA.init_services_telegram(self.ServicesTelegram)
 
         return True
 

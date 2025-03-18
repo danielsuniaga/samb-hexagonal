@@ -67,3 +67,7 @@ class ServicesMethodologyWMA:
     def get_result_entrys_result(self):
 
         return self.entity.get_result_entrys_result()
+    
+    def get_name(self):
+
+        return self.entity.get_name()

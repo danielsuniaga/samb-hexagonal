@@ -24,6 +24,14 @@ class ServicesCheckWMA:
 
     ServicesIndicatorsEntrys = None
 
+    ServicesTelegram = None
+
+    def init_services_telegram(self,value):
+
+        self.ServicesTelegram = value
+
+        return True
+
     def init_services_indicators_entrys(self,value):
 
         self.ServicesIndicatorsEntrys = value
@@ -498,6 +506,26 @@ class ServicesCheckWMA:
         
         return self.add_indicators_entrys_persistence()
     
+    def get_name_methodology(self):
+
+        return self.ServicesMethodologyWMA.get_name()
+    
+    def generate_message_add_entry(self):
+
+        name_methodology = self.get_name_methodology()
+        
+        return self.ServicesTelegram.generate_message_add_entry(name_methodology)
+    
+    def send_report_management(self,result):
+
+        if not result:
+
+            return False
+        
+        mensaje = self.generate_message_add_entry()
+
+        return self.ServicesTelegram.send_message(mensaje,self.get_current_date_hour())
+    
     async def loops(self):
 
         self.set_events_field('init_loop',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
@@ -528,9 +556,9 @@ class ServicesCheckWMA:
 
         result = self.add_entry_persistence(result,result_candles)
 
-        # self.set_events_field('add_persistence',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('add_persistence',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
-        # self.send_report_management(result)
+        self.send_report_management(result)
 
         return True
     

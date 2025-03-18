@@ -165,6 +165,10 @@ class EntityMethodologyWMA:
 
         return self.config['id'] 
     
+    def get_name(self):
+
+        return self.config['name']
+    
     def get_candles_wma(self,candles):
 
         if len(candles) < self.candle_removed:
@@ -196,13 +200,13 @@ class EntityMethodologyWMA:
     
     def check_candles_wma(self,data):
 
-        data = {
-            'open_price': 1.0,
-            'close_price': 3.0,
-            'sma_short': 2.0
-        }
+        # data = {
+        #     'open_price': 1.0,
+        #     'close_price': 3.0,
+        #     'sma_short': 2.0
+        # }
 
-        if data['open_price'] <= data['sma_short'] <= data['close_price']:
+        if Decimal(data['open_price']) <= Decimal(data['sma_short']) <= Decimal(data['close_price']):
 
             # long
 
@@ -210,7 +214,7 @@ class EntityMethodologyWMA:
 
             return self.get_type_entry_long()
         
-        if data['close_price'] <= data['sma_short'] <= data['open_price']:
+        if Decimal(data['close_price']) <= Decimal(data['sma_short']) <= Decimal(data['open_price']):
 
             # SHORT
 
