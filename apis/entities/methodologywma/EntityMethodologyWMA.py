@@ -21,6 +21,8 @@ class EntityMethodologyWMA:
 
     condition_entry = None
 
+    result_entrys = None
+
     def __init__(self):
 
         self.init_config()
@@ -34,6 +36,29 @@ class EntityMethodologyWMA:
         self.init_metrics_sma()
 
         self.init_condition_entry()
+
+        self.init_entrys_results()
+
+    def init_entrys_results(self):
+
+        self.result_entrys = {
+            'result':None,
+            'candles':None
+        }
+
+        return True 
+    
+    def set_result_entrys_result(self,result_entrys):
+        
+        self.result_entrys['result'] = result_entrys
+
+        return True
+    
+    def set_result_entrys_candles(self,result_candles):
+        
+        self.result_entrys['candles'] = result_candles
+
+        return True
 
     def init_condition_entry(self):
 
@@ -132,7 +157,7 @@ class EntityMethodologyWMA:
         
         return self.condition_entry
     
-    def get_canlde_removed(self):
+    def get_candle_removed(self):
             
         return self.candle_removed
     
@@ -278,3 +303,7 @@ class EntityMethodologyWMA:
             return True
         
         return False
+    
+    def get_result_entrys_result(self):
+
+        return self.result_entrys['result']

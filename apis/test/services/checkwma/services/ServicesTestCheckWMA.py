@@ -12,6 +12,10 @@ class ServicesTestCheckWMA():
 
         return self.entity.get_entrys_true()
     
+    def get_data_entry_false(self):
+
+        return self.entity.get_entrys_false()
+    
     def get_data_indicators(self):
 
         return self.entity.get_indicators()

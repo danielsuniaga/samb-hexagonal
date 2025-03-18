@@ -16,6 +16,38 @@ class ServicesCheckWMA:
 
     ServicesMovements = None
 
+    ServicesCronjobs = None
+
+    ServicesPlatform = None
+
+    ServicesEntrys = None
+
+    ServicesIndicatorsEntrys = None
+
+    def init_services_indicators_entrys(self,value):
+
+        self.ServicesIndicatorsEntrys = value
+
+        return True
+
+    def init_services_entrys(self,value):
+
+        self.ServicesEntrys = value
+
+        return True
+
+    def init_services_cronjobs(self,value):
+
+        self.ServicesCronjobs = value
+
+        return True
+
+    def init_services_platform(self,value):
+
+        self.ServicesPlatform = value
+
+        return True
+
     def init_services_movements(self,value):
 
         self.ServicesMovements = value
@@ -157,7 +189,7 @@ class ServicesCheckWMA:
 
         return self.ServicesMethodologyWMA.set_indicators(indicators)
     
-    def get_indicators(self,result,candles):
+    def get_indicators_services(self,result,candles):
 
         if not result:
 
@@ -321,6 +353,38 @@ class ServicesCheckWMA:
 
         return self.ServicesMethodologyWMA.get_condition_entry()
     
+    def add_result_positions_amount(self,data,amount):
+
+        return self.ServicesDeriv.add_result_positions_amount(data,amount)
+    
+    def add_result_positions_current_date(self,data,date):
+
+        return self.ServicesDeriv.add_result_positions_current_date(data,date)
+    
+    def get_current_date_hour(self):
+
+        return self.ServicesDates.get_current_date_hour()
+    
+    def add_result_positions_id_cronjobs(self,data,id_cronjobs):
+
+        return self.ServicesDeriv.add_result_positions_id_cronjobs(data,id_cronjobs)
+    
+    def get_id_cronjobs(self):
+
+        return self.ServicesCronjobs.get_id_cronjobs()
+    
+    def add_result_positions_re_platform(self,data,re_platform):    
+
+        return self.ServicesDeriv.add_result_positions_re_platform(data,re_platform)
+    
+    def get_re_platform(self):
+
+        return self.ServicesPlatform.get_re_platform_deriv()
+    
+    def add_result_positions_id_methodology(self,data,id_methodology):
+
+        return self.ServicesDeriv.add_result_positions_id_methodology(data,id_methodology) 
+    
     def init_set_result_positions(self,result):
 
         return [
@@ -344,6 +408,74 @@ class ServicesCheckWMA:
 
         return result
     
+    def set_result_positions_entity(self,result):
+
+        return self.ServicesMethodologyWMA.set_result_entrys(result)
+    
+    def set_candles_positions(self,candles):
+
+        return self.ServicesMethodologyWMA.set_result_candles(candles)
+    
+    def add_entrys(self,result):
+
+        return self.ServicesEntrys.add_entrys(result)
+    
+    def add_result_positions_data_entrys(self,result,data):
+
+        return self.ServicesDeriv.add_result_positions_data_entrys(result,data)
+    
+    def get_data_entrys(self):
+        
+        return self.ServicesEntrys.get_data_entity()
+    
+    def set_result_indicators(self,result):
+
+        result = self.add_result_positions_current_date(result,self.get_current_date_hour())
+
+        result = self.add_result_positions_data_entrys(result,self.get_data_entrys())
+
+        return result
+    
+    def get_result_entrys_result(self):
+
+        return self.ServicesMethodologyWMA.get_result_entrys_result()
+    
+    def add_entrys_results_persistence(self):
+
+        data = self.get_result_entrys_result()
+
+        data_indicators = self.set_result_indicators(self.get_indicators_methodology())
+
+        result = self.ServicesEntrysResults.add_persistence(data,data_indicators)
+
+        if not result['status']:
+
+            return False
+
+        return True
+    
+    def add_movements_persistence(self,data):
+
+        result = self.ServicesMovements.add_persistence(data)
+
+        if not result['status']:
+
+            return False
+        
+        return self.add_entrys_results_persistence()
+    
+    def add_indicators_entrys_persistence(self):
+
+        data = self.set_result_indicators(self.get_indicators_methodology())
+
+        result = self.ServicesIndicatorsEntrys.add_persistence(data)
+
+        if not result['status']:
+
+            return False
+        
+        return self.add_movements_persistence(data)
+    
     def add_entry_persistence(self,result,candles):
 
         if not result:
@@ -351,8 +483,20 @@ class ServicesCheckWMA:
             return False
         
         self.set_candles_movements(candles)
+
+        result = self.set_result_positions(result)
+
+        self.set_result_positions_entity(result)
+
+        self.set_candles_positions(candles)
+
+        result = self.add_entrys(result)
+
+        if not result['status']:
+            
+            return False
         
-        return True
+        return self.add_indicators_entrys_persistence()
     
     async def loops(self):
 
@@ -362,7 +506,7 @@ class ServicesCheckWMA:
 
         result = self.generate_candles(result_candles)
 
-        result = self.get_indicators(result,result_candles)
+        result = self.get_indicators_services(result,result_candles)
 
         self.set_events_field('get_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
 

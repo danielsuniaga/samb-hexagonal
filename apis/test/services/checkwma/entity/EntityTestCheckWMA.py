@@ -202,3 +202,8 @@ class EntityTestCheckWMA:
     def get_candles(self):
 
         return self.candles
+    
+    def get_entrys_false(self):
+
+        return self.entrys['false']
+    

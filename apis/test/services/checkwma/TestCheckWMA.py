@@ -5,6 +5,12 @@ import apis.services.methodologywma.ServicesMethodologyWMA as ServicesMethodolog
 import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
+import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
+import apis.services.platform.ServicesPlatform as ServicesPlatform
+import apis.services.dates.ServicesDates as ServicesDates
+import apis.services.entrys.ServicesEntrys as ServicesEntrys
+import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
+import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
 
 import apis.test.services.checkwma.services.ServicesTestCheckWMA as ServicesTestCheckWMA    
 
@@ -24,11 +30,27 @@ class TestCheckWMA(unittest.IsolatedAsyncioTestCase):
 
     ServicesManagerDays = None
 
+    ServicesCronjobs = None
+
+    ServicesPlatform = None
+
+    ServicesDates = None
+
+    ServicesEntrys = None
+
+    ServicesIndicatorsEntrys = None
+
+    ServicesEntrysResults = None
+
     def setUp(self):
 
         self.init_services()
 
         self.init_services_intenal()
+
+        self.ServicesCronjobs.set_id_cronjobs("000497e5e7cc401fb6022257c7b7ca80")
+
+        self.ServicesManagerDays.set_money(2)
 
     def init_services(self):
 
@@ -43,6 +65,20 @@ class TestCheckWMA(unittest.IsolatedAsyncioTestCase):
         self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
 
         self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
+
+        self.ServicesCronjobs = ServicesCronjobs.ServicesCronjobs()
+
+        self.ServicesPlatform = ServicesPlatform.ServicesPlatform()
+
+        self.ServicesDates = ServicesDates.ServicesDate()
+
+        self.ServicesEntrys = ServicesEntrys.ServicesEntrys()
+
+        self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys()
+
+        self.ServicesEntrysResults = ServicesEntrysResults.ServicesEntrysResults()
+
+        return True
     
     def init_services_intenal(self):
 
@@ -54,9 +90,27 @@ class TestCheckWMA(unittest.IsolatedAsyncioTestCase):
 
         self.ServicesCheckWMA.init_services_manager_days(self.ServicesManagerDays)
 
+        self.ServicesCheckWMA.init_services_cronjobs(self.ServicesCronjobs)
+
+        self.ServicesCheckWMA.init_services_platform(self.ServicesPlatform)
+
+        self.ServicesCheckWMA.init_services_dates(self.ServicesDates)
+
+        self.ServicesCheckWMA.init_services_entrys(self.ServicesEntrys) 
+
+        self.ServicesCheckWMA.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)  
+
+        self.ServicesCheckWMA.init_services_entrys_results(self.ServicesEntrysResults)  
+
+        return True
+
     def get_data_entrys_true(self):
 
         return self.ServicesTestCheckWMA.get_data_entry_true()
+    
+    def get_data_entrys_false(self):
+
+        return self.ServicesTestCheckWMA.get_data_entry_false()
     
     def get_data_indicators(self):
 
@@ -83,6 +137,22 @@ class TestCheckWMA(unittest.IsolatedAsyncioTestCase):
         result = self.ServicesCheckWMA.add_entry_persistence(data,data_candles)
 
         print(result)
+
+        return True
+    
+    def add_entry_persistence_false(self):
+
+        data = self.get_data_entrys_false()
+
+        data_indicators =  self.get_data_indicators()
+
+        self.set_indicators_methodology(data_indicators)
+
+        data_candles = self.get_data_candles()
+
+        result = self.ServicesCheckWMA.add_entry_persistence(data,data_candles)
+
+        print("services:", result)
 
         return True
 
