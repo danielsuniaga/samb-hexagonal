@@ -70,13 +70,24 @@ class EntityCronjobs():
     
     def init_id_api(self):
 
-        self.id_api = config("ID_API")
+        self.id_api = {
+            'trends':config("ID_API"),
+            'wma':config("ID_API_WMA")
+        }
 
         return True
     
-    def get_id_api(self):
+    def get_id_api_trends(self):
 
-        return self.id_api
+        return self.get_id_api_key('trends')
+    
+    def get_id_api_wma(self):
+
+        return self.get_id_api_key('wma')   
+    
+    def get_id_api_key(self,key):
+
+        return self.id_api[key]
 
     def init_condition(self):
 

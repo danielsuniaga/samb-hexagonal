@@ -1,52 +1,52 @@
-class ServicesCkeckTrends():
-    
+class ServicesCheckWMA:
+
+    ServicesDeriv = None
+
+    ServicesMethodologyWMA = None
+
     ServicesManagerDays = None
 
     ServicesEvents = None
 
     ServicesDates = None
 
-    ServicesMethodologyTrends = None
-
     ServicesIndicators = None
 
     ServicesEntrysResults = None
 
-    ServicesEntrys = None
+    ServicesMovements = None
 
     ServicesCronjobs = None
 
     ServicesPlatform = None
 
-    ServicesIndicatorsEntrys = None 
+    ServicesEntrys = None
 
-    ServicesMovements = None
+    ServicesIndicatorsEntrys = None
 
     ServicesTelegram = None
 
-    ServicesDeriv = None
-
-    def init_services_deriv(self,value):
-
-        self.ServicesDeriv = value
-
-        return True
-    
     def init_services_telegram(self,value):
 
         self.ServicesTelegram = value
 
         return True
 
-    def init_services_movements(self,value):
-
-        self.ServicesMovements = value
-
-        return True 
-
     def init_services_indicators_entrys(self,value):
 
         self.ServicesIndicatorsEntrys = value
+
+        return True
+
+    def init_services_entrys(self,value):
+
+        self.ServicesEntrys = value
+
+        return True
+
+    def init_services_cronjobs(self,value):
+
+        self.ServicesCronjobs = value
 
         return True
 
@@ -56,43 +56,27 @@ class ServicesCkeckTrends():
 
         return True
 
-    def init_services_cronjobs(self,value):
-        
-        self.ServicesCronjobs = value
+    def init_services_movements(self,value):
+
+        self.ServicesMovements = value
 
         return True
-    
-    def get_id_cronjobs(self):
 
-        return self.ServicesCronjobs.get_id_cronjobs()
-
-    def init_services_entrys(self,value):
-
-        self.ServicesEntrys = value
-
-        return True
-    
     def init_services_entrys_results(self,value):
 
         self.ServicesEntrysResults = value
 
-        return True
-    
+        return  
+
     def init_services_indicators(self,value):
 
         self.ServicesIndicators = value
 
         return True
 
-    def init_services_methodology_trends(self,value):
-
-        self.ServicesMethodologyTrends = value
-
-        return True
-
     def init_services_dates(self,value):
 
-        self.ServicesDates = value
+        self.ServicesDates = value  
 
         return True
 
@@ -102,29 +86,37 @@ class ServicesCkeckTrends():
 
         return True
 
-    def init_services_manager_days(self, value):
+    def init_services_manager_days(self,value):
 
         self.ServicesManagerDays = value
 
         return True
-    
-    def get_current_date_hour(self):
 
-        return self.ServicesDates.get_current_date_hour()
+    def init_services_methodology_wma(self,value):
+
+        self.ServicesMethodologyWMA = value
+
+        return True
+
+    def init_services_deriv(self,value):
+
+        self.ServicesDeriv = value
+
+        return True
+    
+    def get_id_methodology(self):
+
+        return self.ServicesMethodologyWMA.get_id()
+    
+    async def init(self):
+
+        return await self.ServicesDeriv.init()
     
     def get_type_manager_days(self,day):
 
         id_methodology = self.get_id_methodology()
 
         return self.ServicesManagerDays.get_type_manager_days(day,id_methodology)
-
-    async def init(self):
-
-        return await self.ServicesDeriv.init()
-    
-    async def closed(self):
-
-        return await self.ServicesDeriv.closed()
     
     def check_mode(self,day):
 
@@ -144,41 +136,33 @@ class ServicesCkeckTrends():
 
         return True
     
-    def get_par(self):
-
-        return self.ServicesDeriv.get_par()
-    
-    def set_events_field(self,field,value):
-
-        return self.ServicesEvents.set_events_field(field,value)
-
     def get_current_date_mil_dynamic(self):
 
         return self.ServicesDates.get_current_date_mil_dynamic()
     
-    def get_current_date_only(self):
+    def init_data_set_events_field_result(self,date,result=0):
 
-        return self.ServicesDates.get_current_date_only()
+        return date+" Result: "+str(result)+" "
     
-    def get_events(self):
+    def set_events_field(self,field,value):
 
-        return self.ServicesEvents.get_events()
+        return self.ServicesEvents.set_events_field(field,value)
+    
+    async def closed(self):
+
+        return await self.ServicesDeriv.closed()
     
     async def get_candles(self):
 
         return await self.ServicesDeriv.get_candles()
     
-    def check_candles(self,candles):
+    def generate_candles(self,candles):
 
-        return self.ServicesMethodologyTrends.check_candles(candles)
+        return self.ServicesMethodologyWMA.generate_candles(candles)
     
     def get_rsi(self,candles):
 
         return self.ServicesIndicators.generate_rsi(candles)
-    
-    def check_rsi(self,rsi):
-
-        return self.ServicesMethodologyTrends.check_rsi(rsi)
     
     def get_sma_short_services(self):
 
@@ -190,58 +174,88 @@ class ServicesCkeckTrends():
 
         return self.ServicesIndicators.generate_sma(candles,indicators)
     
-    def check_sma(self,sma,last_candle):
-
-        return self.ServicesMethodologyTrends.check_sma(sma,last_candle)
-    
-    def get_candle_last(self,candle):
-
-        return self.ServicesIndicators.get_candles_last(candle)
-    
     def get_sma_long(self,candles):
 
         indicators = self.ServicesIndicators.get_sma_long()
 
         return self.ServicesIndicators.generate_sma(candles,indicators)
     
+    def get_candle_last(self,candle):
+
+        return self.ServicesIndicators.get_candles_last(candle)
+    
     def init_data_indicators(self,candles):
 
         return {
             'rsi':self.get_rsi(candles),
-            'sma_short':self.get_sma_short(candles),
+            'sma_short':self.get_sma_long(candles),
             'sma_long':self.get_sma_long(candles),
             'last_candle':self.get_candle_last(candles),
         }
     
-    def init_result_indicators(self,indicators):
+    def set_indicators_methodology(self,indicators):
 
-        return {
-            'rsi':self.check_rsi(indicators['rsi']),
-            'sma_short':self.check_sma(indicators['sma_short'],indicators['last_candle']),
-            'sma_long':self.check_sma(indicators['sma_long'],indicators['last_candle']),
-        }
+        return self.ServicesMethodologyWMA.set_indicators(indicators)
     
-    def check_result_indicators(self,result_indicators):
-
-        return self.ServicesMethodologyTrends.check_result_indicators(result_indicators)
-    
-    def add_result_indicators(self,result_indicators):
-
-        return self.ServicesMethodologyTrends.add_indicator(result_indicators)
-    
-    def check_indicators(self,result,candles):
+    def get_indicators_services(self,result,candles):
 
         if not result:
 
             return False
         
         data_indicators = self.init_data_indicators(candles)
+        
+        self.set_indicators_methodology(data_indicators)
+
+        return True
+    
+    def check_candles(self,result):
+
+        if not result:
+
+            return False
+        
+        return self.ServicesMethodologyWMA.check_candles()
+    
+    def get_indicators_methodology(self):
+
+        return self.ServicesMethodologyWMA.get_indicators()
+    
+    def check_rsi(self,rsi):
+
+        return self.ServicesMethodologyWMA.check_rsi(rsi)
+    
+    def check_sma(self,sma,last_candle):
+
+        return self.ServicesMethodologyWMA.check_sma(sma,last_candle)
+    
+    def init_result_indicators(self,indicators):
+
+        return {
+            'rsi':self.check_rsi(indicators['rsi']),
+            'sma_short':self.check_sma(indicators['sma_long'],indicators['last_candle']),
+            'sma_long':self.check_sma(indicators['sma_long'],indicators['last_candle']),
+        }
+    
+    def check_result_indicators(self,result_indicators):
+            
+        return self.ServicesMethodologyWMA.check_result_indicators(result_indicators)
+    
+    def check_indicators(self,result):
+
+        if not result:
+
+            return False
+        
+        data_indicators = self.get_indicators_methodology()
 
         result_indicators = self.init_result_indicators(data_indicators)
-
-        self.add_result_indicators(data_indicators)
         
         return self.check_result_indicators(result_indicators)
+    
+    def get_current_date_only(self):
+
+        return self.ServicesDates.get_current_date_only()
     
     def sum_entrys_dates(self):
 
@@ -267,14 +281,14 @@ class ServicesCkeckTrends():
     
     def check_monetary_filter_services(self,result):
 
-        return self.ServicesMethodologyTrends.check_monetary_filters(result)
-        
+        return self.ServicesMethodologyWMA.check_monetary_filters(result)
+       
     def check_monetary_filter(self,result):
 
         if not result:
 
             return False
-        
+    
         data = self.init_data_monetary_filter()
 
         return self.check_monetary_filter_services(data)
@@ -285,7 +299,7 @@ class ServicesCkeckTrends():
     
     def get_type_entry(self):
 
-        return self.ServicesMethodologyTrends.get_type_entry_positions()
+        return self.ServicesMethodologyWMA.get_type_entry_positions()
     
     def get_duration(self):
         
@@ -294,6 +308,10 @@ class ServicesCkeckTrends():
     def get_duration_unit(self):    
 
         return self.ServicesDeriv.get_duration_unit()
+    
+    def get_par(self):
+
+        return self.ServicesDeriv.get_par()
     
     def init_data_add_entry(self):
 
@@ -310,20 +328,14 @@ class ServicesCkeckTrends():
         if not result:
 
             return False
+        
+        data = self.init_data_add_entry()
 
         return await self.ServicesDeriv.add_entry(self.init_data_add_entry())
-
-    def set_result_positions_entity(self,result):
-
-        return self.ServicesMethodologyTrends.set_result_entrys(result)
     
-    def set_candles_positions(self,candles):
-
-        return self.ServicesMethodologyTrends.set_result_candles(candles)
-    
-    def add_entrys(self,result):
-
-        return self.ServicesEntrys.add_entrys(result)
+    def set_candles_movements(self,candles):
+        
+        return self.ServicesMovements.set_candles(candles)
     
     def add_result_positions_mode(self,data,mode):
 
@@ -333,21 +345,21 @@ class ServicesCkeckTrends():
 
         return self.ServicesManagerDays.get_mode()
     
-    def get_candle_removed(self):
-
-        return self.ServicesMethodologyTrends.get_candle_removed()
-    
     def add_result_positions_candle_analisys(self,data,candle):
 
         return self.ServicesDeriv.add_result_positions_candle_analisys(data,candle)
     
-    def get_condition_entry(self):
+    def get_candle_removed(self):
 
-        return self.ServicesMethodologyTrends.get_condition_entry()
+        return self.ServicesMethodologyWMA.get_candle_removed()
     
     def add_result_positions_condition_entry(self,data,condition):
         
         return self.ServicesDeriv.add_result_positions_condition_entry(data,condition)
+    
+    def get_condition_entry(self):
+
+        return self.ServicesMethodologyWMA.get_condition_entry()
     
     def add_result_positions_amount(self,data,amount):
 
@@ -357,25 +369,29 @@ class ServicesCkeckTrends():
 
         return self.ServicesDeriv.add_result_positions_current_date(data,date)
     
+    def get_current_date_hour(self):
+
+        return self.ServicesDates.get_current_date_hour()
+    
     def add_result_positions_id_cronjobs(self,data,id_cronjobs):
 
         return self.ServicesDeriv.add_result_positions_id_cronjobs(data,id_cronjobs)
-
-    def add_result_positions_id_methodology(self,data,id_methodology):
-
-        return self.ServicesDeriv.add_result_positions_id_methodology(data,id_methodology) 
     
-    def get_re_platform(self):
+    def get_id_cronjobs(self):
 
-        return self.ServicesPlatform.get_re_platform_deriv()
+        return self.ServicesCronjobs.get_id_cronjobs()
     
     def add_result_positions_re_platform(self,data,re_platform):    
 
         return self.ServicesDeriv.add_result_positions_re_platform(data,re_platform)
     
-    def get_id_methodology(self):
+    def get_re_platform(self):
 
-        return self.ServicesMethodologyTrends.get_id()
+        return self.ServicesPlatform.get_re_platform_deriv()
+    
+    def add_result_positions_id_methodology(self,data,id_methodology):
+
+        return self.ServicesDeriv.add_result_positions_id_methodology(data,id_methodology) 
     
     def init_set_result_positions(self,result):
 
@@ -400,17 +416,25 @@ class ServicesCkeckTrends():
 
         return result
     
-    def get_indicators(self):
+    def set_result_positions_entity(self,result):
 
-        return self.ServicesMethodologyTrends.get_indicators()
+        return self.ServicesMethodologyWMA.set_result_entrys(result)
+    
+    def set_candles_positions(self,candles):
+
+        return self.ServicesMethodologyWMA.set_result_candles(candles)
+    
+    def add_entrys(self,result):
+
+        return self.ServicesEntrys.add_entrys(result)
+    
+    def add_result_positions_data_entrys(self,result,data):
+
+        return self.ServicesDeriv.add_result_positions_data_entrys(result,data)
     
     def get_data_entrys(self):
         
         return self.ServicesEntrys.get_data_entity()
-
-    def add_result_positions_data_entrys(self,result,data):
-
-        return self.ServicesDeriv.add_result_positions_data_entrys(result,data)
     
     def set_result_indicators(self,result):
 
@@ -422,13 +446,13 @@ class ServicesCkeckTrends():
     
     def get_result_entrys_result(self):
 
-        return self.ServicesMethodologyTrends.get_result_entrys_result()
+        return self.ServicesMethodologyWMA.get_result_entrys_result()
     
     def add_entrys_results_persistence(self):
 
         data = self.get_result_entrys_result()
 
-        data_indicators = self.set_result_indicators(self.get_indicators())
+        data_indicators = self.set_result_indicators(self.get_indicators_methodology())
 
         result = self.ServicesEntrysResults.add_persistence(data,data_indicators)
 
@@ -445,24 +469,20 @@ class ServicesCkeckTrends():
         if not result['status']:
 
             return False
-
+        
         return self.add_entrys_results_persistence()
     
     def add_indicators_entrys_persistence(self):
 
-        data = self.set_result_indicators(self.get_indicators())
+        data = self.set_result_indicators(self.get_indicators_methodology())
 
         result = self.ServicesIndicatorsEntrys.add_persistence(data)
 
         if not result['status']:
 
             return False
-
-        return self.add_movements_persistence(data)
-    
-    def set_candles_movements(self,candles):
         
-        return self.ServicesMovements.set_candles(candles)
+        return self.add_movements_persistence(data)
     
     def add_entry_persistence(self,result,candles):
 
@@ -471,9 +491,9 @@ class ServicesCkeckTrends():
             return False
         
         self.set_candles_movements(candles)
-        
+
         result = self.set_result_positions(result)
-        
+
         self.set_result_positions_entity(result)
 
         self.set_candles_positions(candles)
@@ -486,13 +506,9 @@ class ServicesCkeckTrends():
         
         return self.add_indicators_entrys_persistence()
     
-    def init_data_set_events_field_result(self,date,result=0):
-
-        return date+" Result: "+str(result)+" "
-    
     def get_name_methodology(self):
 
-        return self.ServicesMethodologyTrends.get_name()
+        return self.ServicesMethodologyWMA.get_name()
     
     def generate_message_add_entry(self):
 
@@ -516,14 +532,18 @@ class ServicesCkeckTrends():
         
         result_candles = await self.get_candles()
 
+        result = self.generate_candles(result_candles)
+
+        result = self.get_indicators_services(result,result_candles)
+
         self.set_events_field('get_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
-        
-        result = self.check_candles(result_candles)
+
+        result = self.check_candles(result)
 
         self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
         
-        result = self.check_indicators(result,result_candles)
-        
+        result = self.check_indicators(result)
+
         self.set_events_field('generate_indicators',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = self.check_monetary_filter(result)
@@ -542,6 +562,3 @@ class ServicesCkeckTrends():
 
         return True
     
-    def get_duration_seconds(self):
-
-        return self.ServicesDeriv.get_duration_seconds()   

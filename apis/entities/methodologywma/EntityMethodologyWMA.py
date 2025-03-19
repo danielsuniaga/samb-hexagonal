@@ -1,10 +1,17 @@
 from decouple import config
 
 from decimal import Decimal
+class EntityMethodologyWMA:
 
-class EntityMethodologyTrends():
+    config = None
 
     candle_removed = None
+
+    data_candles = None
+
+    indicators = None
+
+    type_entry_positions = None
 
     type_entry = None
 
@@ -12,17 +19,13 @@ class EntityMethodologyTrends():
 
     metrics_sma = None
 
-    type_entry_positions = None
+    condition_entry = None
 
     result_entrys = None
 
-    condition_entry = None
-
-    indicators = None
-
-    config = None
-
     def __init__(self):
+
+        self.init_config()
 
         self.init_candle_removed()
 
@@ -36,25 +39,6 @@ class EntityMethodologyTrends():
 
         self.init_entrys_results()
 
-        self.init_config()
-
-    def init_config(self):
-
-        self.config = {
-            'name':config("NAME_METHODOLOGY_TRENDS"),
-            'id':config("ID_METHODOLOGY_TRENDS")
-        }
-
-        return True
-
-    def get_name(self):
-
-        return self.config['name']
-
-    def get_id(self):
-
-        return self.config['id']  
-
     def init_entrys_results(self):
 
         self.result_entrys = {
@@ -63,25 +47,7 @@ class EntityMethodologyTrends():
         }
 
         return True 
-
-    def add_indicators(self,value):
-
-        self.indicators = value
-
-        return True
     
-    def get_indicators(self):
-
-        return self.indicators
-
-    def init_condition_entry(self):
-
-        self.condition_entry = config("CONDITION_ENTRY")
-
-    def get_condition_entry(self):
-        
-        return self.condition_entry
-
     def set_result_entrys_result(self,result_entrys):
         
         self.result_entrys['result'] = result_entrys
@@ -93,24 +59,10 @@ class EntityMethodologyTrends():
         self.result_entrys['candles'] = result_candles
 
         return True
-    
-    def get_result_entrys_result(self):
 
-        return self.result_entrys['result']
+    def init_condition_entry(self):
 
-    def get_type_entry_positions(self):
-
-        return self.type_entry_positions    
-
-    def set_type_entry(self,type_entry):
-        
-        self.type_entry_positions = type_entry
-
-        return True
-    
-    def get_type_entry(self):
-
-        return self.type_entry
+        self.condition_entry = config("CONDITION_ENTRY")
 
     def init_metrics_sma(self):
 
@@ -119,6 +71,14 @@ class EntityMethodologyTrends():
         }
 
         return True
+    
+    def get_metrics_sma(self,key):
+            
+        return self.metrics_sma[key]
+    
+    def get_metrics_sma_active(self):
+
+        return self.get_metrics_sma('active')
 
     def init_metrics_rsi(self):
 
@@ -130,14 +90,105 @@ class EntityMethodologyTrends():
 
         return True
     
+    def get_metrics_rsi(self,key):
+
+        return self.metrics_rsi[key]
+    
     def get_metrics_rsi_min(self):
 
-        return self.metrics_rsi['min']
+        return self.get_metrics_rsi('min')
     
     def get_metrics_rsi_max(self):
 
-        return self.metrics_rsi['max']
+        return self.get_metrics_rsi('max')
+    
+    def get_metrics_rsi_active(self):
+            
+        return self.get_metrics_rsi('active')
 
+    def get_type_entry_short(self):
+
+        return self.type_entry['short']
+    
+    def get_type_entry_long(self):
+
+        return self.type_entry['long']
+    
+    def get_type_entry_positions(self):
+
+        return self.type_entry_positions    
+
+    def set_indicators(self,indicators):
+
+        self.indicators = indicators
+
+        return True
+    
+    def get_indicators(self):
+
+        return self.indicators
+
+    def set_data_candles(self,data_candles):
+
+        self.data_candles = data_candles
+
+        return True
+    
+    def get_data_candles(self):
+
+        return self.data_candles
+
+    def init_candle_removed(self):
+
+        self.candle_removed = int(config("CANDLE_REMOVED"))
+
+        return True
+
+    def init_config(self):
+
+        self.config = {
+            'name':config("NAME_METHODOLOGY_WMA"),
+            'id':config("ID_METHODOLOGY_WMA")
+        }
+
+        return True
+    
+    def get_condition_entry(self):
+        
+        return self.condition_entry
+    
+    def get_candle_removed(self):
+            
+        return self.candle_removed
+    
+    def get_id(self):
+
+        return self.config['id'] 
+    
+    def get_name(self):
+
+        return self.config['name']
+    
+    def get_candles_wma(self,candles):
+
+        if len(candles) < self.candle_removed:
+
+            return candles
+        
+        return candles[:self.candle_removed]
+
+    def generate_candles(self,candles):
+
+        self.set_data_candles(self.get_candles_wma(candles['candles']))
+        
+        return True 
+    
+    def set_type_entry(self,type_entry):
+        
+        self.type_entry_positions = type_entry
+
+        return True
+    
     def init_type_entry(self):
 
         self.type_entry = {
@@ -147,65 +198,57 @@ class EntityMethodologyTrends():
 
         return True
     
-    def get_type_entry_short(self):
+    def check_candles_wma(self,data):
 
-        return self.type_entry['short']
-    
-    def get_type_entry_long(self):
+        # data = {
+        #     'open_price': 1.0,
+        #     'close_price': 3.0,
+        #     'sma_short': 2.0
+        # }
 
-        return self.type_entry['long']
+        if Decimal(data['open_price']) <= Decimal(data['sma_short']) <= Decimal(data['close_price']):
 
-    def init_candle_removed(self):
-
-        self.candle_removed = int(config("CANDLE_REMOVED"))
-
-        return True
-    
-    def get_candle_removed(self):
-
-        return self.candle_removed
-
-    def get_candles_trends(self,candles):
-
-        if len(candles) < self.candle_removed:
-
-            return candles
-        
-        return candles[:self.candle_removed]
-    
-    def get_candles_close(self,array_candles):
-
-        return [candle['close'] for candle in array_candles]
-    
-    def check_candles_trends(self,candles):
-
-        if all(candles[i] < candles[i + 1] for i in range(len(candles) - 1)):
+            # long
 
             self.set_type_entry(self.get_type_entry_long())
 
-            return self.get_type_entry_long()  # Tendencia alcista
+            return self.get_type_entry_long()
+        
+        if Decimal(data['close_price']) <= Decimal(data['sma_short']) <= Decimal(data['open_price']):
 
-        if all(candles[i] > candles[i + 1] for i in range(len(candles) - 1)):
+            # SHORT
 
             self.set_type_entry(self.get_type_entry_short())
-
-            return self.get_type_entry_short()  # Tendencia bajista
-
-        return 0
+            
+            return self.get_type_entry_short()
+        
+        return False
     
-    def check_candles(self,candles):
+    def check_candles(self):
 
-        candles_trends = self.get_candles_trends(candles['candles'])
+        candles = self.get_data_candles()
 
-        candles_trends_close = self.get_candles_close(candles_trends)
+        indicators = self.get_indicators()
 
-        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
+        for candle in candles:
 
-        result = self.check_candles_trends(candles_trends_close)
+            data = {}
+            
+            data['open_price'] = candle['open']
+
+            data['close_price'] = candle['close']
+
+            data['sma_short'] = indicators['sma_short']
+
+            result = self.check_candles_wma(data)
+
+            if result:
+
+                break
 
         return True
     
-    def check_rsi(self,rsi): 
+    def check_rsi(self,rsi):
 
         if not(self.metrics_rsi['active']):
 
@@ -245,7 +288,7 @@ class EntityMethodologyTrends():
         
         if(self.type_entry_positions == self.get_type_entry_short()):
             
-            return not(self.check_sma_short(sma,last_candle))
+            return self.check_sma_short(sma,last_candle)
 
         return False
     
@@ -258,9 +301,13 @@ class EntityMethodologyTrends():
         return False
     
     def check_monetary_filters(self,monetary_filter):
-        
+
         if monetary_filter['profit'] > monetary_filter['sum_entrys_dates'] and monetary_filter['loss'] < monetary_filter['sum_entrys_dates']:
 
             return True
         
         return False
+    
+    def get_result_entrys_result(self):
+
+        return self.result_entrys['result']
