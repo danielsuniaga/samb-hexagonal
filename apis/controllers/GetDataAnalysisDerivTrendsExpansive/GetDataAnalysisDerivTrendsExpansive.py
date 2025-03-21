@@ -7,6 +7,8 @@ import apis.services.smtp.ServicesSmtp as ServicesSmtp
 import apis.services.checktrendsexpansive.ServicesCheckTrendsExpansive as ServicesCheckTrendsExpansive
 import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.methodologytrendsexpansive.ServicesMethodologyTrendsExpansive as ServicesMethodologyTrendsExpansive
+import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
+import apis.services.indicators.ServicesIndicators as ServicesIndicators
 
 class ControllerGetDataAnalysisDerivTrendsExpansive: 
 
@@ -27,6 +29,10 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
     ServicesDeriv = None
 
     ServicesMethodologyTrendsExpansive = None
+
+    ServicesManagerDays = None
+
+    ServicesIndicators = None
 
     def __init__(self):
 
@@ -54,6 +60,10 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
 
         self.ServicesMethodologyTrendsExpansive = ServicesMethodologyTrendsExpansive.ServicesMethodologyTrendsExpansive()
 
+        self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
+
+        self.ServicesIndicators = ServicesIndicators.ServicesIndicators()   
+
         return True
     
     def init_services_intern(self):
@@ -61,6 +71,10 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
         self.ServicesCheckTrendsExpansive.init_services_deriv(self.ServicesDeriv)
 
         self.ServicesCheckTrendsExpansive.init_services_methodology_trendsExpansive(self.ServicesMethodologyTrendsExpansive)
+
+        self.ServicesCheckTrendsExpansive.init_services_manager_days(self.ServicesManagerDays)
+
+        self.ServicesCheckTrendsExpansive.init_services_indicators(self.ServicesIndicators)
 
         return True
 
@@ -104,7 +118,7 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
 
         self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
 
-        result = await self.ServicesCkeckTrends.init()
+        result = await self.ServicesCheckTrendsExpansive.init()
 
         if not result['status']:
 
@@ -112,15 +126,29 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
 
         self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
-        await self.ServicesCkeckTrends.set_balance(self.ServicesDates.get_day())
+        await self.ServicesCheckTrendsExpansive.set_balance(self.ServicesDates.get_day())
 
         self.ServicesEvents.set_events_field('config_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
-        self.ServicesCkeckTrends.init_services_events(self.ServicesEvents)
+        self.ServicesCheckTrendsExpansive.init_services_events(self.ServicesEvents)
 
-        self.ServicesCkeckTrends.init_services_dates(self.ServicesDates)
+        self.ServicesCheckTrendsExpansive.init_services_dates(self.ServicesDates)
 
         return True
+    
+    async def process_deriv_services(self):
+
+        await self.ServicesCheckTrendsExpansive.loops()
+
+        await self.ServicesCheckTrendsExpansive.closed()
+
+    def finalize_request(self, now, id_cronjobs):
+
+        now = self.ServicesDates.get_current_utc5()
+
+        self.ServicesDates.set_end_date()
+
+        return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
 
     async def GetDataAnalysisDerivExpansive(self, request):
 
@@ -130,6 +158,12 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
         
         if not resultado['status']:
 
-            return   
+            return 
 
-        return True
+        if not await self.initialize_deriv_services(date):
+
+            return self.ServicesSmtp.send_notification_email(date, "Initialization failed")  
+        
+        await self.process_deriv_services()
+
+        return self.finalize_request(now, id_cronjobs)
