@@ -9,6 +9,9 @@ import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.methodologytrendsexpansive.ServicesMethodologyTrendsExpansive as ServicesMethodologyTrendsExpansive
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 import apis.services.indicators.ServicesIndicators as ServicesIndicators
+import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
+import apis.services.movements.ServicesMovements as ServicesMovements
+import apis.services.platform.ServicesPlatform as ServicesPlatform
 
 class ControllerGetDataAnalysisDerivTrendsExpansive: 
 
@@ -33,6 +36,12 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
     ServicesManagerDays = None
 
     ServicesIndicators = None
+    
+    ServicesEntrysResults = None
+
+    ServicesMovements = None
+
+    ServicesPlatform = None
 
     def __init__(self):
 
@@ -64,6 +73,12 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
 
         self.ServicesIndicators = ServicesIndicators.ServicesIndicators()   
 
+        self.ServicesEntrysResults = ServicesEntrysResults.ServicesEntrysResults()
+
+        self.ServicesMovements = ServicesMovements.ServicesMovements()
+
+        self.ServicesPlatform = ServicesPlatform.ServicesPlatform()  
+
         return True
     
     def init_services_intern(self):
@@ -75,6 +90,12 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
         self.ServicesCheckTrendsExpansive.init_services_manager_days(self.ServicesManagerDays)
 
         self.ServicesCheckTrendsExpansive.init_services_indicators(self.ServicesIndicators)
+
+        self.ServicesCheckTrendsExpansive.init_services_entrys_results(self.ServicesEntrysResults)
+
+        self.ServicesCheckTrendsExpansive.init_services_movements(self.ServicesMovements)
+
+        self.ServicesCheckTrendsExpansive.init_services_platform(self.ServicesPlatform)
 
         return True
 

@@ -16,6 +16,8 @@ class EntityMethodologyTrendsExpansive():
 
     indicators = None
 
+    condition_entry = None
+
     def __init__(self):
 
         self.init_config()
@@ -27,6 +29,10 @@ class EntityMethodologyTrendsExpansive():
         self.init_metrics_rsi()
 
         self.init_metrics_sma()
+
+    def init_condition_entry(self):
+
+        self.condition_entry = config("CONDITION_ENTRY")
 
     def init_metrics_sma(self):
 
@@ -193,5 +199,21 @@ class EntityMethodologyTrendsExpansive():
             return True
         
         return False
+    
+    def check_monetary_filters(self,monetary_filter):
+        
+        if monetary_filter['profit'] > monetary_filter['sum_entrys_dates'] and monetary_filter['loss'] < monetary_filter['sum_entrys_dates']:
+
+            return True
+        
+        return False
+    
+    def get_candle_removed(self):
+
+        return self.candle_removed
+    
+    def get_condition_entry(self):
+        
+        return self.condition_entry
     
     

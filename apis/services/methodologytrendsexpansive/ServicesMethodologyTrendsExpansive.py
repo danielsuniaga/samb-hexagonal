@@ -37,3 +37,23 @@ class ServicesMethodologyTrendsExpansive():
     def check_result_indicators(self,result_indicators):
 
         return self.entity.check_result_indicators(result_indicators)
+    
+    def check_monetary_filters(self,monetary_filter):
+
+        return self.entity.check_monetary_filters(monetary_filter)
+    
+    def get_type_entry_positions(self):
+
+        return self.entity.get_type_entry_positions()
+    
+    def get_candle_removed(self):    
+
+        return self.entity.get_candle_removed()
+    
+    def get_condition_entry(self):
+        
+        return self.entity.get_condition_entry()
+    
+    def set_result_entrys(self,result):
+
+        return self.entity.set_result_entrys_result(result)
