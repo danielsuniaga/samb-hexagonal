@@ -18,6 +18,8 @@ class EntityMethodologyTrendsExpansive():
 
     condition_entry = None
 
+    result_entrys = None
+
     def __init__(self):
 
         self.init_config()
@@ -29,6 +31,18 @@ class EntityMethodologyTrendsExpansive():
         self.init_metrics_rsi()
 
         self.init_metrics_sma()
+
+        self.init_entrys_results()
+
+        self.init_condition_entry()
+
+    def get_result_entrys_result(self):
+
+        return self.result_entrys['result']
+
+    def get_indicators(self):
+
+        return self.indicators
 
     def init_condition_entry(self):
 
@@ -83,6 +97,10 @@ class EntityMethodologyTrendsExpansive():
         }
 
         return True
+    
+    def get_name(self):
+
+        return self.config['name']
     
     def add_indicators(self,value):
 
@@ -142,7 +160,7 @@ class EntityMethodologyTrendsExpansive():
 
         candles_trends_close = self.get_candles_close(candles_trends)
 
-        candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45, 6.32, 7.65, 8.08, 9.08, 10.09]
+        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45, 6.32, 7.65, 8.08, 9.08, 10.09]
 
         result = self.check_candles_trends(candles_trends_close)
 
@@ -215,5 +233,26 @@ class EntityMethodologyTrendsExpansive():
     def get_condition_entry(self):
         
         return self.condition_entry
+    
+    def init_entrys_results(self):
+
+        self.result_entrys = {
+            'result':None,
+            'candles':None
+        }
+
+        return True 
+    
+    def set_result_entrys_result(self,result_entrys):
+        
+        self.result_entrys['result'] = result_entrys
+
+        return True
+    
+    def set_result_entrys_candles(self,result_candles):
+        
+        self.result_entrys['candles'] = result_candles
+
+        return True
     
     

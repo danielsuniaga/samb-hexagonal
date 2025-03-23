@@ -12,6 +12,9 @@ import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 import apis.services.dates.ServicesDates as ServicesDates
 import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.platform.ServicesPlatform as ServicesPlatform
+import apis.services.entrys.ServicesEntrys as ServicesEntrys
+import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys  
+import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
 
 class TestCheckTrendsExpansive(unittest.IsolatedAsyncioTestCase):
 
@@ -32,6 +35,12 @@ class TestCheckTrendsExpansive(unittest.IsolatedAsyncioTestCase):
     ServicesCronjobs = None
 
     ServicesPlatform = None
+
+    ServicesEntrys = None
+
+    ServicesIndicatorsEntrys = None
+
+    ServicesEntrysResults = None
 
     def setUp(self):
             
@@ -63,6 +72,12 @@ class TestCheckTrendsExpansive(unittest.IsolatedAsyncioTestCase):
 
         self.ServicesPlatform = ServicesPlatform.ServicesPlatform()
 
+        self.ServicesEntrys = ServicesEntrys.ServicesEntrys()
+
+        self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys()
+
+        self.ServicesEntrysResults = ServicesEntrysResults.ServicesEntrysResults()  
+
     def init_services_internal(self):
 
         self.ServicesCheckTrendsExpansive.init_services_methodology_trendsExpansive(self.ServicesMethodologyTrendsExpansive)
@@ -78,6 +93,12 @@ class TestCheckTrendsExpansive(unittest.IsolatedAsyncioTestCase):
         self.ServicesCheckTrendsExpansive.init_services_cronjobs(self.ServicesCronjobs)
 
         self.ServicesCheckTrendsExpansive.init_services_platform(self.ServicesPlatform)
+
+        self.ServicesCheckTrendsExpansive.init_services_entrys(self.ServicesEntrys)
+
+        self.ServicesCheckTrendsExpansive.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
+
+        self.ServicesCheckTrendsExpansive.init_services_entrys_results(self.ServicesEntrysResults)
 
     def get_data_entrys_true(self):
 

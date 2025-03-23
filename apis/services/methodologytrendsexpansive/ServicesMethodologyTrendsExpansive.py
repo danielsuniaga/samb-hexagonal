@@ -57,3 +57,19 @@ class ServicesMethodologyTrendsExpansive():
     def set_result_entrys(self,result):
 
         return self.entity.set_result_entrys_result(result)
+    
+    def set_result_candles(self,result):
+
+        return self.entity.set_result_entrys_candles(result)
+    
+    def get_indicators(self):
+
+        return self.entity.get_indicators()
+    
+    def get_result_entrys_result(self):
+
+        return self.entity.get_result_entrys_result()
+    
+    def get_name(self):
+
+        return self.entity.get_name()

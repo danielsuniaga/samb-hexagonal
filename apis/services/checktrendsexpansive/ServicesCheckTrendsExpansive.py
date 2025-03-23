@@ -20,6 +20,30 @@ class ServicesCheckTrendsExpansive():
 
     ServicesPlatform = None
 
+    ServicesEntrys = None
+
+    ServicesIndicatorsEntrys = None
+
+    ServicesTelegram = None 
+
+    def init_services_telegram(self,value):
+
+        self.ServicesTelegram = value
+
+        return True
+
+    def init_services_indicators_entrys(self,value):
+
+        self.ServicesIndicatorsEntrys = value
+
+        return True
+
+    def init_services_entrys(self,value):
+
+        self.ServicesEntrys = value
+
+        return True
+
     def init_services_platform(self,value):
 
         self.ServicesPlatform = value
@@ -378,6 +402,94 @@ class ServicesCheckTrendsExpansive():
 
         return self.ServicesMethodologyTrendsExpansive.set_result_entrys(result)
     
+    def set_candles_positions(self,candles):
+
+        return self.ServicesMethodologyTrendsExpansive.set_result_candles(candles)
+    
+    def add_entrys(self,result):
+
+        return self.ServicesEntrys.add_entrys(result)
+    
+    def get_indicators(self):
+
+        return self.ServicesMethodologyTrendsExpansive.get_indicators()
+    
+    def get_data_entrys(self):
+        
+        return self.ServicesEntrys.get_data_entity()
+    
+    def add_result_positions_data_entrys(self,result,data):
+
+        return self.ServicesDeriv.add_result_positions_data_entrys(result,data)
+    
+    def set_result_indicators(self,result):
+
+        result = self.add_result_positions_current_date(result,self.get_current_date_hour())
+
+        result = self.add_result_positions_data_entrys(result,self.get_data_entrys())
+
+        return result
+    
+    def get_result_entrys_result(self):
+
+        return self.ServicesMethodologyTrendsExpansive.get_result_entrys_result()
+    
+    def add_entrys_results_persistence(self):
+
+        data = self.get_result_entrys_result()
+
+        data_indicators = self.set_result_indicators(self.get_indicators())
+
+        result = self.ServicesEntrysResults.add_persistence(data,data_indicators)
+
+        if not result['status']:
+
+            return False
+
+        return True
+    
+    def add_movements_persistence(self,data):
+
+        result = self.ServicesMovements.add_persistence(data)
+
+        if not result['status']:
+
+            return False
+
+        return self.add_entrys_results_persistence()
+    
+    def add_indicators_entrys_persistence(self):
+
+        data = self.set_result_indicators(self.get_indicators())
+
+        result = self.ServicesIndicatorsEntrys.add_persistence(data)
+
+        if not result['status']:
+
+            return False
+
+        return self.add_movements_persistence(data)
+    
+    def get_name_methodology(self):
+
+        return self.ServicesMethodologyTrendsExpansive.get_name()
+    
+    def generate_message_add_entry(self):
+
+        name_methodology = self.get_name_methodology()
+        
+        return self.ServicesTelegram.generate_message_add_entry(name_methodology)
+    
+    def send_report_management(self,result):
+
+        if not result:
+
+            return False
+        
+        mensaje = self.generate_message_add_entry()
+
+        return self.ServicesTelegram.send_message(mensaje,self.get_current_date_hour())
+    
     def add_entry_persistence(self,result,candles):
 
         if not result:
@@ -388,9 +500,7 @@ class ServicesCheckTrendsExpansive():
         
         result = self.set_result_positions(result)
         
-        # self.set_result_positions_entity(result)
-
-        return True
+        self.set_result_positions_entity(result)
 
         self.set_candles_positions(candles)
 
@@ -428,8 +538,8 @@ class ServicesCheckTrendsExpansive():
 
         result = self.add_entry_persistence(result,result_candles)
 
-        # self.set_events_field('add_persistence',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('add_persistence',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
-        # self.send_report_management(result)
+        self.send_report_management(result)
 
         return True

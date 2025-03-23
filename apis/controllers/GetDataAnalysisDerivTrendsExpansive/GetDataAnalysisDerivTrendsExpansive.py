@@ -12,6 +12,9 @@ import apis.services.indicators.ServicesIndicators as ServicesIndicators
 import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
 import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.platform.ServicesPlatform as ServicesPlatform
+import apis.services.entrys.ServicesEntrys as ServicesEntrys
+import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
+import apis.services.telegram.ServicesTelegram as ServicesTelegram
 
 class ControllerGetDataAnalysisDerivTrendsExpansive: 
 
@@ -42,6 +45,12 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
     ServicesMovements = None
 
     ServicesPlatform = None
+
+    ServicesEntrys = None
+
+    ServicesIndicatorsEntrys = None
+
+    ServicesTelegram = None
 
     def __init__(self):
 
@@ -79,6 +88,12 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
 
         self.ServicesPlatform = ServicesPlatform.ServicesPlatform()  
 
+        self.ServicesEntrys = ServicesEntrys.ServicesEntrys()
+
+        self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys() 
+
+        self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
+
         return True
     
     def init_services_intern(self):
@@ -96,6 +111,14 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
         self.ServicesCheckTrendsExpansive.init_services_movements(self.ServicesMovements)
 
         self.ServicesCheckTrendsExpansive.init_services_platform(self.ServicesPlatform)
+
+        self.ServicesCheckTrendsExpansive.init_services_entrys(self.ServicesEntrys)
+
+        self.ServicesCheckTrendsExpansive.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)    
+
+        self.ServicesCheckTrendsExpansive.init_services_cronjobs(self.ServicesCronjobs)
+
+        self.ServicesCheckTrendsExpansive.init_services_telegram(self.ServicesTelegram)
 
         return True
 
