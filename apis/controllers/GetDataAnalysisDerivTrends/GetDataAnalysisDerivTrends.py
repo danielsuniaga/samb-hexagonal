@@ -133,8 +133,7 @@ class ControllerGetDataAnalysisDerivTrends:
         
         if not resultado['status']:
 
-            return 
-        
+            return        
 
         if not await self.initialize_deriv_services(date):
 
