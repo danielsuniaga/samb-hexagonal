@@ -8,6 +8,8 @@ import smtplib
 
 import email.message
 
+import traceback
+
 class EntitySmtp():
 
     cuerpo = None
@@ -98,7 +100,7 @@ class EntitySmtp():
 
     def init_subject(self):
 
-        self.subject = "Notificaciones de excepciones | SAMB | TRADING "
+        self.subject = "Notificaciones de excepciones - ("+config("PROJECT_NAME")+") | SAMB | TRADING "
 
         return True
     
@@ -162,44 +164,35 @@ class EntitySmtp():
         
         return self.get_encabezado()+self.get_cuerpo()+self.get_pie()
     
-    def send_email(self,mensaje):
+    def send_email(self, mensaje):
+        # Obtener la traza de ejecución
+        stack_trace = traceback.format_stack()
+        origen = "".join(stack_trace)
+
+        # # Imprimir el origen del llamado
+        print("\n📌 Correo gatillado desde:\n", str(origen))
 
         self.set_message(mensaje)
-
         self.set_message_body()
-
         body = self.init_body()
 
         try:
-        
             _msg = email.message.Message()
-
             _msg["Subject"] = self.subject
-
             _msg["From"] = self.from_email
-
             _msg["To"] = self.destinatario
-
             _password = self.password_email
-
             _correo = self.email
-            
             _msg.add_header("Content-Type", "text/html")
-            
             _msg.set_payload(body)
-            
-            _s = smtplib.SMTP(self.server, self.port)
-            
-            _s.starttls()
-            
-            _s.login(_correo, _password)
-            
-            _s.sendmail(_msg["From"], [_msg["To"]], _msg.as_string())
 
+            _s = smtplib.SMTP(self.server, self.port)
+            _s.starttls()
+            _s.login(_correo, _password)
+            _s.sendmail(_msg["From"], [_msg["To"]], _msg.as_string())
             _s.quit()
 
         except Exception as err:
+            return {"status": False, "message": "Hubo una incidencia en el envío del mensaje SMTP: " + str(err)}
 
-            return {"status": False, "message":"Hubo una incidencia en el envio del mensaje SMTP: "+str(err)}
-        
         return True
