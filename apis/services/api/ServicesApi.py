@@ -13,6 +13,46 @@ class ServicesApi():
 
         self.repository = RepositoryApi.RepositoryApi()
 
+        self.init_methods_internal()
+
+    def init_methods_internal(self):
+
+        self.get_apis_entity()
+
+    def init_data_get_apis_repository(self):
+
+        return {
+            'condition':self.get_condition()
+        }
+
+    def get_apis_repository(self):
+
+        data = self.init_data_get_apis_repository()
+
+        return self.repository.get_apis(data)
+    
+    def init_data_get_apis_entity(self, result):
+
+        if result.get('status') and 'data' in result:
+
+            return [{'id': item['id'], 'description': item['description']} for item in result['data']]
+        
+        return []
+    
+    def set_apis_entity(self, result):
+
+        self.entity.set_apis(result)
+
+        return True
+
+    def get_apis_entity(self):
+
+        result = self.get_apis_repository()
+
+        data_entity = self.init_data_get_apis_entity(result)
+
+        return self.entity.set_apis_name(data_entity)
+
     def get_api_description(self):
 
         return self.entity.get_api_description()
@@ -37,6 +77,22 @@ class ServicesApi():
         data = self.init_data_get_api_result()
 
         return self.get(data)
+    
+    def get_apis_name_trends(self):
+
+        return self.entity.get_apis_name_trends()
+    
+    def get_apis_name_wma(self):
+            
+        return self.entity.get_apis_name_wma()
+    
+    def get_apis_name_trends_expansive(self):
+                
+        return self.entity.get_apis_name_trends_expansive()
+    
+    def get_apis_name_endpoints(self):
+                
+        return self.entity.get_apis_name_endpoints()
 
     def get_api_key(self,request):
 

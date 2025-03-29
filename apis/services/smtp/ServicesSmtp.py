@@ -14,6 +14,12 @@ class ServicesSmtp():
 
         self.repository = RepositorySmtp.RepositorySmtp()
 
+    def set_apis_name(self, apis):
+
+        self.entity.set_apis_name(apis)
+
+        return True
+
     def generate_id(self):
 
         return self.entity.generate_id()

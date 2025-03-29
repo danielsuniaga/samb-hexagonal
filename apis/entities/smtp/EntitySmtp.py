@@ -8,6 +8,8 @@ import smtplib
 
 import email.message
 
+import traceback
+
 class EntitySmtp():
 
     cuerpo = None
@@ -29,6 +31,8 @@ class EntitySmtp():
     server = None
 
     subject_reports = None
+
+    apis_name = None
 
     def __init__(self):
 
@@ -53,6 +57,20 @@ class EntitySmtp():
         self.init_from_email()
 
         self.init_subject_reports()
+
+    def set_apis_name(self, apis):
+
+        self.apis_name = apis
+
+        return True
+    
+    def get_apis_name(self):
+
+        if self.apis_name is not None:
+
+            return self.apis_name
+
+        return None
 
     def init_subject_reports(self):
 
@@ -98,7 +116,7 @@ class EntitySmtp():
 
     def init_subject(self):
 
-        self.subject = "Notificaciones de excepciones | SAMB | TRADING "
+        self.subject = "Notificaciones de excepciones - ("+config("PROJECT_NAME")+") - "+str(self.apis_name)+" | SAMB | TRADING "
 
         return True
     
@@ -162,7 +180,9 @@ class EntitySmtp():
         
         return self.get_encabezado()+self.get_cuerpo()+self.get_pie()
     
-    def send_email(self,mensaje):
+    def send_email(self, mensaje):
+
+        self.init_subject()
 
         self.set_message(mensaje)
 
@@ -171,35 +191,22 @@ class EntitySmtp():
         body = self.init_body()
 
         try:
-        
             _msg = email.message.Message()
-
             _msg["Subject"] = self.subject
-
             _msg["From"] = self.from_email
-
             _msg["To"] = self.destinatario
-
             _password = self.password_email
-
             _correo = self.email
-            
             _msg.add_header("Content-Type", "text/html")
-            
             _msg.set_payload(body)
-            
-            _s = smtplib.SMTP(self.server, self.port)
-            
-            _s.starttls()
-            
-            _s.login(_correo, _password)
-            
-            _s.sendmail(_msg["From"], [_msg["To"]], _msg.as_string())
 
+            _s = smtplib.SMTP(self.server, self.port)
+            _s.starttls()
+            _s.login(_correo, _password)
+            _s.sendmail(_msg["From"], [_msg["To"]], _msg.as_string())
             _s.quit()
 
         except Exception as err:
+            return {"status": False, "message": "Hubo una incidencia en el envío del mensaje SMTP: " + str(err)}
 
-            return {"status": False, "message":"Hubo una incidencia en el envio del mensaje SMTP: "+str(err)}
-        
         return True

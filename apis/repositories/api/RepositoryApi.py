@@ -8,6 +8,28 @@ class RepositoryApi():
         
         self.cursor_db = connection.cursor()
 
+    def get_apis(self,data):
+
+        try:
+
+            query = "SELECT samb_apis.id AS id, samb_apis.description AS description FROM samb_apis WHERE samb_apis.condition=%s"
+
+            parameters = [data['condition']]
+
+            self.cursor_db.execute(query, parameters)
+
+            result = self.cursor_db.fetchall()
+
+            column_names = [desc[0] for desc in self.cursor_db.description]
+
+            result_with_columns = [dict(zip(column_names, row)) for row in result]
+            
+        except DatabaseError:
+
+            return {'status':False,'msj':"Incidencia en la lectura de los datos en la tabla samb_apis"}
+                
+        return {'status':True,'data':result_with_columns,'msj':'Success'}
+
     def get(self,data):
 
         try:

@@ -125,6 +125,14 @@ class ControllerGetDataAnalysisDerivTrends:
 
         self.ServicesCkeckTrends.init_services_deriv(self.ServicesDeriv)
 
+    def get_apis_name_trends(self):
+
+        return self.ServicesApi.get_apis_name_trends()
+
+    def set_apis_name_smtp(self):
+
+        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends())
+
     async def GetDataAnalysisDeriv(self, request):
 
         now, date, hour, id_cronjobs = self.initialize_request_data()
@@ -152,6 +160,8 @@ class ControllerGetDataAnalysisDerivTrends:
         hour = self.ServicesDates.get_current_hour(now)
 
         self.ServicesDates.set_start_date()
+
+        self.set_apis_name_smtp()
 
         self.ServicesEvents.set_events_field('start_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
 
