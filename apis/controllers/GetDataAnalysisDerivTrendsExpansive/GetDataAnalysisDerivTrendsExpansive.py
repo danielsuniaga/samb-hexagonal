@@ -121,6 +121,15 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
         self.ServicesCheckTrendsExpansive.init_services_telegram(self.ServicesTelegram)
 
         return True
+    
+    def get_apis_name_trends_expansive(self):
+
+        return self.ServicesApi.get_apis_name_trends_expansive()
+
+    def set_apis_name_smtp(self):
+
+        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends_expansive())
+
 
     def initialize_request_data(self):
 
@@ -131,6 +140,8 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
         hour = self.ServicesDates.get_current_hour(now)
 
         self.ServicesDates.set_start_date()
+
+        self.set_apis_name_smtp()
 
         self.ServicesEvents.set_events_field('start_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
 
