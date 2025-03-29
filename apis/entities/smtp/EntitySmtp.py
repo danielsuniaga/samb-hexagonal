@@ -32,6 +32,8 @@ class EntitySmtp():
 
     subject_reports = None
 
+    apis_name = None
+
     def __init__(self):
 
         self.init_condition()
@@ -55,6 +57,20 @@ class EntitySmtp():
         self.init_from_email()
 
         self.init_subject_reports()
+
+    def set_apis_name(self, apis):
+
+        self.apis_name = apis
+
+        return True
+    
+    def get_apis_name(self):
+
+        if self.apis_name is not None:
+
+            return self.apis_name
+
+        return None
 
     def init_subject_reports(self):
 
@@ -100,7 +116,7 @@ class EntitySmtp():
 
     def init_subject(self):
 
-        self.subject = "Notificaciones de excepciones - ("+config("PROJECT_NAME")+") | SAMB | TRADING "
+        self.subject = "Notificaciones de excepciones - ("+config("PROJECT_NAME")+") - "+str(self.apis_name)+" | SAMB | TRADING "
 
         return True
     
@@ -165,15 +181,13 @@ class EntitySmtp():
         return self.get_encabezado()+self.get_cuerpo()+self.get_pie()
     
     def send_email(self, mensaje):
-        # Obtener la traza de ejecución
-        stack_trace = traceback.format_stack()
-        origen = "".join(stack_trace)
 
-        # # Imprimir el origen del llamado
-        print("\n📌 Correo gatillado desde:\n", str(origen))
+        self.init_subject()
 
         self.set_message(mensaje)
+
         self.set_message_body()
+
         body = self.init_body()
 
         try:

@@ -17,3 +17,9 @@ class TestGetEndPoint(unittest.IsolatedAsyncioTestCase):
         result = await  self.controller.GetEndPoint()
 
         print("controller:",result)
+
+    def test_send_email(self):
+
+        result = self.controller.send_email()
+
+        print("controller:",result)
