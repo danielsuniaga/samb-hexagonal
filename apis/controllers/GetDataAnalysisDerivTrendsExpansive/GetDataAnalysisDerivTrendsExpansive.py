@@ -177,7 +177,7 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
 
         if not result['status']:
 
-            return False
+            return result
 
         self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
@@ -189,7 +189,7 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
 
         self.ServicesCheckTrendsExpansive.init_services_dates(self.ServicesDates)
 
-        return True
+        return {'status': True, 'message': 'Initialization successful'}
     
     async def process_deriv_services(self):
 
@@ -214,10 +214,12 @@ class ControllerGetDataAnalysisDerivTrendsExpansive:
         if not resultado['status']:
 
             return 
+        
+        resultado_deriv = await self.initialize_deriv_services(date)
 
-        if not await self.initialize_deriv_services(date):
+        if not resultado_deriv['status']:
 
-            return self.ServicesSmtp.send_notification_email(date, "Initialization failed")  
+            return self.ServicesSmtp.send_notification_email(date, resultado_deriv['message'])  
         
         await self.process_deriv_services()
 
