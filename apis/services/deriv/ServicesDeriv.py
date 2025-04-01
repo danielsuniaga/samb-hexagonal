@@ -1,3 +1,4 @@
+import asyncio
 import apis.entities.deriv.EntityDeriv as EntityDeriv
 
 class ServicesDeriv():
@@ -7,10 +8,46 @@ class ServicesDeriv():
     def __init__(self):
 
         self.entity = EntityDeriv.EntityDeriv()
+
+    def get_conection_broker_atents(self):
+
+        return self.entity.get_conection_broker_atents()
     
     async def init(self):
 
-        return await self.entity.init()
+        conection_broker = self.get_conection_broker_atents()
+
+        max_attempts = self.get_max_attempts(conection_broker)
+
+        sleep_duration = self.get_sleep_duration(conection_broker)
+
+        return await self.attempt_initialization(max_attempts, sleep_duration)
+
+    def get_max_attempts(self, conection_broker):
+
+        return int(conection_broker.get('max_attempts', 3))
+
+    def get_sleep_duration(self, conection_broker):
+
+        return int(conection_broker.get('duration_latency', 500)) / 1000 
+
+    async def attempt_initialization(self, max_attempts, sleep_duration):
+
+        attempt = 0
+
+        while attempt < max_attempts:
+
+            result = await self.entity.init()
+
+            if result.get('status', False):
+
+                return result
+
+            attempt += 1
+
+            await asyncio.sleep(sleep_duration)
+
+        return {'status': False, 'message': 'Max attempts reached, initialization failed'}
     
     async def closed(self):
 

@@ -26,6 +26,8 @@ class EntityDeriv():
 
     duration_seconds = None
 
+    conection_broker_atents = None
+
     def __init__(self):
 
         self.init_par()
@@ -45,6 +47,21 @@ class EntityDeriv():
         self.init_proposal_env()
 
         self.init_duration_seconds()
+
+        self.init_conection_broker_atents()
+
+    def init_conection_broker_atents(self):
+
+        self.conection_broker_atents = {
+            'atents': config("BROKER_CONECTION_ATENTS"),
+            'duration_latency': config("LATENCY_CONECTION_DURATION")
+        }
+
+        return True
+    
+    def get_conection_broker_atents(self):
+
+        return self.conection_broker_atents    
 
     def add_result_positions(self,data,result,index):
 
