@@ -452,5 +452,9 @@ class EntityDeriv():
 
         return await self.check_position_result(result['execution_details']['buy']['contract_id'])
     
+    def init_result_return_attent_initialization(self):
+
+        return {'status': True, 'message': 'Success'}
+    
 
 
