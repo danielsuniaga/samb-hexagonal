@@ -30,10 +30,16 @@ class ServicesDeriv():
     def get_sleep_duration(self, conection_broker):
 
         return int(conection_broker.get('duration_latency', 500)) / 1000 
+    
+    def init_result_return_attent_initialization(self):
+
+        return self.entity.init_result_return_attent_initialization()
 
     async def attempt_initialization(self, max_attempts, sleep_duration):
 
         attempt = 0
+
+        result_return = self.init_result_return_attent_initialization()
 
         while attempt < max_attempts:
 
@@ -45,9 +51,11 @@ class ServicesDeriv():
 
             attempt += 1
 
+            result_return = result
+
             await asyncio.sleep(sleep_duration)
 
-        return {'status': False, 'message': 'Max attempts reached, initialization failed'}
+        return {'status': False, 'message': 'Max attempts reached, initialization failed'+' - '+str(result_return['message'])}
     
     async def closed(self):
 
