@@ -12,6 +12,8 @@ class EntityTelegram():
 
     project_name = None
 
+    data_entrys = None
+
     def __init__(self):
 
         self.init_config_platform()
@@ -19,6 +21,20 @@ class EntityTelegram():
         self.init_condition()
 
         self.init_project_name()
+
+    def add_data_entrys(self,data):
+
+        self.data_entrys = data
+
+        return True
+    
+    def get_data_entrys_account_id(self):
+
+        if self.data_entrys and 'contract_details' in self.data_entrys and 'account_id' in self.data_entrys['contract_details']:
+            
+            return str(self.data_entrys['contract_details']['account_id'])
+        
+        return None
 
     def init_project_name(self):
         
@@ -94,4 +110,4 @@ class EntityTelegram():
     
     def generate_message_add_entry(self,name_methodology):
         
-        return self.get_project_name()+': Registry Entry Success ('+name_methodology+')'
+        return self.get_project_name()+': Registry Entry Success - '+self.get_data_entrys_account_id()+' ('+name_methodology+')'
