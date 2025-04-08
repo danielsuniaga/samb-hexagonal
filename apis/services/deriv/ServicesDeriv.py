@@ -9,6 +9,30 @@ class ServicesDeriv():
 
         self.entity = EntityDeriv.EntityDeriv()
 
+    def init_tokens_asignado(self,account):
+
+        return self.entity.init_tokens_asignado(account)
+
+    def get_tokens_orion(self):
+
+        return self.entity.get_tokens_orion()
+    
+    def get_tokens_ursa_major(self):
+
+        return self.entity.get_tokens_ursa_major()
+    
+    def get_tokens_ursa_minor(self):
+            
+        return self.entity.get_tokens_ursa_minor()
+    
+    def get_tokens_casiopeia(self):
+   
+        return self.entity.get_tokens_casiopeia()
+    
+    def get_tokens_scorpius(self):
+            
+        return self.entity.get_tokens_scorpius()
+
     def get_conection_broker_atents(self):
 
         return self.entity.get_conection_broker_atents()
