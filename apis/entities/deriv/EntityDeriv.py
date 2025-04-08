@@ -28,6 +28,10 @@ class EntityDeriv():
 
     conection_broker_atents = None
 
+    tokens = None
+
+    tokens_asignado = None
+
     def __init__(self):
 
         self.init_par()
@@ -49,6 +53,72 @@ class EntityDeriv():
         self.init_duration_seconds()
 
         self.init_conection_broker_atents()
+
+        self.init_tokens()
+
+    def init_tokens(self):
+
+        self.tokens = {
+            'orion': {
+                'real': config("TOKEN_DERIV_REAL_ORION"),
+                'demo': config("TOKEN_DERIV_DEMO_ORION"),
+            },
+            'ursa_major': {
+                'real': config("TOKEN_DERIV_REAL_URSA_MAJOR"),
+                'demo': config("TOKEN_DERIV_DEMO_URSA_MAJOR"),
+            },
+            'ursa_minor': {
+                'real': config("TOKEN_DERIV_REAL_URSA_MINOR"),
+                'demo': config("TOKEN_DERIV_DEMO_URSA_MINOR"),
+            },
+            'cassiopeia': {
+                'real': config("TOKEN_DERIV_REAL_CASSIOPEIA"),
+                'demo': config("TOKEN_DERIV_DEMO_CASSIOPEIA"),
+            },
+            'scorpius': {
+                'real': config("TOKEN_DERIV_REAL_SCORPIUS"),
+                'demo': config("TOKEN_DERIV_DEMO_SCORPIUS"),
+            },
+        }
+        return True
+    
+    def get_tokens(self,account_type):
+
+        if account_type in self.tokens:
+
+            return self.tokens[account_type]
+
+        return None
+    
+    def get_tokens_orion(self):
+
+        return self.get_tokens('orion')
+    
+    def get_tokens_ursa_major(self):
+
+        return self.get_tokens('ursa_major')
+    
+    def get_tokens_ursa_minor(self):
+        
+        return self.get_tokens('ursa_minor')
+    
+    def get_tokens_cassiopeia(self):
+                        
+        return self.get_tokens('cassiopeia')
+    
+    def get_tokens_scorpius(self):
+            
+        return self.get_tokens('scorpius')
+    
+    def init_tokens_asignado(self,account_type):
+
+        self.tokens_asignado = account_type
+
+        return True
+    
+    def get_tokens_asignado(self):
+
+        return self.tokens_asignado
 
     def init_conection_broker_atents(self):
 
@@ -178,10 +248,7 @@ class EntityDeriv():
     
     async def init_token(self):
 
-        self.tokens = {
-            'demo': config("TOKEN_DERIV_DEMO"),
-            'real': config("TOKEN_DERIV_REAL")
-        }
+        self.tokens = self.get_tokens_asignado()
 
         return True
     
