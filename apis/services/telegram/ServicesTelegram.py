@@ -64,3 +64,7 @@ class ServicesTelegram():
     def send_message_report(self,mensaje):
 
         return self.send_message_entity(mensaje)
+    
+    def add_data_entrys(self,data_entrys):
+        
+        return self.entity.add_data_entrys(data_entrys)

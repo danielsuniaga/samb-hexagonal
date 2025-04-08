@@ -510,6 +510,10 @@ class ServicesCkeckTrends():
 
         return self.ServicesTelegram.send_message(mensaje,self.get_current_date_hour())
     
+    def add_data_entrys_results_reports(self,data):
+
+        return self.ServicesTelegram.add_data_entrys(data)
+    
     async def loops(self):
 
         self.set_events_field('init_loop',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
@@ -531,6 +535,8 @@ class ServicesCkeckTrends():
         self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 
         result = await self.add_entry_broker(result)
+
+        self.add_data_entrys_results_reports(result)
 
         self.set_events_field('add_positions_brokers',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
 

@@ -170,10 +170,24 @@ class ControllerGetDataAnalysisDerivTrends:
         id_cronjobs = self.ServicesCronjobs.generate_cronjobs_id()
 
         return now, date, hour, id_cronjobs
+    
+    def get_tokens(self):
+
+        return self.ServicesDeriv.get_tokens_orion()
+    
+    def init_tokens_asignado(self,account):
+
+        self.ServicesDeriv.init_tokens_asignado(account)
+
+        return True
 
     async def initialize_deriv_services(self, date):
 
         self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
+
+        tokens = self.get_tokens()
+
+        self.init_tokens_asignado(tokens)
 
         result = await self.ServicesCkeckTrends.init()
 
