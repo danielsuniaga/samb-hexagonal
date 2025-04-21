@@ -219,10 +219,6 @@ class ControllerGetDataAnalysisDerivTrends:
 
         self.ServicesDates.set_end_date()
         
-        print("finalize_request")
-
-        print(self.ServicesEvents.get_events())
-
         return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
 
     def verify_services(self, request, hour, date, id_cronjobs):
