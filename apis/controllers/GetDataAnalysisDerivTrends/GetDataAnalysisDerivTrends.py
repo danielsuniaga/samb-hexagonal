@@ -218,7 +218,7 @@ class ControllerGetDataAnalysisDerivTrends:
         now = self.ServicesDates.get_current_utc5()
 
         self.ServicesDates.set_end_date()
-
+        
         return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
 
     def verify_services(self, request, hour, date, id_cronjobs):

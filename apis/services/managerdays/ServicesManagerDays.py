@@ -62,7 +62,19 @@ class ServicesManagerDays():
 
         return self.entity.get_mode_env()
     
+    def check_permission_real(self,data):
+            
+        if(data['permision_real']):
+            
+            return True
+        
+        return False
+    
     def check_mode_operativity(self,data):
+
+        if not self.check_permission_real(data):
+
+            return False
 
         if(data['type']==self.get_mode_env()):
 
