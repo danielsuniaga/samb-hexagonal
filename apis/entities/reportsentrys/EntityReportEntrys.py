@@ -8,6 +8,8 @@ class EntityReportEntrys():
 
     titles_reports = None
 
+    message_params = None
+
     def __init__(self):
 
         self.init_types_reports()
@@ -15,6 +17,24 @@ class EntityReportEntrys():
         self.init_data_reports()
 
         self.init_titles_reports()
+
+        self.init_message_params()
+
+    def set_message_params(self, message):
+
+        self.message_params = message
+
+        return True
+    
+    def get_message_params(self):
+
+        return self.message_params
+
+    def init_message_params(self):
+
+        self.message_params = "PARAMS\n"
+
+        return True
 
     def init_titles_reports(self):
 
@@ -224,7 +244,11 @@ class EntityReportEntrys():
 
         report_lines = self.generate_report_lines(data)
 
-        return message + "\n".join(report_lines) + "\n"
+        return message + self.get_message_params() +"\n".join(report_lines) + "\n"
+    
+    def generate_message_parameters(self, data):
+
+        return "PARAMS: (Profit: "+str(data['profit'])+", Loss: "+str(data['loss'])+", Money: "+str(data['money'])+") \n"
 
     def generate_report_lines(self, data):
 

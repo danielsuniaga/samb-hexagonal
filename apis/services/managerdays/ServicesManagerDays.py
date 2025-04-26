@@ -81,6 +81,16 @@ class ServicesManagerDays():
             return False   
 
         return True
+    
+    def get_type_manager_days_reporting(self,day,id_methodology):
+
+        result = self.repository.get_type_manager_day(day,id_methodology)
+
+        if not result['status']:
+
+            return result
+
+        return result['data']
 
     def get_type_manager_days(self,day,id_methodology):
 

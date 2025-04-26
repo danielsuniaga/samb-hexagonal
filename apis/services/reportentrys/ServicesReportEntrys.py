@@ -14,9 +14,17 @@ class ServicesReportEntrys():
 
     ServicesMethodologys = None
 
+    ServicesManagerDays = None
+
     def __init__(self):
 
         self.entity = EntityReportEntrys.EntityReportEntrys()
+
+    def init_services_manager_days(self,value):
+
+        self.ServicesManagerDays = value
+
+        return True
 
     def init_data_reports(self):    
 
@@ -71,6 +79,10 @@ class ServicesReportEntrys():
     def generate_message(self,data,name_methodology):
 
         return self.entity.generate_message(data,name_methodology)
+    
+    def generate_message_parameters(self,data):
+            
+        return self.entity.generate_message_parameters(data)
     
     def send_message(self,mensaje):
 
@@ -152,9 +164,15 @@ class ServicesReportEntrys():
 
         return self.entity.get_titles_reports_daily_complete_complement()
     
+    def init_message_params(self):
+
+        return self.entity.init_message_params()
+    
     def get_daily_report_entrys_complete(self):
 
         self.init_data_reports()
+
+        self.init_message_params()
 
         data = self.generate_data_reports_daily_complete()
 
@@ -163,6 +181,18 @@ class ServicesReportEntrys():
         result = self.send_message(message)
 
         return True
+    
+    def get_day(self):
+
+        return self.ServicesDates.get_day()
+    
+    def get_type_manager_days_reporting(self,day,id_methodology):
+
+        return self.ServicesManagerDays.get_type_manager_days_reporting(day,id_methodology)
+    
+    def set_message_params(self,message):
+           
+        return self.entity.set_message_params(message)
 
     def get_daily_report_entrys(self):
 
@@ -175,10 +205,18 @@ class ServicesReportEntrys():
         methodologys = self.get_methodologys()
 
         result = []
+
+        day = self.get_day()
         
         for item in methodologys:
 
             self.init_data_reports()
+
+            data_param = self.get_type_manager_days_reporting(day,item['id'])
+
+            message_param = self.generate_message_parameters(data_param)
+
+            self.set_message_params(message_param)
 
             data = self.generate_data_reports_daily(item['id'])
 
