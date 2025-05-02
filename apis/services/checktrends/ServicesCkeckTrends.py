@@ -524,7 +524,7 @@ class ServicesCkeckTrends():
         
         result = self.check_candles(result_candles)
 
-        self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
+        self.set_events_field('check_candles',self.get_current_date_mil_dynamic())
         
         result = self.check_indicators(result,result_candles)
         
@@ -545,10 +545,6 @@ class ServicesCkeckTrends():
         self.set_events_field('add_persistence',self.get_current_date_mil_dynamic())
 
         self.send_report_management(result)
-
-        # print("true", self.get_events())
-
-        # print(self.get_events())
 
         return True
     
