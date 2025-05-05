@@ -12,8 +12,6 @@ class RepositoryEvents():
 
     def add(self,data):
 
-        print("data:",data)
-
         try:
 
             self.cursor_db.execute("INSERT INTO samb_events(id, details, difference, registration_date, update_cate, state, id_samb_cronjobs_id) VALUES (%s, %s, %s, %s, %s, %s, %s)", [data['id'], json.dumps(data['details']), json.dumps(data['difference']), data['registration_date'], data['update_cate'], data['state'], data['id_samb_cronjobs_id']])

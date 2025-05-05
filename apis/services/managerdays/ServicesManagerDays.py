@@ -30,7 +30,11 @@ class ServicesManagerDays():
 
         return self.entity.set_loss(value)
     
-    def set_mode(self,value):
+    def set_mode(self,value,permision_real):
+
+        if not self.check_permission_real(permision_real):
+
+            return self.entity.set_mode(self.get_mode_env())
             
         return self.entity.set_mode(value)
     
@@ -42,7 +46,7 @@ class ServicesManagerDays():
 
         self.set_loss(data['loss'])
 
-        self.set_mode(data['type'])
+        self.set_mode(data['type'],data['permision_real'])
 
         return True
     
@@ -62,9 +66,9 @@ class ServicesManagerDays():
 
         return self.entity.get_mode_env()
     
-    def check_permission_real(self,data):
+    def check_permission_real(self,permision_real):
             
-        if(data['permision_real']):
+        if(permision_real):
             
             return True
         
@@ -72,7 +76,7 @@ class ServicesManagerDays():
     
     def check_mode_operativity(self,data):
 
-        if not self.check_permission_real(data):
+        if not self.check_permission_real(data['permision_real']):
 
             return False
 
