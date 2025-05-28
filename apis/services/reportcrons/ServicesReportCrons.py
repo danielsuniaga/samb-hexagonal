@@ -125,8 +125,6 @@ class ServicesReportCrons():
         duration_seconds = self.get_duration_seconds()
 
         message = self.generate_message(data,duration_seconds)  + self.generate_message_events(data_events)
-
-        print(message)
         
         return self.send_message(message)
     
