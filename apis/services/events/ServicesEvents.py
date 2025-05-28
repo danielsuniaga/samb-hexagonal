@@ -69,3 +69,20 @@ class ServicesEvents():
         data = self.init_data_add_events(details,diferrences,id_cronjobs)
 
         return self.add_events_repository(data)
+    
+    def get_events_daily_cron_repository(self):
+
+        return self.repository.get_events_daily_crons()
+    
+    def init_data_result_events_daily_cron(self,resultado):
+
+        return 'Execution_time: {execution_time}, Details: {difference}'.format(
+            execution_time=round(float(resultado['execution_time']), 2),
+            difference=resultado['difference']
+        )
+    
+    def get_events_daily_cron(self):
+
+        data = self.get_events_daily_cron_repository()
+
+        return self.init_data_result_events_daily_cron(data['result']) if data['status'] else data['message']

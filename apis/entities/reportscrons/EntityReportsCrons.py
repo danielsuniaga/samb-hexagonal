@@ -20,6 +20,7 @@ class EntityReportsCrons():
 
         self.titles_reports = {
             "daily": "DAILY REPORTS CRON(" + config("PROJECT_NAME") + ")",
+            "daily_events": "DAILY EVENTS REPORTS CRON(" + config("PROJECT_NAME") + ")",
         }
 
         return True
@@ -27,6 +28,10 @@ class EntityReportsCrons():
     def get_titles_reports_daily(self):
 
         return self.titles_reports['daily']
+    
+    def get_titles_reports_daily_events(self):
+
+        return self.titles_reports['daily_events']
 
     def get_data_reports(self):
 
@@ -74,6 +79,12 @@ class EntityReportsCrons():
 
         return max_durations-duration_seconds
     
+    def generate_message_events(self,data):
+
+        message = self.get_titles_reports_daily_events() + "\n" + str(data) + "\n"
+
+        return message
+    
     def generate_message(self,data,duration):
 
         message = self.get_titles_reports_daily() + "\n"
@@ -86,7 +97,7 @@ class EntityReportsCrons():
 
             quantities = report['data']['quantities']
 
-            max_durations = round(self.generate_max_durations(float(report['data']['max_durations']),duration_seconds), 2)
+            max_durations = round(float(report['data']['max_durations']), 2)
 
             message += f"{state} : quantities({quantities}), max durations({max_durations})\n"
 

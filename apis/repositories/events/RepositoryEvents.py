@@ -21,3 +21,22 @@ class RepositoryEvents():
             return {'status': False, 'msj': f'No se realizo la escritura en samb_cronjobs. Error: {str(e)}'}
 
         return {'status':True,'msj':'Success'}
+    
+    def get_events_daily_crons(self):
+
+        try:
+
+            self.cursor_db.execute("SELECT samb_events.id AS id, samb_events.difference AS difference, samb_cronjobs.execution_time AS execution_time FROM samb_events INNER JOIN samb_cronjobs ON samb_cronjobs.id = samb_events.id_samb_cronjobs_id WHERE DATE(samb_events.registration_date) = 20250505 ORDER BY samb_cronjobs.execution_time DESC LIMIT 1;")
+
+            rows = self.cursor_db.fetchall()
+
+            columns = [col[0] for col in self.cursor_db.description]
+
+            result = [dict(zip(columns, row)) for row in rows]
+
+            return {'status':True,'message':'Success','result':result[0]}
+        
+        except DatabaseError:
+
+            return {'status':False,'message':"Incidencia en la lectura de las samb_events leidas "}
+        

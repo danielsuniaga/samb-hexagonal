@@ -14,9 +14,17 @@ class ServicesReportCrons():
 
     ServicesDeriv = None
 
+    ServicesEvents = None
+
     def __init__(self):
 
         self.entity = EntityReportsCrons.EntityReportsCrons()
+
+    def init_services_events(self, value):
+
+        self.ServicesEvents = value
+
+        return True
 
     def init_services_deriv(self, value):
 
@@ -76,6 +84,10 @@ class ServicesReportCrons():
 
         return result
     
+    def generate_data_reports_daily_events(self):
+
+        return self.ServicesEvents.get_events_daily_cron()
+    
     def generate_data_reports_daily(self):
 
         data = self.get_data_reports()
@@ -89,6 +101,10 @@ class ServicesReportCrons():
     def generate_message(self,data,duration_seconds):
 
         return self.entity.generate_message(data,duration_seconds)
+    
+    def generate_message_events(self,data_events):
+
+        return self.entity.generate_message_events(data_events)
     
     def send_message(self,mensaje):
 
@@ -104,9 +120,13 @@ class ServicesReportCrons():
         
         data = self.generate_data_reports_daily()
 
+        data_events = self.generate_data_reports_daily_events()
+
         duration_seconds = self.get_duration_seconds()
 
-        message = self.generate_message(data,duration_seconds)
+        message = self.generate_message(data,duration_seconds)  + self.generate_message_events(data_events)
+
+        print(message)
         
         return self.send_message(message)
     
