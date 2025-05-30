@@ -26,7 +26,7 @@ class RepositoryEvents():
 
         try:
 
-            self.cursor_db.execute("SELECT samb_events.id AS id, samb_events.difference AS difference, samb_cronjobs.execution_time AS execution_time FROM samb_events INNER JOIN samb_cronjobs ON samb_cronjobs.id = samb_events.id_samb_cronjobs_id WHERE DATE(samb_events.registration_date) = CURDATE() ORDER BY samb_cronjobs.execution_time DESC LIMIT 1;")
+            self.cursor_db.execute("SELECT samb_events.id AS id, samb_events.difference AS difference, samb_cronjobs.execution_time AS execution_time, samb_cronjobs.condition AS cond FROM samb_events INNER JOIN samb_cronjobs ON samb_cronjobs.id = samb_events.id_samb_cronjobs_id WHERE DATE(samb_cronjobs.start_date) = CURDATE() ORDER BY samb_cronjobs.execution_time DESC LIMIT 1;")
 
             rows = self.cursor_db.fetchall()
 
