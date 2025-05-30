@@ -76,9 +76,10 @@ class ServicesEvents():
     
     def init_data_result_events_daily_cron(self,resultado):
 
-        return 'Execution_time: {execution_time}, Details: {difference}'.format(
+        return 'Condition_cron: {cond} Execution_time: {execution_time}, Details: {difference}'.format(
             execution_time=round(float(resultado['execution_time']), 2),
-            difference=resultado['difference']
+            difference=resultado['difference'],
+            cond =resultado['cond']
         )
     
     def get_events_daily_cron(self):
