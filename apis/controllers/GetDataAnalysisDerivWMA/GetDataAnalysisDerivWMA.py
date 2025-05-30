@@ -98,6 +98,8 @@ class ControllerGetDataAnalysisDerivWMA:
     
     def initialize_services_internal(self):
 
+        self.ServicesEvents.init_services_dates(self.ServicesDates)
+
         self.ServicesCheckWMA.init_services_cronjobs(self.ServicesCronjobs)
 
         self.ServicesCheckWMA.init_services_deriv(self.ServicesDeriv)
@@ -212,11 +214,25 @@ class ControllerGetDataAnalysisDerivWMA:
 
         await self.ServicesCheckWMA.closed()
 
+    def generate_diferences_events(self):
+
+        return self.ServicesEvents.generate_diferences_events()
+    
+    def get_events(self):
+
+        return self.ServicesEvents.get_events()
+    
+    def add_events(self, details, differences, id_cronjobs):
+
+        return self.ServicesEvents.add_events(details, differences, id_cronjobs)
+
     def finalize_request(self, now, id_cronjobs):
 
         now = self.ServicesDates.get_current_utc5()
 
         self.ServicesDates.set_end_date()
+
+        self.add_events(self.get_events(), self.generate_diferences_events(), id_cronjobs)
 
         return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
 

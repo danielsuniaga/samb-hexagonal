@@ -532,7 +532,7 @@ class ServicesCheckWMA:
     
     async def loops(self):
 
-        self.set_events_field('init_loop',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
+        self.set_events_field('init_loop',self.get_current_date_mil_dynamic())
         
         result_candles = await self.get_candles()
 
@@ -540,29 +540,29 @@ class ServicesCheckWMA:
 
         result = self.get_indicators_services(result,result_candles)
 
-        self.set_events_field('get_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic()))
+        self.set_events_field('get_candles',self.get_current_date_mil_dynamic())
 
         result = self.check_candles(result)
 
-        self.set_events_field('check_candles',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('check_candles',self.get_current_date_mil_dynamic())
         
         result = self.check_indicators(result)
 
-        self.set_events_field('generate_indicators',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('generate_indicators',self.get_current_date_mil_dynamic())
 
         result = self.check_monetary_filter(result)
 
-        self.set_events_field('get_filter_monetary',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())
 
         result = await self.add_entry_broker(result)
 
         self.add_data_entrys_results_reports(result)
 
-        self.set_events_field('add_positions_brokers',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('add_positions_brokers',self.get_current_date_mil_dynamic())
 
         result = self.add_entry_persistence(result,result_candles)
 
-        self.set_events_field('add_persistence',self.init_data_set_events_field_result(self.get_current_date_mil_dynamic(),result))
+        self.set_events_field('add_persistence',self.get_current_date_mil_dynamic())
 
         self.send_report_management(result)
 
