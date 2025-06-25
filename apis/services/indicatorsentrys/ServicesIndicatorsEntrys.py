@@ -79,3 +79,28 @@ class ServicesIndicatorsEntrys():
                 return False
         
         return result
+    
+    def init_data_get_indicators_entrys(self, data):
+
+        return{
+                'id_entry': data['id'],
+                'condition': self.get_condition()
+            }  
+
+    def get_entrys_repository(self, data):
+
+        return self.repository.get_entrys(data) 
+
+    def init_result_get_entrys_repository(self, data):
+
+        return data['data'] if 'data' in data else []     
+    
+    def get_data_indicators_entrys(self, data):
+
+        data_persistence = self.init_data_get_indicators_entrys(data)
+
+        result = self.get_entrys_repository(data_persistence)
+
+        result_send = self.init_result_get_entrys_repository(result)
+
+        return self.init_result_get_entrys_repository(result)

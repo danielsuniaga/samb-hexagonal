@@ -11,7 +11,23 @@ import apis.controllers.AddModels.AddModels as ControllerAddModels
 import apis.controllers.GetDailyReportCrons.GetDailyReportCrons as ControllerGetDailyReportCrons
 import apis.controllers.GetDataAnalysisDerivWMA.GetDataAnalysisDerivWMA as ControllerGetDataAnalysisDerivWMA  
 import apis.controllers.GetDataAnalysisDerivTrendsExpansive.GetDataAnalysisDerivTrendsExpansive as ControllerGetDataAnalysisDerivTrendsExpansive  
+import apis.controllers.SendDataSession.SendDataSession as ControllerSendDataSession
 
+class SendDataSession(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerSendDataSession.ControllerSendDataSession() 
+
+    def send_data(self):
+
+        return self.controller.send_data()  
+
+    def post(self, request, format=None):
+
+        return Response(self.send_data())
 class GetDataAnalysisDeriv(APIView):
 
     controller = None

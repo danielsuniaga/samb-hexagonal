@@ -87,3 +87,33 @@ class ServicesEntrys():
 
         return self.init_get_data_dataset_entrys(result)
     
+    def get_entrys_send_session_repository(self,data):
+
+        if self.repository is None:
+
+            raise ValueError("RepositoryEntrys not initialized")
+        
+        return self.repository.get_entrys_send_session(data)
+    
+    def init_data_get_entrys_send_session(self):
+
+        return {
+            "condition": self.get_condition(),
+        }
+    
+    def init_data_result_get_entrys_send_session(self, data):
+
+        if not data['status']:
+
+            return False
+        
+        return data['data']
+    
+    def get_entrys_send_session(self):
+
+        data = self.init_data_get_entrys_send_session()
+
+        result = self.get_entrys_send_session_repository(data)
+
+        return self.init_data_result_get_entrys_send_session(result)
+    
