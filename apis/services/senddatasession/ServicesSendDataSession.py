@@ -40,6 +40,10 @@ class ServicesSendDataSession:
 
         return True
     
+    def get_config_container(self, key):
+
+        return self.entity.get_config_container(key)
+    
     def get_config(self, key):
 
         return self.entity.get_config(key)
@@ -97,7 +101,8 @@ class ServicesSendDataSession:
                 "samb_entrys_results_update_date": entry.get("samb_entrys_results_update_date", ""),
                 "samb_entrys_results_condition": entry.get("samb_entrys_results_condition", ""),
                 "samb_indicadors_entrys": data_indicators,
-                "samd_container_description": self.get_config("Container"),
+                "samd_container_descripcion": self.get_config_container("Name"),
+                "samd_container_id": self.get_config_container("Id"),
             }
         }
     
@@ -134,6 +139,8 @@ class ServicesSendDataSession:
             data_indicators = self.init_send_data_entrys_indicators(entry)
 
             data = self.init_send_data(entry, data_indicators)
+
+            # print("data:", data)
 
             result = self.entity.send_data(data)
             

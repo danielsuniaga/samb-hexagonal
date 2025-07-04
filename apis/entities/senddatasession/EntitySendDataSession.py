@@ -20,12 +20,28 @@ class EntitySendDataSession():
                 "Content-Type": "application/json"
             },
             "Token": config("TOKEN_CONTAINERS", default=""),
-            "Container": config("PROJECT_NAME", default=""),
+            "Container": 
+            {
+                "Id": config("PROJECT_ID", default=""),
+                "Name":config("PROJECT_NAME", default="")
+            },
         }
+
+        return True
 
     def get_config(self,key):
 
         return self.config.get(key, None)
+    
+    def get_config_container(self, key):
+        result = self.get_config("Container")
+        if result and key:
+            for k, v in result.items():
+                if k.lower() == key.lower():
+                    return v
+        return None
+
+
     
     def send_data(self, data):
 
