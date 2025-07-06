@@ -56,21 +56,17 @@ class ServicesSendEntrys:
             "registration_date": self.get_current_date(),
             "conditions": self.get_config("condition"),
             "id_entrys": data.get("id", []),
-            "response": result.get("status_code", 0),
-            "message": result.get("data", ""),
+            "response": result.get("status_code", 0)
         }
     
     def add_send_entrys_repository(self, data):
 
         return self.repository.add(data)
 
-
     def add_send_entrys(self,data,result):
 
         data_persistence = self.init_data_add_send_entrys(data, result)
 
         result = self.add_send_entrys_repository(data_persistence)
-
-        print(f"Result add_send_entrys: {result}")
 
         return result

@@ -12,9 +12,25 @@ class ServicesSendDataSession:
 
     services_send_entrys = None
 
+    services_indicators = None
+
+    services_telegram = None
+
     def __init__(self):
 
         self.init_entity()
+
+    def init_services_telegram(self, value):
+
+        self.services_telegram = value
+
+        return True
+
+    def init_services_indicators(self, value):
+
+        self.services_indicators = value
+
+        return True
 
     def init_services_send_entrys(self,value):
 
@@ -47,6 +63,31 @@ class ServicesSendDataSession:
     def get_config(self, key):
 
         return self.entity.get_config(key)
+    
+    def get_indicators(self):
+
+        return self.services_indicators.get_indicators()
+    
+    def generate_indicators(self, entrys):
+
+        indicadors = self.get_indicators()
+
+        result = []
+
+        for name, data in indicadors.items():
+
+            result.append({
+                "name": name,
+                "id": self.generate_id(),
+                "id_indicators": data.get("id", ""),
+                "id_container":self.get_config_container("Id"),
+                "active": data.get("active", ""),
+                "registration_date":entrys.get("registration_date", ""),
+                "update_date": entrys.get("update_date", ""),
+                "conditions": self.get_config("conditions")
+            })
+
+        return result
     
     def init_send_data(self,entry,data_indicators):
 
@@ -103,6 +144,7 @@ class ServicesSendDataSession:
                 "samb_indicadors_entrys": data_indicators,
                 "samd_container_descripcion": self.get_config_container("Name"),
                 "samd_container_id": self.get_config_container("Id"),
+                "samb_indicators_container": self.generate_indicators(entry),
             }
         }
     
@@ -125,12 +167,36 @@ class ServicesSendDataSession:
             raise ValueError("ServicesSendEntrys not initialized")
 
         return self.services_send_entrys.add_send_entrys(entrys,result)
+
+    def send_message_send_data(self, mensaje):
+
+        if self.services_telegram is None:
+
+            raise ValueError("ServicesTelegram not initialized")
+
+        return self.services_telegram.send_message_send_data(mensaje)
+    
+    def generate_message_send_data(self, entrys,result):
+
+        return self.entity.generate_message(entrys, result)
     
     def check_send_data(self, entrys,result):
+
+        if result["status_code"] != 200:
+
+            self.send_message_send_data(self.generate_message_send_data(entrys, result))
         
         self.add_send_entrys(entrys,result)
 
         return True
+    
+    def generate_id(self):
+
+        if self.entity is None:
+
+            raise ValueError("EntitySendDataSession not initialized")
+
+        return self.entity.generate_id()
     
     def send_services(self, entrys):
 
@@ -140,13 +206,9 @@ class ServicesSendDataSession:
 
             data = self.init_send_data(entry, data_indicators)
 
-            # print("data:", data)
-
             result = self.entity.send_data(data)
             
             self.check_send_data(entry, result)
-
-            break  # Se detiene después de la primera ejecución    return True
 
         return True
 

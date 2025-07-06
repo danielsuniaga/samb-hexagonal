@@ -31,3 +31,7 @@ class ServicesIndicators():
     def get_ids_indicators(self):
 
         return self.entity.get_ids_indicators()
+    
+    def get_indicators(self):
+
+        return self.entity.get_indicators()

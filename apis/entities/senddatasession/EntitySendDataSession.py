@@ -4,6 +4,8 @@ import requests
 
 import json
 
+import uuid
+
 class EntitySendDataSession():
 
     config = None
@@ -11,6 +13,10 @@ class EntitySendDataSession():
     def __init__(self):
 
         self.init_config()
+
+    def generate_id(self):
+
+        return uuid.uuid4().hex
 
     def init_config(self):
 
@@ -25,6 +31,7 @@ class EntitySendDataSession():
                 "Id": config("PROJECT_ID", default=""),
                 "Name":config("PROJECT_NAME", default="")
             },
+            "conditions":"1"
         }
 
         return True
@@ -41,6 +48,28 @@ class EntitySendDataSession():
                     return v
         return None
 
+    def generate_message(self, entrys, result):
+        container_name = self.get_config_container('Name')
+        entry_id = self._get_entry_id(entrys)
+        status_code = self._get_status_code(result)
+        error_message = self._get_error_message(result)
+
+        message = (
+            f"REPORTS SEND TRUNCATED ({container_name})\n"
+            f"Entry ID: {entry_id}\n"
+            f"Response Status Code: {status_code}\n"
+            f"Response Data: {error_message}\n"
+        )
+        return message
+
+    def _get_entry_id(self, entrys):
+        return entrys.get('id', 'N/A')
+
+    def _get_status_code(self, result):
+        return result.get('status_code', 'N/A')
+
+    def _get_error_message(self, result):
+        return result.get('error', 'N/A')
 
     
     def send_data(self, data):

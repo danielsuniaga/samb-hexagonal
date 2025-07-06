@@ -13,14 +13,13 @@ class RepositorySendEntrys():
         try:
 
             self.cursor_db.execute(
-                "INSERT INTO samb_send_entrys (id, registration_date, conditions, id_entrys, response, message) VALUES (%s, %s, %s, %s, %s, %s)",
+                "INSERT INTO samb_send_entrys (id, registration_date, conditions, id_entrys, response) VALUES (%s, %s, %s, %s, %s)",
                 [
                     data['id'],
                     data['registration_date'],
                     data['conditions'],
                     data['id_entrys'],
-                    data['response'],
-                    data['message']
+                    data['response']
                 ]
             )
 

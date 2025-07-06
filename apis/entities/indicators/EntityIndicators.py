@@ -4,6 +4,8 @@ from decimal import Decimal
 
 class EntityIndicators():
 
+    indicators = None
+
     ids_indicators = None
 
     type_rsi = None
@@ -29,6 +31,31 @@ class EntityIndicators():
         self.init_candle_last()
 
         self.init_ids_indicators()
+
+        self.init_indicators()
+
+    def init_indicators(self):
+
+        self.indicators = {
+            'rsi10':{
+                'id':config("RSI10"),
+                'active':config("ACTIVE_RSI")
+            },
+            'sma10':{
+                'id':config("SMA10"),
+                'active':config("ACTIVE_SMA")
+            },
+            'sma30':{
+                'id':config("SMA30"),
+                'active':config("ACTIVE_SMA")
+            }
+        }
+
+        return True
+    
+    def get_indicators(self):
+
+        return self.indicators
 
     def init_ids_indicators(self):
 
