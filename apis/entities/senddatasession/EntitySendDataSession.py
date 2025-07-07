@@ -31,7 +31,8 @@ class EntitySendDataSession():
                 "Id": config("PROJECT_ID", default=""),
                 "Name":config("PROJECT_NAME", default="")
             },
-            "conditions":"1"
+            "conditions":"1",
+            "attends_send":3
         }
 
         return True
@@ -70,6 +71,18 @@ class EntitySendDataSession():
 
     def _get_error_message(self, result):
         return result.get('error', 'N/A')
+    
+    def generate_message_success(self, count):
+        container_name = self.get_config_container('Name')
+        message_header = self.generate_success_header(container_name)
+        message_body = self.generate_success_body(count)
+        return message_header + message_body
+
+    def generate_success_header(self, container_name):
+        return f"REPORT SEND SUCCESS ({container_name})\n"
+
+    def generate_success_body(self, count):
+        return f"Count Request: ({count})\n"
 
     
     def send_data(self, data):

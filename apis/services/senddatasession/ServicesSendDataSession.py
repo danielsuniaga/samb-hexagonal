@@ -185,6 +185,8 @@ class ServicesSendDataSession:
         if result["status_code"] != 200:
 
             self.send_message_send_data(self.generate_message_send_data(entrys, result))
+
+            return False
         
         self.add_send_entrys(entrys,result)
 
@@ -198,17 +200,47 @@ class ServicesSendDataSession:
 
         return self.entity.generate_id()
     
+    def generate_message_send_data_success(self, count):
+
+        return self.entity.generate_message_success(count)
+    
+    def send_message_send_data_success(self, count):
+
+        return self.send_message_send_data(self.generate_message_send_data_success(count))
+    
+    def send_data(self, data):
+
+        if self.entity is None:
+
+            raise ValueError("EntitySendDataSession not initialized")
+
+        return self.entity.send_data(data)
+    
     def send_services(self, entrys):
 
+        count = 0
+
         for entry in entrys:
+
+            count += 1
 
             data_indicators = self.init_send_data_entrys_indicators(entry)
 
             data = self.init_send_data(entry, data_indicators)
 
-            result = self.entity.send_data(data)
-            
-            self.check_send_data(entry, result)
+            attempts = 0
+
+            while attempts < self.get_config("attends_send"):
+
+                result = self.send_data(data)
+
+                if self.check_send_data(entry, result):
+
+                    break
+
+                attempts += 1
+
+        self.send_message_send_data_success(count)
 
         return True
 
