@@ -1,6 +1,6 @@
 # apis/urls.py
 from django.urls import path
-from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive
+from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession
 
 urlpatterns = [
     path('get-data-analysis-deriv-expansive/', GetDataAnalysisDerivExpansive.as_view(), name='get-data-analysis-deriv-expansive'),
@@ -10,4 +10,5 @@ urlpatterns = [
     path('get-daily-report-entrys/', GetDailyReportEntrys.as_view(), name='get-daily-report-entrys'),
     path('get-daily-report-crons/', GetDailyReportCrons.as_view(), name='get-daily-report-crons'),
     path('add-models/', AddModels.as_view(), name='add-models'),
+    path('send-data-session/', SendDataSession.as_view(), name='send-data-session'),
 ]
