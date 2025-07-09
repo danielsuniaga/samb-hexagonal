@@ -16,9 +16,17 @@ class ServicesSendDataSession:
 
     services_telegram = None
 
+    services_movements = None   
+
     def __init__(self):
 
         self.init_entity()
+
+    def init_services_movements(self, value):
+
+        self.services_movements = value
+
+        return True
 
     def init_services_telegram(self, value):
 
@@ -89,7 +97,7 @@ class ServicesSendDataSession:
 
         return result
     
-    def init_send_data(self,entry,data_indicators):
+    def init_send_data(self,entry,data_indicators,data_movements):
 
         return {
             "Token": self.get_config("Token"),
@@ -145,6 +153,7 @@ class ServicesSendDataSession:
                 "samd_container_descripcion": self.get_config_container("Name"),
                 "samd_container_id": self.get_config_container("Id"),
                 "samb_indicators_container": self.generate_indicators(entry),
+                "samb_movements_entrys": data_movements
             }
         }
     
@@ -216,6 +225,10 @@ class ServicesSendDataSession:
 
         return self.entity.send_data(data)
     
+    def init_send_data_entrys_movements(self, entrys):
+
+        return self.services_movements.get_movements_by_entry(entrys)
+    
     def send_services(self, entrys):
 
         count = 0
@@ -226,7 +239,9 @@ class ServicesSendDataSession:
 
             data_indicators = self.init_send_data_entrys_indicators(entry)
 
-            data = self.init_send_data(entry, data_indicators)
+            data_movements = self.init_send_data_entrys_movements(entry)
+
+            data = self.init_send_data(entry, data_indicators,data_movements)
 
             attempts = 0
 
