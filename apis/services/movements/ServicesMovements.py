@@ -55,6 +55,28 @@ class ServicesMovements():
         data_persistence = self.init_data_add_persistence(self.get_candles(),data)
 
         return self.add_movements_repository(data_persistence)
+    
+    def init_data_get_movements_by_entry(self, entry):
+
+        return {
+            'id': entry['id']
+        }
+    
+    def get_movements_by_entry_repository(self, data):
+
+        return self.repository.get_movements_by_entry(data)
+    
+    def init_result_get_movements_by_entry(self, result):
+
+        return result.get('data', []) if result.get('status', False) else []
+    
+    def get_movements_by_entry(self,entry):
+
+        data_persistence = self.init_data_get_movements_by_entry(entry)
+
+        result = self.get_movements_by_entry_repository(data_persistence)
+
+        return self.init_result_get_movements_by_entry(result)
 
 
     

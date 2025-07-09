@@ -12,6 +12,8 @@ import apis.services.indicators.ServicesIndicators as ServicesIndicators
 
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
 
+import apis.services.movements.ServicesMovements as ServicesMovements
+
 class ControllerSendDataSession:
 
     ServicesDataSession = None
@@ -27,6 +29,8 @@ class ControllerSendDataSession:
     ServicesIndicators = None
 
     ServicesTelegram = None
+
+    ServicesMovements = None
 
     def __init__(self):
 
@@ -50,6 +54,8 @@ class ControllerSendDataSession:
 
         self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
 
+        self.ServicesMovements = ServicesMovements.ServicesMovements()
+
         return True
     
     def init_services_intern(self):
@@ -65,6 +71,8 @@ class ControllerSendDataSession:
         self.ServicesDataSession.init_services_indicators(self.ServicesIndicators)
 
         self.ServicesDataSession.init_services_telegram(self.ServicesTelegram)
+
+        self.ServicesDataSession.init_services_movements(self.ServicesMovements)
 
         return True
     
