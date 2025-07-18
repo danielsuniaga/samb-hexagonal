@@ -12,6 +12,7 @@ import apis.controllers.GetDailyReportCrons.GetDailyReportCrons as ControllerGet
 import apis.controllers.GetDataAnalysisDerivWMA.GetDataAnalysisDerivWMA as ControllerGetDataAnalysisDerivWMA  
 import apis.controllers.GetDataAnalysisDerivTrendsExpansive.GetDataAnalysisDerivTrendsExpansive as ControllerGetDataAnalysisDerivTrendsExpansive  
 import apis.controllers.SendDataSession.SendDataSession as ControllerSendDataSession
+import apis.controllers.GetDataAnalysisDerivTrendsShort.GetDataAnalysisDerivTrendsShort as ControllerGetDataAnalysisDerivTrendsShort
 
 class SendDataSession(APIView):
 
@@ -65,6 +66,26 @@ class GetDataAnalysisDerivExpansive(APIView):
     async def async_post(self, request):
 
         result = await self.controller.GetDataAnalysisDerivExpansive(request)
+
+        return result
+    
+class GetDataAnalysisDerivShort(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDataAnalysisDerivTrendsShort.ControllerGetDataAnalysisDerivTrendsShort()
+
+    def post(self, request, format=None):
+
+        response_data = async_to_sync(self.async_post)(request)
+
+        return Response(response_data)
+
+    async def async_post(self, request):
+
+        result = await self.controller.GetDataAnalysisDerivShort(request)
 
         return result
     
