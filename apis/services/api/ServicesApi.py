@@ -90,6 +90,10 @@ class ServicesApi():
                 
         return self.entity.get_apis_name_trends_expansive()
     
+    def get_apis_name_trends_short(self):
+        
+        return self.entity.get_apis_name_trends_short()
+    
     def get_apis_name_endpoints(self):
                 
         return self.entity.get_apis_name_endpoints()
