@@ -1,8 +1,8 @@
-class ServicesCheckTrendsshort():
+class ServicesCheckTrendsMinus():
 
     ServicesDeriv = None
 
-    ServicesMethodologyTrendsExpansive = None
+    ServicesMethodologyTrendsMinus = None
 
     ServicesManagerDays = None
 
@@ -92,9 +92,9 @@ class ServicesCheckTrendsshort():
 
         return True
 
-    def init_services_methodology_trendsExpansive(self,value):
+    def init_services_methodology_trends_minus(self,value):
 
-        self.ServicesMethodologyTrendsExpansive = value
+        self.ServicesMethodologyTrendsMinus = value
 
         return True
 
@@ -110,7 +110,7 @@ class ServicesCheckTrendsshort():
     
     def get_id_methodology(self):
 
-        return self.ServicesMethodologyTrendsExpansive.get_id()
+        return self.ServicesMethodologyTrendsMinus.get_id()
     
     def get_type_manager_days(self,day):
 
@@ -158,8 +158,8 @@ class ServicesCheckTrendsshort():
     
     def check_candles(self,candles):
 
-        return self.ServicesMethodologyTrendsExpansive.check_candles(candles)
-    
+        return self.ServicesMethodologyTrendsMinus.check_candles(candles)
+
     def get_rsi(self,candles):
 
         return self.ServicesIndicators.generate_rsi(candles)
@@ -195,12 +195,12 @@ class ServicesCheckTrendsshort():
     
     def check_rsi(self,rsi):
 
-        return self.ServicesMethodologyTrendsExpansive.check_rsi(rsi)
+        return self.ServicesMethodologyTrendsMinus.check_rsi(rsi)
     
     def check_sma(self,sma,last_candle):
 
-        return self.ServicesMethodologyTrendsExpansive.check_sma(sma,last_candle)
-    
+        return self.ServicesMethodologyTrendsMinus.check_sma(sma,last_candle)
+
     def init_result_indicators(self,indicators):
 
         return {
@@ -211,12 +211,12 @@ class ServicesCheckTrendsshort():
 
     def add_result_indicators(self,result_indicators):
 
-        return self.ServicesMethodologyTrendsExpansive.add_indicator(result_indicators)  
+        return self.ServicesMethodologyTrendsMinus.add_indicator(result_indicators)  
 
     def check_result_indicators(self,result_indicators):
 
-        return self.ServicesMethodologyTrendsExpansive.check_result_indicators(result_indicators)  
-    
+        return self.ServicesMethodologyTrendsMinus.check_result_indicators(result_indicators)  
+
     def check_indicators(self,result,candles):
 
         if not result:
@@ -233,8 +233,8 @@ class ServicesCheckTrendsshort():
     
     def check_monetary_filter_services(self,result):
 
-        return self.ServicesMethodologyTrendsExpansive.check_monetary_filters(result)
-    
+        return self.ServicesMethodologyTrendsMinus.check_monetary_filters(result)
+
     def get_current_date_only(self):
 
         return self.ServicesDates.get_current_date_only()
@@ -277,8 +277,8 @@ class ServicesCheckTrendsshort():
     
     def get_type_entry(self):
 
-        return self.ServicesMethodologyTrendsExpansive.get_type_entry_positions()
-    
+        return self.ServicesMethodologyTrendsMinus.get_type_entry_positions()
+
     def get_duration(self):
         
         return self.ServicesDeriv.get_duration()
@@ -317,8 +317,8 @@ class ServicesCheckTrendsshort():
     
     def set_candles_positions(self,candles):
 
-        return self.ServicesMethodologyTrendsExpansive.set_result_candles(candles)
-    
+        return self.ServicesMethodologyTrendsMinus.set_result_candles(candles)
+
     def add_result_positions_mode(self,data,mode):
 
         return self.ServicesDeriv.add_result_positions_mode(data,mode)
@@ -333,16 +333,16 @@ class ServicesCheckTrendsshort():
     
     def get_candle_removed(self):
 
-        return self.ServicesMethodologyTrendsExpansive.get_candle_removed()
-    
+        return self.ServicesMethodologyTrendsMinus.get_candle_removed()
+
     def add_result_positions_condition_entry(self,data,condition):
         
         return self.ServicesDeriv.add_result_positions_condition_entry(data,condition)
     
     def get_condition_entry(self):
 
-        return self.ServicesMethodologyTrendsExpansive.get_condition_entry()
-    
+        return self.ServicesMethodologyTrendsMinus.get_condition_entry()
+
     def add_result_positions_amount(self,data,amount):
 
         return self.ServicesDeriv.add_result_positions_amount(data,amount)
@@ -400,20 +400,20 @@ class ServicesCheckTrendsshort():
     
     def set_result_positions_entity(self,result):
 
-        return self.ServicesMethodologyTrendsExpansive.set_result_entrys(result)
-    
+        return self.ServicesMethodologyTrendsMinus.set_result_entrys(result)
+
     def set_candles_positions(self,candles):
 
-        return self.ServicesMethodologyTrendsExpansive.set_result_candles(candles)
-    
+        return self.ServicesMethodologyTrendsMinus.set_result_candles(candles)
+
     def add_entrys(self,result):
 
         return self.ServicesEntrys.add_entrys(result)
     
     def get_indicators(self):
 
-        return self.ServicesMethodologyTrendsExpansive.get_indicators()
-    
+        return self.ServicesMethodologyTrendsMinus.get_indicators()
+
     def get_data_entrys(self):
         
         return self.ServicesEntrys.get_data_entity()
@@ -432,8 +432,8 @@ class ServicesCheckTrendsshort():
     
     def get_result_entrys_result(self):
 
-        return self.ServicesMethodologyTrendsExpansive.get_result_entrys_result()
-    
+        return self.ServicesMethodologyTrendsMinus.get_result_entrys_result()
+
     def add_entrys_results_persistence(self):
 
         data = self.get_result_entrys_result()
@@ -472,8 +472,8 @@ class ServicesCheckTrendsshort():
     
     def get_name_methodology(self):
 
-        return self.ServicesMethodologyTrendsExpansive.get_name()
-    
+        return self.ServicesMethodologyTrendsMinus.get_name()
+
     def generate_message_add_entry(self):
 
         name_methodology = self.get_name_methodology()

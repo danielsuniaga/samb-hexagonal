@@ -5,14 +5,19 @@ import apis.services.events.ServicesEvents as ServicesEvents
 import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.shedule.ServicesShedule as ServicesShedule
 import apis.services.api.ServicesApi as ServicesApi
-import apis.services.checktrendsshort.ServicesCheckTrendsShort as ServicesCheckTrendsShort
+import apis.services.checktrendsminus.ServicesCheckTrendsMinus as ServicesCheckTrendsMinus
 import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 import apis.services.indicators.ServicesIndicators as ServicesIndicators
 import apis.services.entrysresults.ServicesEntrysResults as ServicesEntrysResults
 import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.platform.ServicesPlatform as ServicesPlatform
-class ControllerGetDataAnalysisDerivTrendsShort:
+import apis.services.entrys.ServicesEntrys as ServicesEntrys
+import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
+import apis.services.telegram.ServicesTelegram as ServicesTelegram
+import apis.services.methodologytrendsminus.ServicesMethodologyTrendsMinus as ServicesMethodologyTrendsMinus
+
+class ControllerGetDataAnalysisDerivTrendsMinus:
 
     ServicesDates = None
 
@@ -26,7 +31,7 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
     ServicesApi = None
 
-    ServicesCheckTrendsShort = None
+    ServicesCheckTrendsMinus = None
 
     ServicesDeriv = None
 
@@ -40,11 +45,19 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
     ServicesPlatform = None
 
+    ServicesEntrys = None
+
+    ServicesIndicatorsEntrys = None
+
+    ServicesTelegram = None
+
+    EntityMethodologyTrendsMinus = None
+
     def __init__(self):
 
         self.init_services()
 
-        # self.init_services_intern()
+        self.init_services_intern()
 
     def init_services(self):
 
@@ -60,11 +73,11 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
         self.ServicesSmtp = ServicesSmtp.ServicesSmtp()
 
-        self.ServicesCheckTrendsShort = ServicesCheckTrendsShort.ServicesCheckTrendsshort()
+        self.ServicesCheckTrendsMinus = ServicesCheckTrendsMinus.ServicesCheckTrendsMinus()
 
         self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
 
-        # self.ServicesMethodologyTrendsExpansive = ServicesMethodologyTrendsExpansive.ServicesMethodologyTrendsExpansive()
+        self.ServicesMethodologyTrendsMinus = ServicesMethodologyTrendsMinus.ServicesMethodologyTrendsMinus()
 
         self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
 
@@ -76,11 +89,11 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
         self.ServicesPlatform = ServicesPlatform.ServicesPlatform()  
 
-        # self.ServicesEntrys = ServicesEntrys.ServicesEntrys()
+        self.ServicesEntrys = ServicesEntrys.ServicesEntrys()
 
-        # self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys() 
+        self.ServicesIndicatorsEntrys = ServicesIndicatorsEntrys.ServicesIndicatorsEntrys() 
 
-        # self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
+        self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
 
         return True
     
@@ -88,37 +101,37 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
         self.ServicesEvents.init_services_dates(self.ServicesDates)
 
-        self.ServicesCheckTrendsShort.init_services_deriv(self.ServicesDeriv)
+        self.ServicesCheckTrendsMinus.init_services_deriv(self.ServicesDeriv)
 
-        # self.ServicesCheckTrendsShort.init_services_methodology_trendsExpansive(self.ServicesMethodologyTrendsExpansive)
+        self.ServicesCheckTrendsMinus.init_services_methodology_trends_minus(self.ServicesMethodologyTrendsMinus)
 
-        self.ServicesCheckTrendsShort.init_services_manager_days(self.ServicesManagerDays)
+        self.ServicesCheckTrendsMinus.init_services_manager_days(self.ServicesManagerDays)
 
-        self.ServicesCheckTrendsShort.init_services_indicators(self.ServicesIndicators)
+        self.ServicesCheckTrendsMinus.init_services_indicators(self.ServicesIndicators)
 
-        self.ServicesCheckTrendsShort.init_services_entrys_results(self.ServicesEntrysResults)
+        self.ServicesCheckTrendsMinus.init_services_entrys_results(self.ServicesEntrysResults)
 
-        self.ServicesCheckTrendsShort.init_services_movements(self.ServicesMovements)
+        self.ServicesCheckTrendsMinus.init_services_movements(self.ServicesMovements)
 
-        self.ServicesCheckTrendsShort.init_services_platform(self.ServicesPlatform)
+        self.ServicesCheckTrendsMinus.init_services_platform(self.ServicesPlatform)
 
-        self.ServicesCheckTrendsShort.init_services_entrys(self.ServicesEntrys)
+        self.ServicesCheckTrendsMinus.init_services_entrys(self.ServicesEntrys)
 
-        self.ServicesCheckTrendsShort.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
+        self.ServicesCheckTrendsMinus.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
 
-        self.ServicesCheckTrendsShort.init_services_cronjobs(self.ServicesCronjobs)
+        self.ServicesCheckTrendsMinus.init_services_cronjobs(self.ServicesCronjobs)
 
-        self.ServicesCheckTrendsShort.init_services_telegram(self.ServicesTelegram)
+        self.ServicesCheckTrendsMinus.init_services_telegram(self.ServicesTelegram)
 
         return True
-    
-    def get_apis_name_trends_short(self):
 
-        return self.ServicesApi.get_apis_name_trends_short()
+    def get_apis_name_trends_minus(self):
+
+        return self.ServicesApi.get_apis_name_trends_minus()
 
     def set_apis_name_smtp(self):
 
-        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends_short())
+        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends_minus())
 
     def initialize_request_data(self):
 
@@ -143,7 +156,7 @@ class ControllerGetDataAnalysisDerivTrendsShort:
         servicios_a_verificar = [
             lambda: self.ServicesShedule.get_shedule_result(hour),
             lambda: self.ServicesApi.get_api_result(),
-            lambda: self.ServicesCronjobs.add_trends_short(id_cronjobs, date)
+            lambda: self.ServicesCronjobs.add_trends_minus(id_cronjobs, date)
         ]
 
         for servicio in servicios_a_verificar:
@@ -158,6 +171,16 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
         return {'status': True}
     
+    def get_tokens(self):
+
+        return self.ServicesDeriv.get_tokens_ursa_minor()
+    
+    def init_tokens_asignado(self,account):
+
+        self.ServicesDeriv.init_tokens_asignado(account)
+
+        return True
+    
     async def initialize_deriv_services(self, date):
 
         self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
@@ -166,7 +189,7 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
         self.init_tokens_asignado(tokens)
 
-        result = await self.ServicesCheckTrendsshort.init()
+        result = await self.ServicesCheckTrendsMinus.init()
 
         if not result['status']:
 
@@ -174,17 +197,17 @@ class ControllerGetDataAnalysisDerivTrendsShort:
 
         self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
-        await self.ServicesCheckTrendsExpansive.set_balance(self.ServicesDates.get_day())
+        await self.ServicesCheckTrendsMinus.set_balance(self.ServicesDates.get_day())
 
         self.ServicesEvents.set_events_field('config_broker', self.ServicesDates.get_current_date_mil_dynamic())
 
-        self.ServicesCheckTrendsExpansive.init_services_events(self.ServicesEvents)
+        self.ServicesCheckTrendsMinus.init_services_events(self.ServicesEvents)
 
-        self.ServicesCheckTrendsExpansive.init_services_dates(self.ServicesDates)
+        self.ServicesCheckTrendsMinus.init_services_dates(self.ServicesDates)
 
         return {'status': True, 'message': 'Initialization successful'}
 
-    async def GetDataAnalysisDerivShort(self, request):
+    async def GetDataAnalysisDerivMinus(self, request):
 
         now, date, hour, id_cronjobs = self.initialize_request_data()
 

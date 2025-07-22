@@ -28,7 +28,7 @@ class EntityApi():
             'trends':config("ID_API"),
             'wma':config("ID_API_WMA"),
             'trends_expansive':config("ID_API_TRENDS_EXPANSIVE"),
-            'trends_short':config("ID_API_TRENDS_SHORT"),
+            'trends_minus':config("ID_API_TRENDS_MINUS"),
             'endpoinst':config("ID_API_ENDPOINT"),
         }
 
@@ -72,9 +72,9 @@ class EntityApi():
 
         return self.get_apis_name(id)
     
-    def get_apis_name_trends_short(self):
+    def get_apis_name_trends_minus(self):
 
-        id = self.get_apis_ids('trends_short')
+        id = self.get_apis_ids('trends_minus')
 
         return self.get_apis_name(id)
     
