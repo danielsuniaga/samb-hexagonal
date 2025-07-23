@@ -236,17 +236,20 @@ class ControllerGetDataAnalysisDerivTrendsMinus:
         return self.ServicesEvents.add_events(details, differences, id_cronjobs)
 
     async def GetDataAnalysisDerivMinus(self, request):
-
         now, date, hour, id_cronjobs = self.initialize_request_data()
 
         resultado = self.verify_services(request, hour, date, id_cronjobs)
 
         if not resultado['status']:
+            self.ServicesSmtp.send_notification_email(date, resultado['message'])  # ← añade esto si lo deseas
+            return resultado
 
-            return 
-        
         resultado_deriv = await self.initialize_deriv_services(date)
+        if not resultado_deriv['status']:
+            self.ServicesSmtp.send_notification_email(date, resultado_deriv['message'])  # ← añade esto si lo deseas
+            return resultado_deriv
 
         await self.process_deriv_services()
 
         return self.finalize_request(now, id_cronjobs)
+
