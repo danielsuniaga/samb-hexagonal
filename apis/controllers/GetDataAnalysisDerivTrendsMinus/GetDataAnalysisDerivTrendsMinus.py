@@ -124,6 +124,14 @@ class ControllerGetDataAnalysisDerivTrendsMinus:
         self.ServicesCheckTrendsMinus.init_services_telegram(self.ServicesTelegram)
 
         return True
+    
+    def generate_diferences_events(self):
+
+        return self.ServicesEvents.generate_diferences_events()
+    
+    def get_events(self):
+
+        return self.ServicesEvents.get_events()
 
     def get_apis_name_trends_minus(self):
 
@@ -207,6 +215,26 @@ class ControllerGetDataAnalysisDerivTrendsMinus:
 
         return {'status': True, 'message': 'Initialization successful'}
 
+    async def process_deriv_services(self):
+
+        await self.ServicesCheckTrendsMinus.loops()
+
+        await self.ServicesCheckTrendsMinus.closed()
+
+    def finalize_request(self, now, id_cronjobs):
+
+        now = self.ServicesDates.get_current_utc5()
+
+        self.ServicesDates.set_end_date()
+
+        self.add_events(self.get_events(), self.generate_diferences_events(), id_cronjobs)
+
+        return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
+    
+    def add_events(self, details, differences, id_cronjobs):
+
+        return self.ServicesEvents.add_events(details, differences, id_cronjobs)
+
     async def GetDataAnalysisDerivMinus(self, request):
 
         now, date, hour, id_cronjobs = self.initialize_request_data()
@@ -219,4 +247,6 @@ class ControllerGetDataAnalysisDerivTrendsMinus:
         
         resultado_deriv = await self.initialize_deriv_services(date)
 
-        return True
+        await self.process_deriv_services()
+
+        return self.finalize_request(now, id_cronjobs)
