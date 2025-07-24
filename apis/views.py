@@ -79,15 +79,13 @@ class GetDataAnalysisDerivMinus(APIView):
 
     def post(self, request, format=None):
 
-        return Response(True)
-
         response_data = async_to_sync(self.async_post)(request)
 
         return Response(response_data)
 
     async def async_post(self, request):
 
-        result = await self.controller.GetDataAnalysisDerivShort(request)
+        result = await self.controller.GetDataAnalysisDerivMinus(request)
 
         return result
     
