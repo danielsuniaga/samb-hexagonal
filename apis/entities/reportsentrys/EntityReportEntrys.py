@@ -248,7 +248,7 @@ class EntityReportEntrys():
     
     def generate_message_parameters(self, data):
 
-        return "PARAMS: (Profit: "+str(data['profit'])+", Loss: "+str(data['loss'])+", Money: "+str(data['money'])+") \n"
+        return "PARAMS: (Type: "+str(data['type'])+", Day: "+str(data['day_description'])+" Permission real: "+str(data['permision_real'])+", Profit: "+str(data['profit'])+", Loss: "+str(data['loss'])+", Money: "+str(data['money'])+", Obs:"+str(data['observations'])+") \n"
 
     def generate_report_lines(self, data):
 
