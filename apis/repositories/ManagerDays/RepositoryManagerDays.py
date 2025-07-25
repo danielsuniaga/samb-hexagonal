@@ -12,7 +12,7 @@ class RepositoryManagerDays():
 
         try:
 
-            query = """SELECT samb_manager_days.type AS type, samb_manager_days.money AS money, samb_manager_days.profit AS profit, samb_manager_days.loss AS loss, samb_methodologys.permission_real AS permision_real FROM samb_manager_days INNER JOIN samb_methodologys ON samb_manager_days.id_methodology=samb_methodologys.id WHERE samb_manager_days.day_number = %s AND samb_manager_days.id_methodology = %s"""
+            query = """SELECT samb_manager_days.type AS type, samb_manager_days.money AS money, samb_manager_days.profit AS profit, samb_manager_days.loss AS loss, samb_manager_days.day_description AS day_description, samb_manager_days.observations AS observations, samb_methodologys.permission_real AS permision_real FROM samb_manager_days INNER JOIN samb_methodologys ON samb_manager_days.id_methodology = samb_methodologys.id  WHERE samb_manager_days.day_number = %s AND samb_manager_days.id_methodology = %s"""
 
             self.cursor_db.execute(query, [day, id_methodology])
 
