@@ -70,9 +70,6 @@ class EntityModels():
 
         X = data.drop(columns=['entry_result', 'year', 'day', 'hour','month'])  # ¡NUNCA COMENTAR ESTA LÍNEA!
 
-        # X = data.drop(columns=['entry_type','entry_amount', 'entry_result','movement_high_candle','movement_low_candle'])  # ¡NUNCA COMENTAR ESTA LÍNEA!
-        print("data x",X)
-
         # 1. División optimizada con semilla más favorable
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, 
@@ -329,23 +326,11 @@ class EntityModels():
         message = self.get_head_message_reports()
         
         for model_name, metrics in results.items():
-            message += f"\n🤖 {model_name.upper()}:\n"
-            message += f"  📊 Accuracy: {metrics['accuracy']:.3f} | Balanced: {metrics['balanced_accuracy']:.3f}\n"
-            message += f"  🎯 Precision: {metrics['precision']:.3f} | Recall: {metrics['recall']:.3f}\n"
-            message += f"  📈 F1: {metrics['f1_score']:.3f}"
-            
-            # AUC solo si está disponible
-            if metrics.get('auc_score') is not None:
-                message += f" | AUC: {metrics['auc_score']:.3f}"
-            message += "\n"
-            
-            # Métricas específicas de trading
-            message += f"  💰 Win Precision: {metrics['precision_win']:.3f} | Loss Precision: {metrics['precision_loss']:.3f}\n"
-            message += f"  📊 Actual Win Rate: {metrics['actual_win_rate']:.3f} | Predicted: {metrics['predicted_win_rate']:.3f}\n"
-            message += f"  🎲 Predictions: {metrics['win_predictions']}/{metrics['total_predictions']} wins\n"
-            
-            # Matriz de confusión resumida
-            tp, tn, fp, fn = metrics['true_positives'], metrics['true_negatives'], metrics['false_positives'], metrics['false_negatives']
-            message += f"  📋 TP:{tp} TN:{tn} FP:{fp} FN:{fn}\n"
+
+            message += f"{model_name.upper()}: "
+            message += f"Accuracy({metrics['accuracy']:.3f}), "
+            message += f"Precision({metrics['precision']:.3f}), "
+            message += f"Recall({metrics['recall']:.3f}), "
+            message += f"F1 Score({metrics['f1_score']:.3f})\n"
         
         return message

@@ -164,6 +164,7 @@ class RepositoryEntrys():
             )
             SELECT 
                 PivotedCandles.id_entry_id AS id_entry_id,
+                samb_methodologys.description_number AS description_methodology,
                 CASE WHEN samb_entrys.type = 'CALL' THEN 1 WHEN samb_entrys.type = 'PUT' THEN 0 ELSE NULL END AS entry_type,
                 CASE WHEN samb_entrys.condition_entry = 'CLOSE' THEN 1 ELSE NULL END AS entry_condition,
                 samb_entrys.amount AS entry_amount,
@@ -204,6 +205,7 @@ class RepositoryEntrys():
                 PivotedCandles.candle_29_open, PivotedCandles.candle_29_high, PivotedCandles.candle_29_low, PivotedCandles.candle_29_close,
                 PivotedCandles.candle_30_open, PivotedCandles.candle_30_high, PivotedCandles.candle_30_low, PivotedCandles.candle_30_close
             FROM samb_entrys 
+            INNER JOIN samb_methodologys ON samb_entrys.id_methodology = samb_methodologys.id
             INNER JOIN samb_entrys_results ON samb_entrys.id = samb_entrys_results.id_entrys_id 
             INNER JOIN PivotedCandles ON samb_entrys.id = PivotedCandles.id_entry_id 
             LEFT JOIN samb_indicators_entrys sma_30 ON sma_30.id_entry_id = samb_entrys.id AND sma_30.id_indicators_id = %s 
