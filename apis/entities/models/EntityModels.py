@@ -63,12 +63,36 @@ class EntityModels():
     def get_config_active(self):
         
         return self.config['active']
+
+    def clean_nan_data(self, X, y):
+
+        filas_originales = len(X)
+        
+        # Si es pandas DataFrame
+        if hasattr(X, 'isna'):
+            # Eliminar filas con cualquier valor NaN o infinito
+            mask_limpio = ~(X.isna().any(axis=1) | X.isin([np.inf, -np.inf]).any(axis=1))
+            X = X[mask_limpio]
+            y = y[mask_limpio]
+        else:
+            # Si es numpy array
+            # Eliminar filas con NaN o infinitos
+            mask_limpio = ~(np.isnan(X).any(axis=1) | np.isinf(X).any(axis=1))
+            X = X[mask_limpio]
+            y = y[mask_limpio]
+        
+        filas_finales = len(X)
+        filas_eliminadas = filas_originales - filas_finales
+
+        return X, y
     
     def init_data(self,data):
 
         y = data['entry_result']
 
         X = data.drop(columns=['entry_result', 'year', 'day', 'hour','month'])  # ¡NUNCA COMENTAR ESTA LÍNEA!
+
+        X, y = self.clean_nan_data(X, y)
 
         # 1. División optimizada con semilla más favorable
         X_train, X_test, y_train, y_test = train_test_split(
