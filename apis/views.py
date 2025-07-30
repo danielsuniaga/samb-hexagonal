@@ -49,6 +49,28 @@ class GetDataAnalysisDeriv(APIView):
 
         return result
     
+class GetDataAnalysisDerivML(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDataAnalysisDerivTrends.ControllerGetDataAnalysisDerivTrends()
+
+    def post(self, request, format=None):
+
+        return Response(True)
+
+        response_data = async_to_sync(self.async_post)(request)
+
+        return Response(response_data)
+        
+    async def async_post(self, request):
+
+        result = await self.controller.GetDataAnalysisDeriv(request)
+
+        return result
+    
 class GetDataAnalysisDerivExpansive(APIView):
 
     controller = None
