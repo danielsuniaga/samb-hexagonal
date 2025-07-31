@@ -4,7 +4,7 @@ import apis.services.cronjobs.ServicesCronjobs as ServicesCronjobs
 import apis.services.api.ServicesApi as ServicesApi
 import apis.services.smtp.ServicesSmtp as ServicesSmtp
 import apis.services.shedule.ServicesShedule as ServicesShedule
-import apis.services.checktrends.ServicesCkeckTrends as ServicesCkeckTrends
+import apis.services.checktrendsml.ServicesCheckTrendsML as ServicesCkeckTrendsML
 import apis.services.managerdays.ServicesManagerDays as ServicesManagerDays
 import apis.services.methodologytrendsml.ServicesMethodologyTrendsML as ServicesMethodologyTrendsML
 import apis.services.indicators.ServicesIndicators as ServicesIndicators
@@ -14,7 +14,8 @@ import apis.services.platform.ServicesPlatform as ServicesPlatform
 import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndicatorsEntrys
 import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
-import apis.services.deriv.ServicesDeriv as ServicesDeriv   
+import apis.services.deriv.ServicesDeriv as ServicesDeriv
+import apis.services.models.ServicesModels as ServicesModels   
 
 
 class ControllerGetDataAnalysisDerivTrendsML: 
@@ -26,7 +27,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
     ServicesApi = None
     ServicesSmtp = None
     ServicesShedule = None
-    ServicesCkeckTrends = None
+    ServicesCkeckTrendsML = None
     ServicesManagerDays = None
     ServicesMethodologyTrendsML = None
     ServicesIndicators = None
@@ -37,6 +38,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
     ServicesMovements = None
     ServicesTelegram = None
     ServicesDeriv = None
+    ServicesModels = None
 
     def __init__(self):
         self.initialize_services()
@@ -49,7 +51,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesApi = ServicesApi.ServicesApi()
         self.ServicesSmtp = ServicesSmtp.ServicesSmtp()
         self.ServicesShedule = ServicesShedule.ServicesShedule()
-        self.ServicesCkeckTrends = ServicesCkeckTrends.ServicesCkeckTrends()
+        self.ServicesCheckTrendsML = ServicesCkeckTrendsML.ServicesCkeckTrendsML()
         self.ServicesManagerDays = ServicesManagerDays.ServicesManagerDays()
         self.ServicesMethodologyTrendsML = ServicesMethodologyTrendsML.ServicesMethodologyTrendsML()
         self.ServicesIndicators = ServicesIndicators.ServicesIndicators()
@@ -60,41 +62,91 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesMovements = ServicesMovements.ServicesMovements()
         self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
         self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
+        self.ServicesModels = ServicesModels.ServicesModels()
 
     def initialize_check_trends_services_interns(self):
         self.ServicesEvents.init_services_dates(self.ServicesDates)
-        self.ServicesCkeckTrends.init_services_manager_days(self.ServicesManagerDays)
-        self.ServicesCkeckTrends.init_services_methodology_trends(self.ServicesMethodologyTrendsML)
-        self.ServicesCkeckTrends.init_services_indicators(self.ServicesIndicators)
-        self.ServicesCkeckTrends.init_services_entrys_results(self.ServicesEntrysResults)
-        self.ServicesCkeckTrends.init_services_entrys(self.ServicesEntrys)
-        self.ServicesCkeckTrends.init_services_cronjobs(self.ServicesCronjobs)
-        self.ServicesCkeckTrends.init_services_platform(self.ServicesPlatform)
-        self.ServicesCkeckTrends.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
-        self.ServicesCkeckTrends.init_services_movements(self.ServicesMovements)
-        self.ServicesCkeckTrends.init_services_telegram(self.ServicesTelegram)
-        self.ServicesCkeckTrends.init_services_deriv(self.ServicesDeriv)
+        self.ServicesCheckTrendsML.init_services_manager_days(self.ServicesManagerDays)
+        self.ServicesCheckTrendsML.init_services_methodology_trends_ml(self.ServicesMethodologyTrendsML)
+        self.ServicesCheckTrendsML.init_services_indicators(self.ServicesIndicators)
+        self.ServicesCheckTrendsML.init_services_entrys_results(self.ServicesEntrysResults)
+        self.ServicesCheckTrendsML.init_services_entrys(self.ServicesEntrys)
+        self.ServicesCheckTrendsML.init_services_cronjobs(self.ServicesCronjobs)
+        self.ServicesCheckTrendsML.init_services_platform(self.ServicesPlatform)
+        self.ServicesCheckTrendsML.init_services_indicators_entrys(self.ServicesIndicatorsEntrys)
+        self.ServicesCheckTrendsML.init_services_movements(self.ServicesMovements)
+        self.ServicesCheckTrendsML.init_services_telegram(self.ServicesTelegram)
+        self.ServicesCheckTrendsML.init_services_deriv(self.ServicesDeriv)
+        self.ServicesCheckTrendsML.init_services_models(self.ServicesModels)
  
 
-    def get_apis_name_trends(self):
-        return self.ServicesApi.get_apis_name_trends()
+    def get_apis_name_trends_ml(self):
+        return self.ServicesApi.get_apis_name_trends_ml()
 
     def set_apis_name_smtp(self):
-        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends())
+        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends_ml())
 
-    async def GetDataAnalysisDeriv(self, request):
+    def verify_services(self, request, hour, date, id_cronjobs):
+
+        servicios_a_verificar = [
+            lambda: self.ServicesShedule.get_shedule_result(hour),
+            lambda: self.ServicesApi.get_api_result(),
+            lambda: self.ServicesCronjobs.add_trends_ml(id_cronjobs, date)
+        ]
+
+        for servicio in servicios_a_verificar:
+
+            resultado = servicio() if callable(servicio) else servicio
+
+            if not resultado['status']:
+
+                self.ServicesSmtp.send_notification_email(date, resultado['message'])
+                
+                return resultado
+
+        return {'status': True}
+
+    async def GetDataAnalysisDerivML(self, request):
+
         now, date, hour, id_cronjobs = self.initialize_request_data()
         resultado = self.verify_services(request, hour, date, id_cronjobs)
         if not resultado['status']:
-            return        
+            return resultado 
         resultado_deriv = await self.initialize_deriv_services(date)
         if not resultado_deriv['status']:
             return self.ServicesSmtp.send_notification_email(date, resultado_deriv['message'])  
+        
         await self.process_deriv_services()
-        # Aquí puedes incluir el procesamiento ML
-        ml_result = await self.ServicesML.run_ml_analysis(date)
-        # Puedes manejar el resultado como necesites
+
         return self.finalize_request(now, id_cronjobs)
+    
+    async def process_deriv_services(self):
+
+        await self.ServicesCheckTrendsML.loops()
+
+        await self.ServicesCheckTrendsML.closed()
+
+    def generate_diferences_events(self):
+
+        return self.ServicesEvents.generate_diferences_events()
+    
+    def get_events(self):
+
+        return self.ServicesEvents.get_events()
+    
+    def add_events(self, details, differences, id_cronjobs):
+
+        return self.ServicesEvents.add_events(details, differences, id_cronjobs)
+
+    def finalize_request(self, now, id_cronjobs):
+
+        now = self.ServicesDates.get_current_utc5()
+
+        self.ServicesDates.set_end_date()
+
+        self.add_events(self.get_events(), self.generate_diferences_events(), id_cronjobs)
+        
+        return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
 
     def initialize_request_data(self):
         now = self.ServicesDates.get_current_utc5()
@@ -114,12 +166,16 @@ class ControllerGetDataAnalysisDerivTrendsML:
         return True
 
     async def initialize_deriv_services(self, date):
+    
         self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
         tokens = self.get_tokens()
         self.init_tokens_asignado(tokens)
-        result = await self.ServicesCkeckTrends.init()
+        result = await self.ServicesCheckTrendsML.init()
         if not result['status']:
             return result
         self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
-        await self.ServicesCkeckTrends.set_balance(self.ServicesDates.get_day())
+        await self.ServicesCheckTrendsML.set_balance(self.ServicesDates.get_day())
         self.ServicesEvents.set_events_field('config_broker', self.ServicesDates.get_current_date_mil_dynamic())
+        self.ServicesCheckTrendsML.init_services_events(self.ServicesEvents)
+        self.ServicesCheckTrendsML.init_services_dates(self.ServicesDates)
+        return {'status': True, 'message': 'Initialization successful'}

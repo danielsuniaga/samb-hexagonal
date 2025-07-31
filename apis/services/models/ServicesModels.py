@@ -1,14 +1,18 @@
 import apis.entities.models.EntityModels as EntityModels
+import apis.repositories.models.RepositoryModels as RepositoryModels
 
 class ServicesModels(): 
 
     entity = None
+
+    repository = None
 
     ServicesDatasets = None
 
     def __init__(self):
         
         self.entity = EntityModels.EntityModels()
+        self.repository = RepositoryModels.RepositoryModels()
     
     def init_services_datasets(self,value):
 
@@ -80,3 +84,19 @@ class ServicesModels():
     def get_directory_general(self):
 
         return self.entity.get_config_directory_general()
+    
+    def get_best_model_repository(self):
+
+        return self.repository.get_best_model()
+
+    def get_best_model(self):
+
+        result = self.get_best_model_repository()
+
+        print(result)
+
+        return True
+    
+    def check_models(self):
+
+        return True 
