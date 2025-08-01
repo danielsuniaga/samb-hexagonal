@@ -88,15 +88,52 @@ class ServicesModels():
     def get_best_model_repository(self):
 
         return self.repository.get_best_model()
+    
+    def init_result_get_best_model(self, result):
+
+        return result['data'][0]
 
     def get_best_model(self):
 
         result = self.get_best_model_repository()
 
-        print(result)
-
-        return True
+        return self.init_result_get_best_model(result)
     
+    def get_config_accuracy_min(self):  
+        return self.entity.get_config_accuracy_min()
+    
+    def set_config_accuracy_min(self, value):
+
+        return self.entity.set_config_accuracy_min(value)
+
     def check_models(self):
 
-        return True 
+        result = self.get_best_model()
+
+        if float(result['accuracy']) < float(self.get_config_accuracy_min()):
+
+            return {'status': False, 'message': f"Accuracy {result['accuracy']} is below the minimum required {str(self.get_config_accuracy_min())}"}
+        
+        self.set_config_accuracy_min(result)
+
+        return {'status': True, 'message': 'Models are checked successfully.'} 
+    
+    def get_config_best_model(self):
+
+        return self.entity.get_config_best_model()
+    
+    def get_name_models_by_id_models(self, id_model):
+
+        return self.entity.get_name_models_by_id_models(id_model)
+    
+    def get_predict_models(self,id_models):
+
+        return self.entity.get_predict_models(id_models)
+    
+    def check_predict_models(self):
+
+        best_model_info = self.get_best_model()
+
+        result = self.get_predict_models(best_model_info['id'])
+
+        return True

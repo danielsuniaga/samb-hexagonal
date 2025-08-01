@@ -78,7 +78,6 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesCheckTrendsML.init_services_telegram(self.ServicesTelegram)
         self.ServicesCheckTrendsML.init_services_deriv(self.ServicesDeriv)
         self.ServicesCheckTrendsML.init_services_models(self.ServicesModels)
- 
 
     def get_apis_name_trends_ml(self):
         return self.ServicesApi.get_apis_name_trends_ml()
@@ -87,24 +86,50 @@ class ControllerGetDataAnalysisDerivTrendsML:
         return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends_ml())
 
     def verify_services(self, request, hour, date, id_cronjobs):
+        servicios_a_verificar = self.init_verify_services(hour, date, id_cronjobs)
 
-        servicios_a_verificar = [
-            lambda: self.ServicesShedule.get_shedule_result(hour),
-            lambda: self.ServicesApi.get_api_result(),
-            lambda: self.ServicesCronjobs.add_trends_ml(id_cronjobs, date)
-        ]
-
-        for servicio in servicios_a_verificar:
-
-            resultado = servicio() if callable(servicio) else servicio
-
+        for servicio_info in servicios_a_verificar:
+            resultado = self.execute_service_check(servicio_info)
             if not resultado['status']:
-
-                self.ServicesSmtp.send_notification_email(date, resultado['message'])
-                
+                self.handle_service_error(servicio_info, date, resultado)
                 return resultado
 
         return {'status': True}
+
+    def init_verify_services(self, hour, date, id_cronjobs):
+        return [
+            {
+                'name': 'schedule_service',
+                'function': lambda: self.ServicesShedule.get_shedule_result(hour),
+                'send_email_on_error': True
+            },
+            {
+                'name': 'api_service',
+                'function': lambda: self.ServicesApi.get_api_result(),
+                'send_email_on_error': True
+            },
+            {
+                'name': 'cronjobs_service',
+                'function': lambda: self.ServicesCronjobs.add_trends_ml(id_cronjobs, date),
+                'send_email_on_error': True
+            },
+                        {
+                'name': 'models_service',
+                'function': lambda: self.ServicesModels.check_models(),
+                'send_email_on_error': False
+            }
+
+        ]
+
+    def execute_service_check(self, servicio_info):
+        servicio_function = servicio_info['function']
+        resultado = servicio_function() if callable(servicio_function) else servicio_function
+        return resultado
+
+    def handle_service_error(self, servicio_info, date, resultado):
+        if servicio_info.get('send_email_on_error', False):
+            self.ServicesSmtp.send_notification_email(date, resultado['message'])
+
 
     async def GetDataAnalysisDerivML(self, request):
 

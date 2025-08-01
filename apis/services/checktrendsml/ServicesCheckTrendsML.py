@@ -528,6 +528,14 @@ class ServicesCkeckTrendsML():
 
         return True
     
+    def check_predict_models(self,result):
+
+        if not result:
+
+            return False
+
+        return self.ServicesModels.check_predict_models()
+    
     async def loops(self):
 
         self.set_events_field('init_loop',self.get_current_date_mil_dynamic())
@@ -544,7 +552,8 @@ class ServicesCkeckTrendsML():
         
         self.set_events_field('generate_indicators',self.get_current_date_mil_dynamic())
 
-        print("Result Indicators: ",result)
+        self.check_predict_models(result)
+
         # result = self.check_monetary_filter(result)
 
         # self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())

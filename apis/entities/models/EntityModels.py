@@ -34,6 +34,8 @@ class EntityModels():
             'active':int(config("ACTIVE_GENERAL_ML")),
             'directory_general':config("DIRECTORY_ML_GENERAL"),
             'name_project':config("PROJECT_NAME"),
+            'accuracy_min': float(config("ML_ACCURACY_MIN")),
+            'best_model': None,
             'id_models':
                 {
                     'regression_logistic':config("ID_REGRESSION_LOGISTIC"),
@@ -51,6 +53,32 @@ class EntityModels():
         }
 
         return True
+    
+    def get_name_models_by_id_models(self, id_model):
+        for name, id_value in self.config['id_models'].items():
+            if id_value == id_model:
+                return self.config['name_models'][name]
+        
+        return None
+    
+    def set_config(self, key, value):
+
+        if key in self.config:
+            self.config[key] = value
+            return True
+        return False
+    
+    def set_config_accuracy_min(self, value):
+
+        return self.set_config('accuracy_min', value)
+    
+    def get_config_accuracy_min(self):
+        
+        return self.config['accuracy_min']
+    
+    def get_config_best_model(self):
+
+        return self.config['best_model']
     
     def get_config_name_project(self):
         
@@ -90,7 +118,13 @@ class EntityModels():
 
         y = data['entry_result']
 
-        X = data.drop(columns=['entry_result', 'year', 'day', 'hour','month'])  # ¡NUNCA COMENTAR ESTA LÍNEA!
+        X = data.drop(columns=['entry_result', 'year', 'day', 'hour','month'])  
+
+        # if hasattr(X, 'columns'):
+        #     print("📋 COLUMNAS DE X:")
+        #     for i, col in enumerate(X.columns, 1):
+        #         print(f"{i:3d}. {col}")
+        #     print(f"\nTotal: {len(X.columns)} columnas")
 
         X, y = self.clean_nan_data(X, y)
 
@@ -358,3 +392,170 @@ class EntityModels():
             message += f"F1 Score({metrics['f1_score']:.3f})\n"
         
         return message
+    
+    def open_model(self, path): 
+        try:
+            with open(path, 'rb') as model_file:
+                loaded_model = pickle.load(model_file)
+                if loaded_model is None:
+                    return {'status': False, 'message': 'Failed to load model'}
+                return {'status': True, 'model': loaded_model, 'path': path}
+        except FileNotFoundError:
+            return {'status': False, 'message': f'Model file not found: {path}'}
+        except Exception as e:
+            return {'status': False, 'message': f'Error loading model: {str(e)}'}
+        
+    def init_data_get_predict_model(self):
+
+        data = {
+            'description_methodology': 'test',
+            'entry_type': 'test',
+            'entry_condition': 'test',
+            'entry_amount': 'test',
+            'sma_30_value': 'test',
+            'sma_10_value': 'test',
+            'rsi_value': 'test',
+            'candle_1_open': 'test',
+            'candle_1_high': 'test',
+            'candle_1_low': 'test',
+            'candle_1_close': 'test',
+            'candle_2_open': 'test',
+            'candle_2_high': 'test',
+            'candle_2_low': 'test',
+            'candle_2_close': 'test',
+            'candle_3_open': 'test',
+            'candle_3_high': 'test',
+            'candle_3_low': 'test',
+            'candle_3_close': 'test',
+            'candle_4_open': 'test',
+            'candle_4_high': 'test',
+            'candle_4_low': 'test',
+            'candle_4_close': 'test',
+            'candle_5_open': 'test',
+            'candle_5_high': 'test',
+            'candle_5_low': 'test',
+            'candle_5_close': 'test',
+            'candle_6_open': 'test',
+            'candle_6_high': 'test',
+            'candle_6_low': 'test',
+            'candle_6_close': 'test',
+            'candle_7_open': 'test',
+            'candle_7_high': 'test',
+            'candle_7_low': 'test',
+            'candle_7_close': 'test',
+            'candle_8_open': 'test',
+            'candle_8_high': 'test',
+            'candle_8_low': 'test',
+            'candle_8_close': 'test',
+            'candle_9_open': 'test',
+            'candle_9_high': 'test',
+            'candle_9_low': 'test',
+            'candle_9_close': 'test',
+            'candle_10_open': 'test',
+            'candle_10_high': 'test',
+            'candle_10_low': 'test',
+            'candle_10_close': 'test',
+            'candle_11_open': 'test',
+            'candle_11_high': 'test',
+            'candle_11_low': 'test',
+            'candle_11_close': 'test',
+            'candle_12_open': 'test',
+            'candle_12_high': 'test',
+            'candle_12_low': 'test',
+            'candle_12_close': 'test',
+            'candle_13_open': 'test',
+            'candle_13_high': 'test',
+            'candle_13_low': 'test',
+            'candle_13_close': 'test',
+            'candle_14_open': 'test',
+            'candle_14_high': 'test',
+            'candle_14_low': 'test',
+            'candle_14_close': 'test',
+            'candle_15_open': 'test',
+            'candle_15_high': 'test',
+            'candle_15_low': 'test',
+            'candle_15_close': 'test',
+            'candle_16_open': 'test',
+            'candle_16_high': 'test',
+            'candle_16_low': 'test',
+            'candle_16_close': 'test',
+            'candle_17_open': 'test',
+            'candle_17_high': 'test',
+            'candle_17_low': 'test',
+            'candle_17_close': 'test',
+            'candle_18_open': 'test',
+            'candle_18_high': 'test',
+            'candle_18_low': 'test',
+            'candle_18_close': 'test',
+            'candle_19_open': 'test',
+            'candle_19_high': 'test',
+            'candle_19_low': 'test',
+            'candle_19_close': 'test',
+            'candle_20_open': 'test',
+            'candle_20_high': 'test',
+            'candle_20_low': 'test',
+            'candle_20_close': 'test',
+            'candle_21_open': 'test',
+            'candle_21_high': 'test',
+            'candle_21_low': 'test',
+            'candle_21_close': 'test',
+            'candle_22_open': 'test',
+            'candle_22_high': 'test',
+            'candle_22_low': 'test',
+            'candle_22_close': 'test',
+            'candle_23_open': 'test',
+            'candle_23_high': 'test',
+            'candle_23_low': 'test',
+            'candle_23_close': 'test',
+            'candle_24_open': 'test',
+            'candle_24_high': 'test',
+            'candle_24_low': 'test',
+            'candle_24_close': 'test',
+            'candle_25_open': 'test',
+            'candle_25_high': 'test',
+            'candle_25_low': 'test',
+            'candle_25_close': 'test',
+            'candle_26_open': 'test',
+            'candle_26_high': 'test',
+            'candle_26_low': 'test',
+            'candle_26_close': 'test',
+            'candle_27_open': 'test',
+            'candle_27_high': 'test',
+            'candle_27_low': 'test',
+            'candle_27_close': 'test',
+            'candle_28_open': 'test',
+            'candle_28_high': 'test',
+            'candle_28_low': 'test',
+            'candle_28_close': 'test',
+            'candle_29_open': 'test',
+            'candle_29_high': 'test',
+            'candle_29_low': 'test',
+            'candle_29_close': 'test',
+            'candle_30_open': 'test',
+            'candle_30_high': 'test',
+            'candle_30_low': 'test',
+            'candle_30_close': 'test',
+        }
+        return data
+
+    def get_predict_models(self,id_models):
+
+        name_models = self.get_name_models_by_id_models(id_models)
+
+        if not name_models:
+            return {'status': False, 'message': f'Model ID {id_models} not found'}
+
+        path = self.get_config_directory_general() + name_models
+
+        model_result = self.open_model(path)
+
+        if not model_result['status']:
+            return {'status': False, 'message': 'Failed to load model'}
+
+        data_models = self.init_data_get_predict_model()
+
+        print(data_models)
+
+        return True
+
+        
