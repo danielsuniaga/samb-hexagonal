@@ -17,6 +17,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, Ma
 
 import pickle
 import numpy as np
+import pandas as pd
 
 class EntityModels():
 
@@ -49,10 +50,17 @@ class EntityModels():
                     'decision_tree':config("NAME_DECISION_TREE"),
                     'random_forest':config("NAME_RANDOM_FOREST"),
                     'mlp':config("NAME_MLP")
+                },
+            'scaler':
+                {
+                    'name':config("NAME_SCALER"),
                 }
         }
 
         return True
+    
+    def get_config_scaler_name(self):
+        return self.config['scaler']['name']
     
     def get_name_models_by_id_models(self, id_model):
         for name, id_value in self.config['id_models'].items():
@@ -114,39 +122,63 @@ class EntityModels():
 
         return X, y
     
-    def init_data(self,data):
-
-        y = data['entry_result']
-
-        X = data.drop(columns=['entry_result', 'year', 'day', 'hour','month'])  
-
-        # if hasattr(X, 'columns'):
-        #     print("📋 COLUMNAS DE X:")
-        #     for i, col in enumerate(X.columns, 1):
-        #         print(f"{i:3d}. {col}")
-        #     print(f"\nTotal: {len(X.columns)} columnas")
-
+    def init_data(self, data):
+        """
+        Inicializa los datos para entrenamiento y test, delegando responsabilidades.
+        """
+        y = self.extract_target(data)
+        X = self.extract_features(data)
         X, y = self.clean_nan_data(X, y)
+        X_train, X_test, y_train, y_test = self.split_data(X, y)
+        self.scaler = self.create_and_save_scaler(X_train)
+        X_train_scaled, X_test_scaled = self.apply_scaler(X_train, X_test)
+        return X_train_scaled, X_test_scaled, y_train, y_test
 
-        # 1. División optimizada con semilla más favorable
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, 
-            test_size=0.12,              # Menos test (88% entrenamiento)
-            stratify=y,                  # Mantener proporciones de clases
-            random_state=2024,           # Semilla favorable
-            shuffle=True                 # Asegurar mezcla completa
+    def extract_target(self, data):
+        """
+        Extrae la variable objetivo (y) del DataFrame.
+        """
+        return data['entry_result']
+
+    def extract_features(self, data):
+        """
+        Extrae las variables predictoras (X) del DataFrame.
+        """
+        return data.drop(columns=['entry_result', 'year', 'day', 'hour', 'month'])
+
+    def split_data(self, X, y):
+        """
+        Divide los datos en conjuntos de entrenamiento y prueba.
+        """
+        return train_test_split(
+            X, y,
+            test_size=0.12,
+            stratify=y,
+            random_state=2024,
+            shuffle=True
         )
-        
-        # 2. Crear y entrenar el scaler SOLO con datos de entrenamiento
-        self.scaler = StandardScaler()  # Volver a StandardScaler (mejor para ML)
-        self.scaler.fit(X_train)
 
+    def create_and_save_scaler(self, X_train):
+        """
+        Crea y guarda el scaler entrenado con los datos de entrenamiento.
+        """
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        scaler_path = self.get_config_directory_general() + self.get_config_scaler_name()
+        try:
+            with open(scaler_path, 'wb') as scaler_file:
+                pickle.dump(scaler, scaler_file)
+        except Exception as e:
+            print(f"❌ Error al guardar el scaler: {str(e)}")
+        return scaler
 
-        # # 3. Aplicar el scaler a ambos conjuntos
+    def apply_scaler(self, X_train, X_test):
+        """
+        Aplica el scaler a los conjuntos de entrenamiento y prueba.
+        """
         X_train_scaled = self.scaler.transform(X_train)
         X_test_scaled = self.scaler.transform(X_test)
-
-        return X_train_scaled, X_test_scaled, y_train, y_test
+        return X_train_scaled, X_test_scaled
     
     def train_models(self, x, y):
 
@@ -404,141 +436,52 @@ class EntityModels():
             return {'status': False, 'message': f'Model file not found: {path}'}
         except Exception as e:
             return {'status': False, 'message': f'Error loading model: {str(e)}'}
+    
+    def open_scaler(self, path):
+        """
+        Cargar el scaler guardado desde un archivo pickle
+        """
+        try:
+            with open(path, 'rb') as scaler_file:
+                loaded_scaler = pickle.load(scaler_file)
+                if loaded_scaler is None:
+                    return {'status': False, 'message': 'Failed to load scaler'}
+                return {'status': True, 'scaler': loaded_scaler, 'path': path}
+        except FileNotFoundError:
+            return {'status': False, 'message': f'Scaler file not found: {path}'}
+        except Exception as e:
+            return {'status': False, 'message': f'Error loading scaler: {str(e)}'}
         
-    def init_data_get_predict_model(self):
+    def init_data_get_predict_model(self,data,candles):
 
+        # Extraer las 30 últimas velas (o las primeras 30 si es necesario)
+        candle_list = candles.get('candles', [])
+        if len(candle_list) < 30:
+            raise ValueError("No hay suficientes velas en el parámetro 'candles' (se requieren al menos 30)")
+
+        # Tomar las últimas 30 velas (asumiendo que están ordenadas de más antigua a más reciente)
+        last_30_candles = candle_list[-30:]
+
+        # Construir el diccionario de datos reemplazando los campos 'test' por los valores reales de las velas
         data = {
-            'description_methodology': 'test',
-            'entry_type': 'test',
-            'entry_condition': 'test',
-            'entry_amount': 'test',
-            'sma_30_value': 'test',
-            'sma_10_value': 'test',
-            'rsi_value': 'test',
-            'candle_1_open': 'test',
-            'candle_1_high': 'test',
-            'candle_1_low': 'test',
-            'candle_1_close': 'test',
-            'candle_2_open': 'test',
-            'candle_2_high': 'test',
-            'candle_2_low': 'test',
-            'candle_2_close': 'test',
-            'candle_3_open': 'test',
-            'candle_3_high': 'test',
-            'candle_3_low': 'test',
-            'candle_3_close': 'test',
-            'candle_4_open': 'test',
-            'candle_4_high': 'test',
-            'candle_4_low': 'test',
-            'candle_4_close': 'test',
-            'candle_5_open': 'test',
-            'candle_5_high': 'test',
-            'candle_5_low': 'test',
-            'candle_5_close': 'test',
-            'candle_6_open': 'test',
-            'candle_6_high': 'test',
-            'candle_6_low': 'test',
-            'candle_6_close': 'test',
-            'candle_7_open': 'test',
-            'candle_7_high': 'test',
-            'candle_7_low': 'test',
-            'candle_7_close': 'test',
-            'candle_8_open': 'test',
-            'candle_8_high': 'test',
-            'candle_8_low': 'test',
-            'candle_8_close': 'test',
-            'candle_9_open': 'test',
-            'candle_9_high': 'test',
-            'candle_9_low': 'test',
-            'candle_9_close': 'test',
-            'candle_10_open': 'test',
-            'candle_10_high': 'test',
-            'candle_10_low': 'test',
-            'candle_10_close': 'test',
-            'candle_11_open': 'test',
-            'candle_11_high': 'test',
-            'candle_11_low': 'test',
-            'candle_11_close': 'test',
-            'candle_12_open': 'test',
-            'candle_12_high': 'test',
-            'candle_12_low': 'test',
-            'candle_12_close': 'test',
-            'candle_13_open': 'test',
-            'candle_13_high': 'test',
-            'candle_13_low': 'test',
-            'candle_13_close': 'test',
-            'candle_14_open': 'test',
-            'candle_14_high': 'test',
-            'candle_14_low': 'test',
-            'candle_14_close': 'test',
-            'candle_15_open': 'test',
-            'candle_15_high': 'test',
-            'candle_15_low': 'test',
-            'candle_15_close': 'test',
-            'candle_16_open': 'test',
-            'candle_16_high': 'test',
-            'candle_16_low': 'test',
-            'candle_16_close': 'test',
-            'candle_17_open': 'test',
-            'candle_17_high': 'test',
-            'candle_17_low': 'test',
-            'candle_17_close': 'test',
-            'candle_18_open': 'test',
-            'candle_18_high': 'test',
-            'candle_18_low': 'test',
-            'candle_18_close': 'test',
-            'candle_19_open': 'test',
-            'candle_19_high': 'test',
-            'candle_19_low': 'test',
-            'candle_19_close': 'test',
-            'candle_20_open': 'test',
-            'candle_20_high': 'test',
-            'candle_20_low': 'test',
-            'candle_20_close': 'test',
-            'candle_21_open': 'test',
-            'candle_21_high': 'test',
-            'candle_21_low': 'test',
-            'candle_21_close': 'test',
-            'candle_22_open': 'test',
-            'candle_22_high': 'test',
-            'candle_22_low': 'test',
-            'candle_22_close': 'test',
-            'candle_23_open': 'test',
-            'candle_23_high': 'test',
-            'candle_23_low': 'test',
-            'candle_23_close': 'test',
-            'candle_24_open': 'test',
-            'candle_24_high': 'test',
-            'candle_24_low': 'test',
-            'candle_24_close': 'test',
-            'candle_25_open': 'test',
-            'candle_25_high': 'test',
-            'candle_25_low': 'test',
-            'candle_25_close': 'test',
-            'candle_26_open': 'test',
-            'candle_26_high': 'test',
-            'candle_26_low': 'test',
-            'candle_26_close': 'test',
-            'candle_27_open': 'test',
-            'candle_27_high': 'test',
-            'candle_27_low': 'test',
-            'candle_27_close': 'test',
-            'candle_28_open': 'test',
-            'candle_28_high': 'test',
-            'candle_28_low': 'test',
-            'candle_28_close': 'test',
-            'candle_29_open': 'test',
-            'candle_29_high': 'test',
-            'candle_29_low': 'test',
-            'candle_29_close': 'test',
-            'candle_30_open': 'test',
-            'candle_30_high': 'test',
-            'candle_30_low': 'test',
-            'candle_30_close': 'test',
+            'description_methodology': data['description_methodology'],
+            'entry_type': data['entry_type'],
+            'entry_condition': data['entry_condition'],
+            'entry_amount': data['entry_amount'],
+            'sma_30_value': data['sma_30_value'],
+            'sma_10_value': data['sma_10_value'],
+            'rsi_value': data['rsi_value'],
         }
+
+        # Agregar los campos de las 30 velas
+        for idx, candle in enumerate(last_30_candles, start=1):
+            data[f'candle_{idx}_open'] = candle.get('open')
+            data[f'candle_{idx}_high'] = candle.get('high')
+            data[f'candle_{idx}_low'] = candle.get('low')
+            data[f'candle_{idx}_close'] = candle.get('close')
         return data
 
-    def get_predict_models(self,id_models):
+    def get_predict_models(self,id_models,data,candles):
 
         name_models = self.get_name_models_by_id_models(id_models)
 
@@ -552,10 +495,62 @@ class EntityModels():
         if not model_result['status']:
             return {'status': False, 'message': 'Failed to load model'}
 
-        data_models = self.init_data_get_predict_model()
+        # Cargar el scaler guardado usando el método auxiliar
+        scaler_path = self.get_config_directory_general() + "scaler.pkl"
+        scaler_result = self.open_scaler(scaler_path)
+        
+        if not scaler_result['status']:
+            return {'status': False, 'message': scaler_result['message']}
+        
+        # Asignar el scaler cargado al atributo de la clase
+        self.scaler = scaler_result['scaler']
 
-        print(data_models)
+        # Preparar los datos con las 30 velas reales
+        data_models = self.init_data_get_predict_model(data,candles)
 
-        return True
+        # Convertir el diccionario a DataFrame para aplicar el scaler
+        data_df = pd.DataFrame([data_models])
+        
+        # Aplicar el scaler a los datos de predicción (mismo que se usó en entrenamiento)
+        data_scaled = self.scaler.transform(data_df)
+        
+        # Realizar la predicción con el modelo cargado
+        model = model_result['model']
+        prediction = model.predict(data_scaled)
+        
+        # Obtener probabilidades si el modelo las soporta
+        probabilities = None
+        probability_loss = 0.0
+        probability_win = 0.0
+        confidence = 0.0
+        
+        if hasattr(model, 'predict_proba'):
+            probabilities = model.predict_proba(data_scaled)
+            probability_loss = float(probabilities[0][0])  # Probabilidad de pérdida (clase 0)
+            probability_win = float(probabilities[0][1])   # Probabilidad de ganancia (clase 1)
+            confidence = float(max(probabilities[0]))      # Confianza (mayor probabilidad)
+        
+        # Interpretar resultado
+        prediction_result = int(prediction[0])  # 0 = pérdida, 1 = ganancia
+        
+        print("🎯 PREDICCIÓN COMPLETADA:")
+        print(f"   Predicción: {'GANANCIA' if prediction_result == 1 else 'PÉRDIDA'} ({prediction_result})")
+        print(f"   Probabilidad de Pérdida: {probability_loss:.3f} ({probability_loss*100:.1f}%)")
+        print(f"   Probabilidad de Ganancia: {probability_win:.3f} ({probability_win*100:.1f}%)")
+        print(f"   Confianza: {confidence:.3f} ({confidence*100:.1f}%)")
+        
+        return {
+            'status': True,
+            'model_id': id_models,
+            'model_name': name_models,
+            'prediction': prediction_result,           # 0 o 1
+            'prediction_label': 'GANANCIA' if prediction_result == 1 else 'PÉRDIDA',
+            'probability_loss': probability_loss,      # Probabilidad de pérdida [0-1]
+            'probability_win': probability_win,        # Probabilidad de ganancia [0-1]
+            'confidence': confidence,                  # Confianza del modelo [0-1]
+            'confidence_percentage': confidence * 100, # Confianza en porcentaje
+            'data_shape': data_scaled.shape,           # Para debug
+            'features_count': data_scaled.shape[1]     # Número de características
+        }
 
         

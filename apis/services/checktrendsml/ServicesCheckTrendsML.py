@@ -28,6 +28,14 @@ class ServicesCkeckTrendsML():
 
     ServicesModels = None
 
+    ServicesMethodologys = None
+
+    def init_services_methodologys(self,value):
+
+        self.ServicesMethodologys = value
+
+        return True
+
     def init_services_models(self,value):
 
         self.ServicesModels = value
@@ -236,6 +244,10 @@ class ServicesCkeckTrendsML():
     def add_result_indicators(self,result_indicators):
 
         return self.ServicesMethodologyTrendsML.add_indicator(result_indicators)
+    
+    def get_result_indicators(self):
+
+        return self.ServicesMethodologyTrendsML.get_indicators()
 
     def check_indicators(self,result,candles):
 
@@ -528,14 +540,47 @@ class ServicesCkeckTrendsML():
 
         return True
     
-    def check_predict_models(self,result):
+    def get_methodology_description_number_by_id(self, id_methodology):
+        return self.ServicesMethodologys.get_methodology_description_number_by_id(id_methodology)
+    
+    def generate_entry_type_value(self, entry_type):
+        if entry_type == 'CALL':
+            return 1
+        elif entry_type == 'PUT':
+            return 0
+        else:
+            return None
+        
+    def generate_entry_condition_value(self, condition):
+        if condition == 'CLOSE':
+            return 1
+        else:
+            return None
+
+    def init_check_predict_models(self):
+
+        data_indicators = self.get_result_indicators()
+
+        return {
+            'description_methodology': self.get_methodology_description_number_by_id(self.get_id_methodology()),
+            'entry_type': self.generate_entry_type_value(self.get_type_entry()),
+            'entry_condition': self.generate_entry_condition_value(self.get_condition_entry()),
+            'entry_amount': self.get_money(),
+            'sma_30_value': data_indicators['sma_long'],
+            'sma_10_value': data_indicators['sma_short'],
+            'rsi_value': data_indicators['rsi'],
+        }
+
+    def check_predict_models(self,result,candles):
 
         if not result:
 
             return False
+        
+        data_services = self.init_check_predict_models()
 
-        return self.ServicesModels.check_predict_models()
-    
+        return self.ServicesModels.check_predict_models(data_services,candles)
+
     async def loops(self):
 
         self.set_events_field('init_loop',self.get_current_date_mil_dynamic())
@@ -552,7 +597,7 @@ class ServicesCkeckTrendsML():
         
         self.set_events_field('generate_indicators',self.get_current_date_mil_dynamic())
 
-        self.check_predict_models(result)
+        self.check_predict_models(result,result_candles)
 
         # result = self.check_monetary_filter(result)
 

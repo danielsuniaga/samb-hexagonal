@@ -15,7 +15,8 @@ import apis.services.indicatorsentrys.ServicesIndicatorsEntrys as ServicesIndica
 import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
 import apis.services.deriv.ServicesDeriv as ServicesDeriv
-import apis.services.models.ServicesModels as ServicesModels   
+import apis.services.models.ServicesModels as ServicesModels
+import apis.services.methodologys.ServicesMethodologys as ServicesMethodologys   
 
 
 class ControllerGetDataAnalysisDerivTrendsML: 
@@ -39,6 +40,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
     ServicesTelegram = None
     ServicesDeriv = None
     ServicesModels = None
+    ServicesMethodologys = None
 
     def __init__(self):
         self.initialize_services()
@@ -63,6 +65,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesTelegram = ServicesTelegram.ServicesTelegram()
         self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
         self.ServicesModels = ServicesModels.ServicesModels()
+        self.ServicesMethodologys = ServicesMethodologys.ServicesMethodologys()
 
     def initialize_check_trends_services_interns(self):
         self.ServicesEvents.init_services_dates(self.ServicesDates)
@@ -78,6 +81,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesCheckTrendsML.init_services_telegram(self.ServicesTelegram)
         self.ServicesCheckTrendsML.init_services_deriv(self.ServicesDeriv)
         self.ServicesCheckTrendsML.init_services_models(self.ServicesModels)
+        self.ServicesCheckTrendsML.init_services_methodologys(self.ServicesMethodologys)
 
     def get_apis_name_trends_ml(self):
         return self.ServicesApi.get_apis_name_trends_ml()

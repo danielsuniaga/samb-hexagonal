@@ -126,14 +126,14 @@ class ServicesModels():
 
         return self.entity.get_name_models_by_id_models(id_model)
     
-    def get_predict_models(self,id_models):
+    def get_predict_models(self,id_models,data,candles):
 
-        return self.entity.get_predict_models(id_models)
+        return self.entity.get_predict_models(id_models,data,candles)
     
-    def check_predict_models(self):
+    def check_predict_models(self,data, candles):
 
         best_model_info = self.get_best_model()
 
-        result = self.get_predict_models(best_model_info['id'])
+        result = self.get_predict_models(best_model_info['id'],data, candles)
 
         return True
