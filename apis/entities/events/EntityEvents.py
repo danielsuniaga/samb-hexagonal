@@ -60,7 +60,7 @@ class EntityEvents():
             'check_candles':'',
             'generate_indicators':'',
             'get_filter_monetary':'',
-            'get_model_general_rl':'',
+            'get_model_ml':'',
             'add_positions_brokers':'',
             'add_persistence':''
         }

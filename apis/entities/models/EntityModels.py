@@ -36,7 +36,9 @@ class EntityModels():
             'directory_general':config("DIRECTORY_ML_GENERAL"),
             'name_project':config("PROJECT_NAME"),
             'accuracy_min': float(config("ML_ACCURACY_MIN")),
+            'probability_min': float(config("PROBABILITY_MIN")),
             'best_model': None,
+            'result_models': None,
             'id_models':
                 {
                     'regression_logistic':config("ID_REGRESSION_LOGISTIC"),
@@ -62,6 +64,9 @@ class EntityModels():
     def get_config_scaler_name(self):
         return self.config['scaler']['name']
     
+    def get_config_probability_min(self):
+        return self.config['probability_min']
+    
     def get_name_models_by_id_models(self, id_model):
         for name, id_value in self.config['id_models'].items():
             if id_value == id_model:
@@ -79,6 +84,10 @@ class EntityModels():
     def set_config_accuracy_min(self, value):
 
         return self.set_config('accuracy_min', value)
+    
+    def set_config_result_models(self, value):
+
+        return self.set_config('result_models', value)
     
     def get_config_accuracy_min(self):
         
@@ -452,7 +461,9 @@ class EntityModels():
         except Exception as e:
             return {'status': False, 'message': f'Error loading scaler: {str(e)}'}
         
-    def init_data_get_predict_model(self,data,candles):
+    def init_data_get_predict_model(self,data):
+
+        candles = data.get('candles', [])
 
         # Extraer las 30 últimas velas (o las primeras 30 si es necesario)
         candle_list = candles.get('candles', [])
@@ -481,44 +492,53 @@ class EntityModels():
             data[f'candle_{idx}_close'] = candle.get('close')
         return data
 
-    def get_predict_models(self,id_models,data,candles):
-
+    def load_model_and_scaler(self, id_models):
+        """
+        Carga el modelo y scaler específicos por ID.
+        Responsabilidad: Gestión de carga de archivos ML.
+        """
         name_models = self.get_name_models_by_id_models(id_models)
-
         if not name_models:
             return {'status': False, 'message': f'Model ID {id_models} not found'}
 
-        path = self.get_config_directory_general() + name_models
-
-        model_result = self.open_model(path)
-
+        # Cargar modelo
+        model_path = self.get_config_directory_general() + name_models
+        model_result = self.open_model(model_path)
         if not model_result['status']:
             return {'status': False, 'message': 'Failed to load model'}
 
-        # Cargar el scaler guardado usando el método auxiliar
+        # Cargar scaler
         scaler_path = self.get_config_directory_general() + "scaler.pkl"
         scaler_result = self.open_scaler(scaler_path)
-        
         if not scaler_result['status']:
             return {'status': False, 'message': scaler_result['message']}
         
-        # Asignar el scaler cargado al atributo de la clase
-        self.scaler = scaler_result['scaler']
+        return {
+            'status': True,
+            'model': model_result['model'],
+            'model_name': name_models,
+            'scaler': scaler_result['scaler']
+        }
 
-        # Preparar los datos con las 30 velas reales
-        data_models = self.init_data_get_predict_model(data,candles)
-
-        # Convertir el diccionario a DataFrame para aplicar el scaler
+    def prepare_prediction_data(self, data, scaler):
+        """
+        Prepara y escala los datos para predicción.
+        Responsabilidad: Transformación de datos de entrada.
+        """
+        # Preparar datos con las 30 velas reales
+        data_models = self.init_data_get_predict_model(data)
+        
+        # Convertir a DataFrame y aplicar scaler
         data_df = pd.DataFrame([data_models])
+        data_scaled = scaler.transform(data_df)
         
-        # Aplicar el scaler a los datos de predicción (mismo que se usó en entrenamiento)
-        data_scaled = self.scaler.transform(data_df)
-        
-        # Realizar la predicción con el modelo cargado
-        model = model_result['model']
-        prediction = model.predict(data_scaled)
-        
-        # Obtener probabilidades si el modelo las soporta
+        return data_scaled
+
+    def calculate_probabilities(self, model, data_scaled):
+        """
+        Calcula las probabilidades y confianza del modelo.
+        Responsabilidad: Cálculo de métricas de predicción.
+        """
         probabilities = None
         probability_loss = 0.0
         probability_win = 0.0
@@ -530,19 +550,18 @@ class EntityModels():
             probability_win = float(probabilities[0][1])   # Probabilidad de ganancia (clase 1)
             confidence = float(max(probabilities[0]))      # Confianza (mayor probabilidad)
         
-        # Interpretar resultado
-        prediction_result = int(prediction[0])  # 0 = pérdida, 1 = ganancia
-        
-        print("🎯 PREDICCIÓN COMPLETADA:")
-        print(f"   Predicción: {'GANANCIA' if prediction_result == 1 else 'PÉRDIDA'} ({prediction_result})")
-        print(f"   Probabilidad de Pérdida: {probability_loss:.3f} ({probability_loss*100:.1f}%)")
-        print(f"   Probabilidad de Ganancia: {probability_win:.3f} ({probability_win*100:.1f}%)")
-        print(f"   Confianza: {confidence:.3f} ({confidence*100:.1f}%)")
-        
+        return probability_loss, probability_win, confidence
+
+    def format_prediction_result(self, id_models, model_name, prediction_result, 
+                                probability_loss, probability_win, confidence, data_scaled):
+        """
+        Formatea el resultado final de la predicción.
+        Responsabilidad: Estructuración de respuesta.
+        """
         return {
             'status': True,
             'model_id': id_models,
-            'model_name': name_models,
+            'model_name': model_name,
             'prediction': prediction_result,           # 0 o 1
             'prediction_label': 'GANANCIA' if prediction_result == 1 else 'PÉRDIDA',
             'probability_loss': probability_loss,      # Probabilidad de pérdida [0-1]
@@ -553,4 +572,43 @@ class EntityModels():
             'features_count': data_scaled.shape[1]     # Número de características
         }
 
+    def get_predict_models(self, id_models, data):
+        """
+        Método principal para obtener predicciones del modelo.
+        Responsabilidad: Orquestación del proceso de predicción.
+        """
+        # 1. Cargar modelo y scaler
+        load_result = self.load_model_and_scaler(id_models)
+        if not load_result['status']:
+            return load_result
         
+        model = load_result['model']
+        model_name = load_result['model_name'] 
+        scaler = load_result['scaler']
+        
+        # Asignar scaler al atributo de clase (para compatibilidad)
+        self.scaler = scaler
+
+        # 2. Preparar datos
+        data_scaled = self.prepare_prediction_data(data, scaler)
+        
+        # 3. Realizar predicción
+        prediction = model.predict(data_scaled)
+        prediction_result = int(prediction[0])  # 0 = pérdida, 1 = ganancia
+        
+        # 4. Calcular probabilidades
+        probability_loss, probability_win, confidence = self.calculate_probabilities(model, data_scaled)
+        
+        # 5. Formatear resultado
+        return self.format_prediction_result(
+            id_models, model_name, prediction_result,
+            probability_loss, probability_win, confidence, data_scaled
+        )
+
+    def check_predict_models(self, data):
+
+        if data['probability_win'] < self.get_config_probability_min():
+            
+            return {'status': False, 'message': f"Probability {data['probability_win']} is below the minimum required {self.get_config_probability_min()}"}
+
+        return {'status': True, 'message': 'Probability is acceptable.'}

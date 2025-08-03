@@ -557,7 +557,7 @@ class ServicesCkeckTrendsML():
         else:
             return None
 
-    def init_check_predict_models(self):
+    def init_check_predict_models(self,candles):
 
         data_indicators = self.get_result_indicators()
 
@@ -569,6 +569,7 @@ class ServicesCkeckTrendsML():
             'sma_30_value': data_indicators['sma_long'],
             'sma_10_value': data_indicators['sma_short'],
             'rsi_value': data_indicators['rsi'],
+            'candles': candles
         }
 
     def check_predict_models(self,result,candles):
@@ -577,9 +578,9 @@ class ServicesCkeckTrendsML():
 
             return False
         
-        data_services = self.init_check_predict_models()
+        data_services = self.init_check_predict_models(candles)
 
-        return self.ServicesModels.check_predict_models(data_services,candles)
+        return self.ServicesModels.check_predict_models(data_services)
 
     async def loops(self):
 
@@ -597,11 +598,11 @@ class ServicesCkeckTrendsML():
         
         self.set_events_field('generate_indicators',self.get_current_date_mil_dynamic())
 
+        result = self.check_monetary_filter(result)
+
+        self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())
+
         self.check_predict_models(result,result_candles)
-
-        # result = self.check_monetary_filter(result)
-
-        # self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())
 
         # result = await self.add_entry_broker(result)
 

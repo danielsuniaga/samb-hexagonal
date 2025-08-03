@@ -9,10 +9,18 @@ class ServicesModels():
 
     ServicesDatasets = None
 
+    ServicesPredictModels = None
+
     def __init__(self):
         
         self.entity = EntityModels.EntityModels()
         self.repository = RepositoryModels.RepositoryModels()
+
+    def init_services_predict_models(self,value):
+
+        self.ServicesPredictModels = value
+
+        return True
     
     def init_services_datasets(self,value):
 
@@ -126,14 +134,37 @@ class ServicesModels():
 
         return self.entity.get_name_models_by_id_models(id_model)
     
-    def get_predict_models(self,id_models,data,candles):
+    def get_predict_models(self,id_models,data):
 
-        return self.entity.get_predict_models(id_models,data,candles)
+        return self.entity.get_predict_models(id_models,data)
     
-    def check_predict_models(self,data, candles):
+    def set_config_result_models(self, value):
+
+        return self.entity.set_config_result_models(value)
+    
+    def check_predict_models_entity(self, data):
+
+        return self.entity.check_predict_models(data)
+    
+    def init_data_check_predict_models_entity(self, data):
+        return {'probability_win': data.get('probability_win')}
+    
+    def add_predict_models(self, data):
+
+        return self.ServicesPredictModels.add(data)
+    
+    def check_predict_models(self,data):
 
         best_model_info = self.get_best_model()
 
-        result = self.get_predict_models(best_model_info['id'],data, candles)
+        data_models = self.get_predict_models(best_model_info['id'],data)
 
-        return True
+        self.set_config_result_models(data_models)
+
+        data_entity = self.init_data_check_predict_models_entity(data_models)
+
+        self.add_predict_models(data_entity)
+
+        result = self.check_predict_models_entity(data_entity)
+
+        return result

@@ -16,7 +16,8 @@ import apis.services.movements.ServicesMovements as ServicesMovements
 import apis.services.telegram.ServicesTelegram as ServicesTelegram
 import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.models.ServicesModels as ServicesModels
-import apis.services.methodologys.ServicesMethodologys as ServicesMethodologys   
+import apis.services.methodologys.ServicesMethodologys as ServicesMethodologys  
+import apis.services.predictmodels.ServicesPredictModels as ServicesPredictModels 
 
 
 class ControllerGetDataAnalysisDerivTrendsML: 
@@ -41,6 +42,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
     ServicesDeriv = None
     ServicesModels = None
     ServicesMethodologys = None
+    ServicesPredictModels = None
 
     def __init__(self):
         self.initialize_services()
@@ -66,9 +68,11 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesDeriv = ServicesDeriv.ServicesDeriv()
         self.ServicesModels = ServicesModels.ServicesModels()
         self.ServicesMethodologys = ServicesMethodologys.ServicesMethodologys()
+        self.ServicesPredictModels = ServicesPredictModels.ServicesPredictModels()
 
     def initialize_check_trends_services_interns(self):
         self.ServicesEvents.init_services_dates(self.ServicesDates)
+        self.ServicesModels.init_services_predict_models(self.ServicesPredictModels)
         self.ServicesCheckTrendsML.init_services_manager_days(self.ServicesManagerDays)
         self.ServicesCheckTrendsML.init_services_methodology_trends_ml(self.ServicesMethodologyTrendsML)
         self.ServicesCheckTrendsML.init_services_indicators(self.ServicesIndicators)
@@ -82,6 +86,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesCheckTrendsML.init_services_deriv(self.ServicesDeriv)
         self.ServicesCheckTrendsML.init_services_models(self.ServicesModels)
         self.ServicesCheckTrendsML.init_services_methodologys(self.ServicesMethodologys)
+
 
     def get_apis_name_trends_ml(self):
         return self.ServicesApi.get_apis_name_trends_ml()
