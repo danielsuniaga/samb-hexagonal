@@ -72,6 +72,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
 
     def initialize_check_trends_services_interns(self):
         self.ServicesEvents.init_services_dates(self.ServicesDates)
+        self.ServicesPredictModels.init_services_dates(self.ServicesDates)
         self.ServicesModels.init_services_predict_models(self.ServicesPredictModels)
         self.ServicesCheckTrendsML.init_services_manager_days(self.ServicesManagerDays)
         self.ServicesCheckTrendsML.init_services_methodology_trends_ml(self.ServicesMethodologyTrendsML)

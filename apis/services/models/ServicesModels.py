@@ -163,7 +163,7 @@ class ServicesModels():
 
         data_entity = self.init_data_check_predict_models_entity(data_models)
 
-        self.add_predict_models(data_entity)
+        self.add_predict_models(data_models)
 
         result = self.check_predict_models_entity(data_entity)
 
