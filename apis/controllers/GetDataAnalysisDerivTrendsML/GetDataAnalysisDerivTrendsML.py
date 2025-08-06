@@ -18,6 +18,7 @@ import apis.services.deriv.ServicesDeriv as ServicesDeriv
 import apis.services.models.ServicesModels as ServicesModels
 import apis.services.methodologys.ServicesMethodologys as ServicesMethodologys  
 import apis.services.predictmodels.ServicesPredictModels as ServicesPredictModels 
+import apis.services.entryspredictmodels.ServicesEntrysPredictModels as ServicesEntrysPredictModels
 
 
 class ControllerGetDataAnalysisDerivTrendsML: 
@@ -43,6 +44,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
     ServicesModels = None
     ServicesMethodologys = None
     ServicesPredictModels = None
+    ServicesEntrysPredictModels = None
 
     def __init__(self):
         self.initialize_services()
@@ -69,9 +71,11 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesModels = ServicesModels.ServicesModels()
         self.ServicesMethodologys = ServicesMethodologys.ServicesMethodologys()
         self.ServicesPredictModels = ServicesPredictModels.ServicesPredictModels()
+        self.ServicesEntrysPredictModels = ServicesEntrysPredictModels.ServicesEntrysPredictModels()
 
     def initialize_check_trends_services_interns(self):
         self.ServicesEvents.init_services_dates(self.ServicesDates)
+        self.ServicesEntrysPredictModels.init_services_dates(self.ServicesDates)
         self.ServicesPredictModels.init_services_dates(self.ServicesDates)
         self.ServicesModels.init_services_predict_models(self.ServicesPredictModels)
         self.ServicesCheckTrendsML.init_services_manager_days(self.ServicesManagerDays)
@@ -87,6 +91,7 @@ class ControllerGetDataAnalysisDerivTrendsML:
         self.ServicesCheckTrendsML.init_services_deriv(self.ServicesDeriv)
         self.ServicesCheckTrendsML.init_services_models(self.ServicesModels)
         self.ServicesCheckTrendsML.init_services_methodologys(self.ServicesMethodologys)
+        self.ServicesCheckTrendsML.init_services_entrys_predict_models(self.ServicesEntrysPredictModels)
 
 
     def get_apis_name_trends_ml(self):

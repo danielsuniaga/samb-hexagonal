@@ -30,6 +30,12 @@ class ServicesCkeckTrendsML():
 
     ServicesMethodologys = None
 
+    ServicesEntrysPredictModels = None
+
+    def init_services_entrys_predict_models(self, value):
+        self.ServicesEntrysPredictModels = value
+        return True
+
     def init_services_methodologys(self,value):
 
         self.ServicesMethodologys = value
@@ -444,6 +450,22 @@ class ServicesCkeckTrendsML():
 
         return self.ServicesMethodologyTrendsML.get_result_entrys_result()
     
+    def get_config_id_predict_models(self):
+
+        return self.ServicesModels.get_config_id_predict_models()
+    
+    def add_entrys_predict_models(self, data_indicators):
+
+        data_indicators['id_predict_models'] = self.get_config_id_predict_models()
+
+        result = self.ServicesEntrysPredictModels.add(data_indicators)
+
+        if not result['status']:
+
+            return False
+        
+        return True
+    
     def add_entrys_results_persistence(self):
 
         data = self.get_result_entrys_result()
@@ -456,8 +478,8 @@ class ServicesCkeckTrendsML():
 
             return False
 
-        return True
-    
+        return self.add_entrys_predict_models(data_indicators)
+
     def add_movements_persistence(self,data):
 
         result = self.ServicesMovements.add_persistence(data)
@@ -602,19 +624,21 @@ class ServicesCkeckTrendsML():
 
         self.set_events_field('get_filter_monetary',self.get_current_date_mil_dynamic())
 
-        self.check_predict_models(result,result_candles)
+        result = self.check_predict_models(result,result_candles)
 
-        # result = await self.add_entry_broker(result)
+        self.set_events_field('get_model_ml',self.get_current_date_mil_dynamic())
 
-        # self.add_data_entrys_results_reports(result)
+        result = await self.add_entry_broker(result)
 
-        # self.set_events_field('add_positions_brokers',self.get_current_date_mil_dynamic())
+        self.add_data_entrys_results_reports(result)
 
-        # result = self.add_entry_persistence(result,result_candles)
+        self.set_events_field('add_positions_brokers',self.get_current_date_mil_dynamic())
 
-        # self.set_events_field('add_persistence',self.get_current_date_mil_dynamic())
+        result = self.add_entry_persistence(result,result_candles)
 
-        # self.send_report_management(result)
+        self.set_events_field('add_persistence',self.get_current_date_mil_dynamic())
+
+        self.send_report_management(result)
 
         return True
     

@@ -149,9 +149,16 @@ class ServicesModels():
     def init_data_check_predict_models_entity(self, data):
         return {'probability_win': data.get('probability_win')}
     
-    def add_predict_models(self, data):
+    def add_predict_models(self, data, data_predict):
 
-        return self.ServicesPredictModels.add(data)
+        return self.ServicesPredictModels.add(data, data_predict)
+    
+    def get_config_data_predict(self):
+
+        return self.entity.get_config_data_predict()
+    
+    def get_config_id_predict_models(self):
+        return self.ServicesPredictModels.get_config_id_predict_models()
     
     def check_predict_models(self,data):
 
@@ -163,8 +170,14 @@ class ServicesModels():
 
         data_entity = self.init_data_check_predict_models_entity(data_models)
 
-        self.add_predict_models(data_models)
+        data_predict = self.get_config_data_predict()
+
+        self.add_predict_models(data_models, data_predict)
 
         result = self.check_predict_models_entity(data_entity)
 
-        return result
+        if not result['status']:
+
+            return False
+
+        return True

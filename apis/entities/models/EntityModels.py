@@ -39,6 +39,7 @@ class EntityModels():
             'probability_min': float(config("PROBABILITY_MIN")),
             'best_model': None,
             'result_models': None,
+            'data_predict': None,
             'id_models':
                 {
                     'regression_logistic':config("ID_REGRESSION_LOGISTIC"),
@@ -61,6 +62,9 @@ class EntityModels():
 
         return True
     
+    def get_config_data_predict(self):
+        return self.config['data_predict']
+    
     def get_config_scaler_name(self):
         return self.config['scaler']['name']
     
@@ -80,6 +84,10 @@ class EntityModels():
             self.config[key] = value
             return True
         return False
+    
+    def set_config_data_predict(self, value):
+
+        return self.set_config('data_predict', value)
     
     def set_config_accuracy_min(self, value):
 
@@ -490,6 +498,8 @@ class EntityModels():
             data[f'candle_{idx}_high'] = candle.get('high')
             data[f'candle_{idx}_low'] = candle.get('low')
             data[f'candle_{idx}_close'] = candle.get('close')
+
+        self.set_config_data_predict(data)
         return data
 
     def load_model_and_scaler(self, id_models):

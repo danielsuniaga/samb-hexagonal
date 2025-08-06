@@ -19,13 +19,15 @@ class ServicesPredictModels:
     def generate_id(self):
         return self.entity.generate_id()
 
-    def init_data_samb_predict_models_data(self, data):
+    def init_data_samb_predict_models_data(self, data, data_predict):
+
         return {
-            'id': 'test',
-            'dictionary': 'test',
-            'registration_date': 'test',
-            'update_date': 'test',
-            'state': 'test'
+            'id': self.generate_id(),
+            'id_samb_predict_models': data['id'],
+            'dictionary': data_predict,
+            'registration_date': self.get_current_date_hour(),
+            'update_date': self.get_current_date_hour(),
+            'state': self.get_config_condition()
         }
     
     def get_config_accuracy_min(self):
@@ -46,7 +48,7 @@ class ServicesPredictModels:
     def init_samb_predict_models(self, data):
         # print("data: ",data)
         return {
-            'id': self.generate_id(),
+            'id': data['id'],
             'id_models': data['model_id'],
             'accuracy_min': self.get_config_accuracy_min(),
             'probability_min': self.get_config_probability_min(),
@@ -63,25 +65,32 @@ class ServicesPredictModels:
             'update_date': self.get_current_date_hour(),
             'state': self.get_config_condition()
         }
+    
+    def set_config_id_predict_models(self, id_predict_models):
+        return self.entity.set_config_id_predict_models(id_predict_models)
+    
+    def get_config_id_predict_models(self):
+        return self.entity.get_config_id_predict_models()
 
-    def init_data_add(self,data):
+    def init_data_add(self,data,data_predict):
+
+        data['id'] = self.generate_id()
+
+        self.set_config_id_predict_models(data['id'])
 
         return {
             'samb_predict_models': self.init_samb_predict_models(data),
-            'samb_predict_models_data': self.init_data_samb_predict_models_data(data)
+            'samb_predict_models_data': self.init_data_samb_predict_models_data(data,data_predict)
         }
     
     def add_repository(self, data):
 
-        # return True 
         return self.repository.add(data)
 
-    def add(self,data):
+    def add(self,data,data_predict):
 
-        data_persistent = self.init_data_add(data)
+        data_persistent = self.init_data_add(data,data_predict)
 
         result = self.add_repository(data_persistent)
-
-        print(f"Predict model added with ID: {result}")
 
         return result

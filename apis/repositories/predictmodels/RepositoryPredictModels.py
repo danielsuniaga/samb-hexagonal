@@ -9,6 +9,26 @@ class RepositoryPredictModels:
 
     def add_predict_model(self, data):
         try:
+            
+            params = [
+                data['id'],
+                data['id_models'],
+                data['accuracy_min'],
+                data['probability_min'],
+                data['model_name'],
+                data['prediction'],
+                data['prediction_label'],
+                data['probability_loss'],
+                data['probability_win'],
+                data['confidence'],
+                data['confidence_percentage'],
+                str(data['data_shape']),
+                data['features_count'],
+                data['registration_date'],
+                data['update_date'],
+                data['state']
+            ]
+            
             self.cursor_db.execute("""
                 INSERT INTO samb_predict_models (
                     id,
@@ -25,29 +45,12 @@ class RepositoryPredictModels:
                     data_shape,
                     features_count,
                     registration_date,
-                    udpate_date,
+                    update_date,
                     state
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )
-            """, [
-                data['id'],
-                data['id_models'],
-                data['accuracy_min'],
-                data['probability_min'],
-                data['model_name'],
-                data['prediction'],
-                data['prediction_label'],
-                data['probability_loss'],
-                data['probability_win'],
-                data['confidence'],
-                data['confidence_percentage'],
-                data['data_shape'],
-                data['features_count'],
-                data['registration_date'],
-                data['udpate_date'],
-                data['state']
-            ])
+            """, params)
         except DatabaseError as e:
             return {
                 'status': False,
@@ -60,15 +63,31 @@ class RepositoryPredictModels:
         try:
             self.cursor_db.execute("""
                 INSERT INTO samb_predict_models_data (
-                    id, id_samb_predict_models, dictionary, registration_date, update_date, state
-                ) VALUES (%s, %s, %s, %s, %s, %s)
+                    id,
+                    id_samb_predict_models,
+                    dictionary,
+                    registration_date,
+                    update_date,
+                    state
+                ) VALUES (
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
+                )
             """, [
-                data['id'], data['id_samb_predict_models'], data['dictionary'],
-                data['registration_date'], data['update_date'], data['state']
+                data['id'],
+                data['id_samb_predict_models'],
+                str(data['dictionary']),
+                data['registration_date'],
+                data['update_date'],
+                data['state']
             ])
-        except DatabaseError:
-            return {'status': False, 'msj': 'No se realizó la escritura en samb_predict_models_data'}
-        
+        except DatabaseError as e:
+            return {'status': False, 'msj': f'No se realizó la escritura en samb_predict_models_data  Error: {str(e)}'}
+
         return {'status': True, 'msj': 'Success'}
 
     def add(self, data):
@@ -79,8 +98,8 @@ class RepositoryPredictModels:
             return result_model
         
         # # Segunda inserción
-        # result_data = self.add_predict_model_data(data['samb_predict_models_data'])
-        # if not result_data['status']:
-        #     return result_data
+        result_data = self.add_predict_model_data(data['samb_predict_models_data'])
+        if not result_data['status']:
+            return result_data
         
         return {'status': True, 'msj': 'Success'}

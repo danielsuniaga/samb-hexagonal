@@ -14,13 +14,27 @@ class EntityPredictModels:
             'condition': '1',
             'accuracy_min': float(config("ML_ACCURACY_MIN")),
             'probability_min': float(config("PROBABILITY_MIN")),
+            'id_predict_models':None
         }
+        return True
+    
+    def set_config(self, key, value):
+        if not self.config:
+            self.init_config()
+        self.config[key] = value
+        return True
+    
+    def set_config_id_predict_models(self, id_predict_models):
+        self.set_config('id_predict_models', id_predict_models)
         return True
     
     def get_config(self, key):
         if not self.config:
             self.init_config()
         return self.config[key]
+    
+    def get_config_id_predict_models(self):
+        return self.get_config('id_predict_models')
     
     def get_config_condition(self):
         return self.get_config('condition')
