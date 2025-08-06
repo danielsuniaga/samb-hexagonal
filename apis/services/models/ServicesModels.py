@@ -1,14 +1,26 @@
 import apis.entities.models.EntityModels as EntityModels
+import apis.repositories.models.RepositoryModels as RepositoryModels
 
 class ServicesModels(): 
 
     entity = None
 
+    repository = None
+
     ServicesDatasets = None
+
+    ServicesPredictModels = None
 
     def __init__(self):
         
         self.entity = EntityModels.EntityModels()
+        self.repository = RepositoryModels.RepositoryModels()
+
+    def init_services_predict_models(self,value):
+
+        self.ServicesPredictModels = value
+
+        return True
     
     def init_services_datasets(self,value):
 
@@ -80,3 +92,92 @@ class ServicesModels():
     def get_directory_general(self):
 
         return self.entity.get_config_directory_general()
+    
+    def get_best_model_repository(self):
+
+        return self.repository.get_best_model()
+    
+    def init_result_get_best_model(self, result):
+
+        return result['data'][0]
+
+    def get_best_model(self):
+
+        result = self.get_best_model_repository()
+
+        return self.init_result_get_best_model(result)
+    
+    def get_config_accuracy_min(self):  
+        return self.entity.get_config_accuracy_min()
+    
+    def set_config_accuracy_min(self, value):
+
+        return self.entity.set_config_accuracy_min(value)
+
+    def check_models(self):
+
+        result = self.get_best_model()
+
+        if float(result['accuracy']) < float(self.get_config_accuracy_min()):
+
+            return {'status': False, 'message': f"Accuracy {result['accuracy']} is below the minimum required {str(self.get_config_accuracy_min())}"}
+        
+        self.set_config_accuracy_min(result)
+
+        return {'status': True, 'message': 'Models are checked successfully.'} 
+    
+    def get_config_best_model(self):
+
+        return self.entity.get_config_best_model()
+    
+    def get_name_models_by_id_models(self, id_model):
+
+        return self.entity.get_name_models_by_id_models(id_model)
+    
+    def get_predict_models(self,id_models,data):
+
+        return self.entity.get_predict_models(id_models,data)
+    
+    def set_config_result_models(self, value):
+
+        return self.entity.set_config_result_models(value)
+    
+    def check_predict_models_entity(self, data):
+
+        return self.entity.check_predict_models(data)
+    
+    def init_data_check_predict_models_entity(self, data):
+        return {'probability_win': data.get('probability_win')}
+    
+    def add_predict_models(self, data, data_predict):
+
+        return self.ServicesPredictModels.add(data, data_predict)
+    
+    def get_config_data_predict(self):
+
+        return self.entity.get_config_data_predict()
+    
+    def get_config_id_predict_models(self):
+        return self.ServicesPredictModels.get_config_id_predict_models()
+    
+    def check_predict_models(self,data):
+
+        best_model_info = self.get_best_model()
+
+        data_models = self.get_predict_models(best_model_info['id'],data)
+
+        self.set_config_result_models(data_models)
+
+        data_entity = self.init_data_check_predict_models_entity(data_models)
+
+        data_predict = self.get_config_data_predict()
+
+        self.add_predict_models(data_models, data_predict)
+
+        result = self.check_predict_models_entity(data_entity)
+
+        if not result['status']:
+
+            return False
+
+        return True

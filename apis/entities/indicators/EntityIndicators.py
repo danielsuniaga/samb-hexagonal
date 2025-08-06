@@ -17,7 +17,7 @@ class EntityIndicators():
     sma_long = None
 
     candle_last = None
-
+    
     def __init__(self):
 
         self.init_type_rsi()

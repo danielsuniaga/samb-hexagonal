@@ -17,6 +17,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, Ma
 
 import pickle
 import numpy as np
+import pandas as pd
 
 class EntityModels():
 
@@ -34,6 +35,11 @@ class EntityModels():
             'active':int(config("ACTIVE_GENERAL_ML")),
             'directory_general':config("DIRECTORY_ML_GENERAL"),
             'name_project':config("PROJECT_NAME"),
+            'accuracy_min': float(config("ML_ACCURACY_MIN")),
+            'probability_min': float(config("PROBABILITY_MIN")),
+            'best_model': None,
+            'result_models': None,
+            'data_predict': None,
             'id_models':
                 {
                     'regression_logistic':config("ID_REGRESSION_LOGISTIC"),
@@ -47,10 +53,57 @@ class EntityModels():
                     'decision_tree':config("NAME_DECISION_TREE"),
                     'random_forest':config("NAME_RANDOM_FOREST"),
                     'mlp':config("NAME_MLP")
+                },
+            'scaler':
+                {
+                    'name':config("NAME_SCALER"),
                 }
         }
 
         return True
+    
+    def get_config_data_predict(self):
+        return self.config['data_predict']
+    
+    def get_config_scaler_name(self):
+        return self.config['scaler']['name']
+    
+    def get_config_probability_min(self):
+        return self.config['probability_min']
+    
+    def get_name_models_by_id_models(self, id_model):
+        for name, id_value in self.config['id_models'].items():
+            if id_value == id_model:
+                return self.config['name_models'][name]
+        
+        return None
+    
+    def set_config(self, key, value):
+
+        if key in self.config:
+            self.config[key] = value
+            return True
+        return False
+    
+    def set_config_data_predict(self, value):
+
+        return self.set_config('data_predict', value)
+    
+    def set_config_accuracy_min(self, value):
+
+        return self.set_config('accuracy_min', value)
+    
+    def set_config_result_models(self, value):
+
+        return self.set_config('result_models', value)
+    
+    def get_config_accuracy_min(self):
+        
+        return self.config['accuracy_min']
+    
+    def get_config_best_model(self):
+
+        return self.config['best_model']
     
     def get_config_name_project(self):
         
@@ -86,33 +139,63 @@ class EntityModels():
 
         return X, y
     
-    def init_data(self,data):
-
-        y = data['entry_result']
-
-        X = data.drop(columns=['entry_result', 'year', 'day', 'hour','month'])  # ¡NUNCA COMENTAR ESTA LÍNEA!
-
+    def init_data(self, data):
+        """
+        Inicializa los datos para entrenamiento y test, delegando responsabilidades.
+        """
+        y = self.extract_target(data)
+        X = self.extract_features(data)
         X, y = self.clean_nan_data(X, y)
+        X_train, X_test, y_train, y_test = self.split_data(X, y)
+        self.scaler = self.create_and_save_scaler(X_train)
+        X_train_scaled, X_test_scaled = self.apply_scaler(X_train, X_test)
+        return X_train_scaled, X_test_scaled, y_train, y_test
 
-        # 1. División optimizada con semilla más favorable
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, 
-            test_size=0.12,              # Menos test (88% entrenamiento)
-            stratify=y,                  # Mantener proporciones de clases
-            random_state=2024,           # Semilla favorable
-            shuffle=True                 # Asegurar mezcla completa
+    def extract_target(self, data):
+        """
+        Extrae la variable objetivo (y) del DataFrame.
+        """
+        return data['entry_result']
+
+    def extract_features(self, data):
+        """
+        Extrae las variables predictoras (X) del DataFrame.
+        """
+        return data.drop(columns=['entry_result', 'year', 'day', 'hour', 'month'])
+
+    def split_data(self, X, y):
+        """
+        Divide los datos en conjuntos de entrenamiento y prueba.
+        """
+        return train_test_split(
+            X, y,
+            test_size=0.12,
+            stratify=y,
+            random_state=2024,
+            shuffle=True
         )
-        
-        # 2. Crear y entrenar el scaler SOLO con datos de entrenamiento
-        self.scaler = StandardScaler()  # Volver a StandardScaler (mejor para ML)
-        self.scaler.fit(X_train)
 
+    def create_and_save_scaler(self, X_train):
+        """
+        Crea y guarda el scaler entrenado con los datos de entrenamiento.
+        """
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        scaler_path = self.get_config_directory_general() + self.get_config_scaler_name()
+        try:
+            with open(scaler_path, 'wb') as scaler_file:
+                pickle.dump(scaler, scaler_file)
+        except Exception as e:
+            print(f"❌ Error al guardar el scaler: {str(e)}")
+        return scaler
 
-        # # 3. Aplicar el scaler a ambos conjuntos
+    def apply_scaler(self, X_train, X_test):
+        """
+        Aplica el scaler a los conjuntos de entrenamiento y prueba.
+        """
         X_train_scaled = self.scaler.transform(X_train)
         X_test_scaled = self.scaler.transform(X_test)
-
-        return X_train_scaled, X_test_scaled, y_train, y_test
+        return X_train_scaled, X_test_scaled
     
     def train_models(self, x, y):
 
@@ -358,3 +441,184 @@ class EntityModels():
             message += f"F1 Score({metrics['f1_score']:.3f})\n"
         
         return message
+    
+    def open_model(self, path): 
+        try:
+            with open(path, 'rb') as model_file:
+                loaded_model = pickle.load(model_file)
+                if loaded_model is None:
+                    return {'status': False, 'message': 'Failed to load model'}
+                return {'status': True, 'model': loaded_model, 'path': path}
+        except FileNotFoundError:
+            return {'status': False, 'message': f'Model file not found: {path}'}
+        except Exception as e:
+            return {'status': False, 'message': f'Error loading model: {str(e)}'}
+    
+    def open_scaler(self, path):
+        """
+        Cargar el scaler guardado desde un archivo pickle
+        """
+        try:
+            with open(path, 'rb') as scaler_file:
+                loaded_scaler = pickle.load(scaler_file)
+                if loaded_scaler is None:
+                    return {'status': False, 'message': 'Failed to load scaler'}
+                return {'status': True, 'scaler': loaded_scaler, 'path': path}
+        except FileNotFoundError:
+            return {'status': False, 'message': f'Scaler file not found: {path}'}
+        except Exception as e:
+            return {'status': False, 'message': f'Error loading scaler: {str(e)}'}
+        
+    def init_data_get_predict_model(self,data):
+
+        candles = data.get('candles', [])
+
+        # Extraer las 30 últimas velas (o las primeras 30 si es necesario)
+        candle_list = candles.get('candles', [])
+        if len(candle_list) < 30:
+            raise ValueError("No hay suficientes velas en el parámetro 'candles' (se requieren al menos 30)")
+
+        # Tomar las últimas 30 velas (asumiendo que están ordenadas de más antigua a más reciente)
+        last_30_candles = candle_list[-30:]
+
+        # Construir el diccionario de datos reemplazando los campos 'test' por los valores reales de las velas
+        data = {
+            'description_methodology': data['description_methodology'],
+            'entry_type': data['entry_type'],
+            'entry_condition': data['entry_condition'],
+            'entry_amount': data['entry_amount'],
+            'sma_30_value': data['sma_30_value'],
+            'sma_10_value': data['sma_10_value'],
+            'rsi_value': data['rsi_value'],
+        }
+
+        # Agregar los campos de las 30 velas
+        for idx, candle in enumerate(last_30_candles, start=1):
+            data[f'candle_{idx}_open'] = candle.get('open')
+            data[f'candle_{idx}_high'] = candle.get('high')
+            data[f'candle_{idx}_low'] = candle.get('low')
+            data[f'candle_{idx}_close'] = candle.get('close')
+
+        self.set_config_data_predict(data)
+        return data
+
+    def load_model_and_scaler(self, id_models):
+        """
+        Carga el modelo y scaler específicos por ID.
+        Responsabilidad: Gestión de carga de archivos ML.
+        """
+        name_models = self.get_name_models_by_id_models(id_models)
+        if not name_models:
+            return {'status': False, 'message': f'Model ID {id_models} not found'}
+
+        # Cargar modelo
+        model_path = self.get_config_directory_general() + name_models
+        model_result = self.open_model(model_path)
+        if not model_result['status']:
+            return {'status': False, 'message': 'Failed to load model'}
+
+        # Cargar scaler
+        scaler_path = self.get_config_directory_general() + "scaler.pkl"
+        scaler_result = self.open_scaler(scaler_path)
+        if not scaler_result['status']:
+            return {'status': False, 'message': scaler_result['message']}
+        
+        return {
+            'status': True,
+            'model': model_result['model'],
+            'model_name': name_models,
+            'scaler': scaler_result['scaler']
+        }
+
+    def prepare_prediction_data(self, data, scaler):
+        """
+        Prepara y escala los datos para predicción.
+        Responsabilidad: Transformación de datos de entrada.
+        """
+        # Preparar datos con las 30 velas reales
+        data_models = self.init_data_get_predict_model(data)
+        
+        # Convertir a DataFrame y aplicar scaler
+        data_df = pd.DataFrame([data_models])
+        data_scaled = scaler.transform(data_df)
+        
+        return data_scaled
+
+    def calculate_probabilities(self, model, data_scaled):
+        """
+        Calcula las probabilidades y confianza del modelo.
+        Responsabilidad: Cálculo de métricas de predicción.
+        """
+        probabilities = None
+        probability_loss = 0.0
+        probability_win = 0.0
+        confidence = 0.0
+        
+        if hasattr(model, 'predict_proba'):
+            probabilities = model.predict_proba(data_scaled)
+            probability_loss = float(probabilities[0][0])  # Probabilidad de pérdida (clase 0)
+            probability_win = float(probabilities[0][1])   # Probabilidad de ganancia (clase 1)
+            confidence = float(max(probabilities[0]))      # Confianza (mayor probabilidad)
+        
+        return probability_loss, probability_win, confidence
+
+    def format_prediction_result(self, id_models, model_name, prediction_result, 
+                                probability_loss, probability_win, confidence, data_scaled):
+        """
+        Formatea el resultado final de la predicción.
+        Responsabilidad: Estructuración de respuesta.
+        """
+        return {
+            'status': True,
+            'model_id': id_models,
+            'model_name': model_name,
+            'prediction': prediction_result,           # 0 o 1
+            'prediction_label': 'GANANCIA' if prediction_result == 1 else 'PÉRDIDA',
+            'probability_loss': probability_loss,      # Probabilidad de pérdida [0-1]
+            'probability_win': probability_win,        # Probabilidad de ganancia [0-1]
+            'confidence': confidence,                  # Confianza del modelo [0-1]
+            'confidence_percentage': confidence * 100, # Confianza en porcentaje
+            'data_shape': data_scaled.shape,           # Para debug
+            'features_count': data_scaled.shape[1]     # Número de características
+        }
+
+    def get_predict_models(self, id_models, data):
+        """
+        Método principal para obtener predicciones del modelo.
+        Responsabilidad: Orquestación del proceso de predicción.
+        """
+        # 1. Cargar modelo y scaler
+        load_result = self.load_model_and_scaler(id_models)
+        if not load_result['status']:
+            return load_result
+        
+        model = load_result['model']
+        model_name = load_result['model_name'] 
+        scaler = load_result['scaler']
+        
+        # Asignar scaler al atributo de clase (para compatibilidad)
+        self.scaler = scaler
+
+        # 2. Preparar datos
+        data_scaled = self.prepare_prediction_data(data, scaler)
+        
+        # 3. Realizar predicción
+        prediction = model.predict(data_scaled)
+        prediction_result = int(prediction[0])  # 0 = pérdida, 1 = ganancia
+        
+        # 4. Calcular probabilidades
+        probability_loss, probability_win, confidence = self.calculate_probabilities(model, data_scaled)
+        
+        # 5. Formatear resultado
+        return self.format_prediction_result(
+            id_models, model_name, prediction_result,
+            probability_loss, probability_win, confidence, data_scaled
+        )
+
+    def check_predict_models(self, data):
+
+        if data['probability_win'] < self.get_config_probability_min():
+            
+            return {'status': False, 'message': f"Probability {data['probability_win']} is below the minimum required {self.get_config_probability_min()}"}
+
+        return {'status': True, 'message': 'Probability is acceptable.'}

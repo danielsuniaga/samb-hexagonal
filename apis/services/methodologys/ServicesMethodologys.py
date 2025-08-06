@@ -39,3 +39,27 @@ class ServicesMethodologys:
         result = self.get_methodologys_repository(data)
 
         return self.init_data_result_get_methodologys(result)
+    
+    def init_data_get_methodology_description_number_by_id(self, id_methodology):
+
+        return {
+            'id_methodology': id_methodology
+        }
+    
+    def get_methodology_description_number_by_id_repository(self, data):
+
+        return self.repository.get_methodology_description_number_by_id(data)
+    
+    def init_result_get_methodology_description_number_by_id(self, result):
+
+        if result.get('status') and result.get('data'):
+            return result['data'][0].get('description_number')
+        return None
+    
+    def get_methodology_description_number_by_id(self, id_methodology):
+
+        data_persistence = self.init_data_get_methodology_description_number_by_id(id_methodology)  
+
+        result = self.get_methodology_description_number_by_id_repository(data_persistence)
+
+        return self.init_result_get_methodology_description_number_by_id(result)

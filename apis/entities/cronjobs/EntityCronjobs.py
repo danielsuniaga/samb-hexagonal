@@ -74,7 +74,8 @@ class EntityCronjobs():
             'trends':config("ID_API"),
             'wma':config("ID_API_WMA"),
             'trends_expansive':config("ID_API_TRENDS_EXPANSIVE"),
-            'trends_minus':config("ID_API_TRENDS_MINUS")
+            'trends_minus':config("ID_API_TRENDS_MINUS"),
+            'trends_ml':config("ID_API_TRENDS_ML"),
         }
 
         return True
@@ -82,6 +83,10 @@ class EntityCronjobs():
     def get_id_api_trends(self):
 
         return self.get_id_api_key('trends')
+    
+    def get_id_api_trends_ml(self):
+
+        return self.get_id_api_key('trends_ml')
     
     def get_id_api_trends_expansive(self):
 

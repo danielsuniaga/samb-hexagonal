@@ -1,12 +1,13 @@
 # apis/urls.py
 from django.urls import path
-from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus
+from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML
 
 urlpatterns = [
     path('get-data-analysis-deriv-minus/', GetDataAnalysisDerivMinus.as_view(), name='get-data-analysis-deriv-minus'),
     path('get-data-analysis-deriv-expansive/', GetDataAnalysisDerivExpansive.as_view(), name='get-data-analysis-deriv-expansive'),
     path('get-data-analysis-deriv-wma/', GetDataAnalysisDerivWMA.as_view(), name='get-data-analysis-deriv-wma'),
     path('get-data-analysis-deriv/', GetDataAnalysisDeriv.as_view(), name='get-data-analysis-deriv'),
+    path('get-data-analysis-deriv-ml/', GetDataAnalysisDerivML.as_view(), name='get-data-analysis-deriv-ml'),
     path('get-endpoint/', GetEndPoint.as_view(), name='get-endpoint'),
     path('get-daily-report-entrys/', GetDailyReportEntrys.as_view(), name='get-daily-report-entrys'),
     path('get-daily-report-crons/', GetDailyReportCrons.as_view(), name='get-daily-report-crons'),
