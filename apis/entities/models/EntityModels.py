@@ -587,33 +587,46 @@ class EntityModels():
         Método principal para obtener predicciones del modelo.
         Responsabilidad: Orquestación del proceso de predicción.
         """
-        # 1. Cargar modelo y scaler
-        load_result = self.load_model_and_scaler(id_models)
-        if not load_result['status']:
-            return load_result
-        
-        model = load_result['model']
-        model_name = load_result['model_name'] 
-        scaler = load_result['scaler']
-        
-        # Asignar scaler al atributo de clase (para compatibilidad)
-        self.scaler = scaler
+        model = None
+        scaler = None
+        try:
+            # 1. Cargar modelo y scaler
+            load_result = self.load_model_and_scaler(id_models)
+            if not load_result['status']:
+                return load_result
+            
+            model = load_result['model']
+            model_name = load_result['model_name'] 
+            scaler = load_result['scaler']
+            
+            # Asignar scaler al atributo de clase (para compatibilidad)
+            self.scaler = scaler
 
-        # 2. Preparar datos
-        data_scaled = self.prepare_prediction_data(data, scaler)
-        
-        # 3. Realizar predicción
-        prediction = model.predict(data_scaled)
-        prediction_result = int(prediction[0])  # 0 = pérdida, 1 = ganancia
-        
-        # 4. Calcular probabilidades
-        probability_loss, probability_win, confidence = self.calculate_probabilities(model, data_scaled)
-        
-        # 5. Formatear resultado
-        return self.format_prediction_result(
-            id_models, model_name, prediction_result,
-            probability_loss, probability_win, confidence, data_scaled
-        )
+            # 2. Preparar datos
+            data_scaled = self.prepare_prediction_data(data, scaler)
+            
+            # 3. Realizar predicción
+            prediction = model.predict(data_scaled)
+            prediction_result = int(prediction[0])  # 0 = pérdida, 1 = ganancia
+            
+            # 4. Calcular probabilidades
+            probability_loss, probability_win, confidence = self.calculate_probabilities(model, data_scaled)
+            
+            # 5. Formatear resultado
+            return self.format_prediction_result(
+                id_models, model_name, prediction_result,
+                probability_loss, probability_win, confidence, data_scaled
+            )
+        finally:
+            # Limpieza explícita de memoria
+            if 'model' in locals() and model is not None:
+                del model
+            if 'scaler' in locals() and scaler is not None:
+                del scaler
+            if hasattr(self, 'scaler'):
+                self.scaler = None
+            import gc
+            gc.collect()
 
     def check_predict_models(self, data):
 
