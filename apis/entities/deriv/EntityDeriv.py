@@ -4,6 +4,8 @@ from decouple import config
 
 import asyncio
 
+import gc
+
 class EntityDeriv():
 
     id_app = None
@@ -314,6 +316,10 @@ class EntityDeriv():
 
             return {'status': False, 'message': f'Se generó una excepción al cerrar la conexión con Deriv: {err}'}
         
+        self.api = None
+
+        gc.collect()
+        
         return {'status': True, 'message': 'Conexión con Deriv cerrada correctamente'}
     
     async def init_data_ticks_history(self):
@@ -522,6 +528,6 @@ class EntityDeriv():
     def init_result_return_attent_initialization(self):
 
         return {'status': True, 'message': 'Success'}
-    
+
 
 
