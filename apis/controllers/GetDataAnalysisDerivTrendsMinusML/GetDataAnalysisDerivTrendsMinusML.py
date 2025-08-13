@@ -94,11 +94,11 @@ class ControllerGetDataAnalysisDerivTrendsMinusML:
         self.ServicesCheckTrendsMinusML.init_services_methodologys(self.ServicesMethodologys)
         self.ServicesCheckTrendsMinusML.init_services_entrys_predict_models(self.ServicesEntrysPredictModels)
 
-    def get_apis_name_trends_ml(self):
-        return self.ServicesApi.get_apis_name_trends_ml()
+    def get_apis_name_trends_minus_ml(self):
+        return self.ServicesApi.get_apis_name_trends_minus_ml()
 
     def set_apis_name_smtp(self):
-        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends_ml())
+        return self.ServicesSmtp.set_apis_name(self.get_apis_name_trends_minus_ml())
 
     def verify_services(self, request, hour, date, id_cronjobs):
         servicios_a_verificar = self.init_verify_services(hour, date, id_cronjobs)
@@ -152,7 +152,7 @@ class ControllerGetDataAnalysisDerivTrendsMinusML:
         if not resultado_deriv['status']:
             return self.ServicesSmtp.send_notification_email(date, resultado_deriv['message'])
         await self.process_deriv_services()
-        # return self.finalize_request(now, id_cronjobs)
+        return self.finalize_request(now, id_cronjobs)
 
         return True
 
@@ -169,11 +169,11 @@ class ControllerGetDataAnalysisDerivTrendsMinusML:
     def add_events(self, details, differences, id_cronjobs):
         return self.ServicesEvents.add_events(details, differences, id_cronjobs)
 
-    # def finalize_request(self, now, id_cronjobs):
-    #     now = self.ServicesDates.get_current_utc5()
-    #     self.ServicesDates.set_end_date()
-    #     self.add_events(self.get_events(), self.generate_diferences_events(), id_cronjobs)
-    #     return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
+    def finalize_request(self, now, id_cronjobs):
+        now = self.ServicesDates.get_current_utc5()
+        self.ServicesDates.set_end_date()
+        self.add_events(self.get_events(), self.generate_diferences_events(), id_cronjobs)
+        return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
 
     def initialize_request_data(self):
         now = self.ServicesDates.get_current_utc5()
