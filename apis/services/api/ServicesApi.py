@@ -94,6 +94,10 @@ class ServicesApi():
             
         return self.entity.get_apis_name_wma()
     
+    def get_apis_name_wma_ml(self):
+
+        return self.entity.get_apis_name_wma_ml()
+
     def get_apis_name_trends_expansive(self):
                 
         return self.entity.get_apis_name_trends_expansive()

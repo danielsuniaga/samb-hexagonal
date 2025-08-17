@@ -15,6 +15,7 @@ import apis.controllers.SendDataSession.SendDataSession as ControllerSendDataSes
 import apis.controllers.GetDataAnalysisDerivTrendsMinus.GetDataAnalysisDerivTrendsMinus as ControllerGetDataAnalysisDerivTrendsMinus
 import apis.controllers.GetDataAnalysisDerivTrendsML.GetDataAnalysisDerivTrendsML as ControllerGetDataAnalysisDerivTrendsML
 import apis.controllers.GetDataAnalysisDerivTrendsMinusML.GetDataAnalysisDerivTrendsMinusML as ControllerGetDataAnalysisDerivTrendsMinusML
+import apis.controllers.GetDataAnalysisDerivWMAML.GetDataAnalysisDerivWMAML as ControllerGetDataAnalysisDerivWMAML
 
 class SendDataSession(APIView):
 
@@ -148,6 +149,26 @@ class GetDataAnalysisDerivWMA(APIView):
     async def async_post(self, request):
 
         result = await self.controller.GetDataAnalysisDerivWMA(request)
+
+        return result
+    
+class GetDataAnalysisDerivWMAML(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDataAnalysisDerivWMAML.ControllerGetDataAnalysisDerivWMAML()
+
+    def post(self, request, format=None):
+
+        response_data = async_to_sync(self.async_post)(request)
+
+        return Response(response_data)
+        
+    async def async_post(self, request):
+
+        result = await self.controller.GetDataAnalysisDerivWMAML(request)
 
         return result
 
