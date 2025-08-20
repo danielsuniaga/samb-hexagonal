@@ -77,6 +77,7 @@ class EntityCronjobs():
             'trends_minus':config("ID_API_TRENDS_MINUS"),
             'trends_ml':config("ID_API_TRENDS_ML"),
             'trends_minus_ml':config("ID_API_TRENDS_MINUS_ML"),
+            'wma_ml':config("ID_API_WMA_ML"),
         }
 
         return True
@@ -105,6 +106,10 @@ class EntityCronjobs():
 
         return self.get_id_api_key('wma')   
     
+    def get_id_api_wma_ml(self):
+
+        return self.get_id_api_key('wma_ml') 
+
     def get_id_api_key(self,key):
 
         return self.id_api[key]
