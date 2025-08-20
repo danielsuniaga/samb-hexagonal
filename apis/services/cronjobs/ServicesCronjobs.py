@@ -135,7 +135,7 @@ class ServicesCronjobs():
             'id':id_cronjobs,
             'date':date,
             'condition':self.get_condition(),
-            'id_api':self.get_id_api_wma(),
+            'id_api':self.get_id_api_wma_ml(),
             'id_financial_asset':self.get_id_financial_asset(),
             'default_execute':self.get_default_execute()
         }

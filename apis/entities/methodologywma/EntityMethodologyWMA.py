@@ -200,13 +200,11 @@ class EntityMethodologyWMA:
     
     def check_candles_wma(self,data):
 
-        print(f"check_candles_wma: {data}")
-
-        data = {
-            'open_price': 1.0,
-            'close_price': 3.0,
-            'sma_short': 2.0
-        }
+        # data = {
+        #     'open_price': 1.0,
+        #     'close_price': 3.0,
+        #     'sma_short': 2.0
+        # }
 
         if Decimal(data['open_price']) <= Decimal(data['sma_short']) <= Decimal(data['close_price']):
 

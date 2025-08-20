@@ -145,6 +145,13 @@ class EntityMethodologyWMAML:
         return True
 
     def check_candles_wmaml(self, data):
+        # print(f"check_candles_wma: {data}")
+
+        # data = {
+        #     'open_price': 1.0,
+        #     'close_price': 3.0,
+        #     'sma_short': 2.0
+        # }
         if Decimal(data['open_price']) <= Decimal(data['sma_short']) <= Decimal(data['close_price']):
             self.set_type_entry(self.get_type_entry_long())
             return self.get_type_entry_long()
