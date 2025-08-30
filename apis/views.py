@@ -13,10 +13,24 @@ import apis.controllers.GetDataAnalysisDerivWMA.GetDataAnalysisDerivWMA as Contr
 import apis.controllers.GetDataAnalysisDerivTrendsExpansive.GetDataAnalysisDerivTrendsExpansive as ControllerGetDataAnalysisDerivTrendsExpansive  
 import apis.controllers.SendDataSession.SendDataSession as ControllerSendDataSession
 import apis.controllers.GetDataAnalysisDerivTrendsMinus.GetDataAnalysisDerivTrendsMinus as ControllerGetDataAnalysisDerivTrendsMinus
+import apis.controllers.GetDataAnalysisDerivEnvolvent.GetDataAnalysisDerivEnvolvent as ControllerGetDataAnalysisDerivEnvolvent
 import apis.controllers.GetDataAnalysisDerivTrendsML.GetDataAnalysisDerivTrendsML as ControllerGetDataAnalysisDerivTrendsML
 import apis.controllers.GetDataAnalysisDerivTrendsMinusML.GetDataAnalysisDerivTrendsMinusML as ControllerGetDataAnalysisDerivTrendsMinusML
 import apis.controllers.GetDataAnalysisDerivWMAML.GetDataAnalysisDerivWMAML as ControllerGetDataAnalysisDerivWMAML
 
+class GetDataAnalysisDerivEnvolvent(APIView):
+    controller = None
+
+    def __init__(self):
+        self.controller = ControllerGetDataAnalysisDerivEnvolvent.ControllerGetDataAnalysisDerivEnvolvent()
+
+    def post(self, request, format=None):
+        response_data = async_to_sync(self.async_post)(request)
+        return Response(response_data)
+
+    async def async_post(self, request):
+        result = await self.controller.GetDataAnalysisDerivEnvolvent(request)
+        return result
 class SendDataSession(APIView):
 
     controller = None
