@@ -81,6 +81,10 @@ class ServicesApi():
     def get_apis_name_trends(self):
 
         return self.entity.get_apis_name_trends()
+    
+    def get_apis_name_trends_recent(self):
+
+        return self.entity.get_apis_name_trends_recent()
 
     def get_apis_name_trends_ml(self):
 
