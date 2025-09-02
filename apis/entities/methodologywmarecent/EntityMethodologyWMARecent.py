@@ -1,7 +1,7 @@
 from decouple import config
 
 from decimal import Decimal
-class EntityMethodologyWMA:
+class EntityMethodologyWMARecent:
 
     config = None
 
@@ -147,8 +147,8 @@ class EntityMethodologyWMA:
     def init_config(self):
 
         self.config = {
-            'name':config("NAME_METHODOLOGY_WMA"),
-            'id':config("ID_METHODOLOGY_WMA")
+            'name':config("NAME_METHODOLOGY_WMA_RECENT"),
+            'id':config("ID_METHODOLOGY_WMA_RECENT")
         }
 
         return True
@@ -171,15 +171,7 @@ class EntityMethodologyWMA:
     
     def get_candles_wma(self,candles):
 
-        # print("candles:",candles)
-
-        if len(candles) < self.candle_removed:
-
-            return candles
-        
-        # print("candlers wma", candles[:self.candle_removed])
-        
-        return candles[:self.candle_removed]
+        return candles[-self.candle_removed:]
 
     def generate_candles(self,candles):
 

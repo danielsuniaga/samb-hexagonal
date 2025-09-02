@@ -191,7 +191,11 @@ class EntityMethodologyTrendsRecent():
     
     def check_candles(self,candles):
 
+        print("candles:",candles)
+
         candles_trends = self.get_candles_trends(candles['candles'])
+
+        print("candles_trends:",candles_trends)
 
         candles_trends_close = self.get_candles_close(candles_trends)
 

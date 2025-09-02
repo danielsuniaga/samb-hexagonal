@@ -80,6 +80,7 @@ class EntityCronjobs():
             'wma_ml':config("ID_API_WMA_ML"),
             'envolvent':config("ID_API_ENVOLVENT"),
             'trends_recent':config("ID_API_TRENDS_RECENT"),
+            'wma_recent':config("ID_API_WMA_RECENT"),
         }
 
         return True
@@ -115,7 +116,11 @@ class EntityCronjobs():
     def get_id_api_wma(self):
 
         return self.get_id_api_key('wma')   
-    
+
+    def get_id_api_wma_recent(self):
+
+        return self.get_id_api_key('wma_recent')   
+
     def get_id_api_wma_ml(self):
 
         return self.get_id_api_key('wma_ml') 
