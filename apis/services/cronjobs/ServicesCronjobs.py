@@ -61,6 +61,10 @@ class ServicesCronjobs():
     def get_id_api_wma(self):
 
         return self.entity.get_id_api_wma()
+
+    def get_id_api_wma_recent(self):
+
+        return self.entity.get_id_api_wma_recent()
     
     def get_id_api_wma_ml(self):
 
@@ -148,6 +152,17 @@ class ServicesCronjobs():
             'default_execute':self.get_default_execute()
         }
 
+    def init_add_wma_recent_repository(self,id_cronjobs,date):
+
+        return {
+            'id':id_cronjobs,
+            'date':date,
+            'condition':self.get_condition(),
+            'id_api':self.get_id_api_wma_recent(),
+            'id_financial_asset':self.get_id_financial_asset(),
+            'default_execute':self.get_default_execute()
+        }
+
     def init_add_wma_ml_repository(self,id_cronjobs,date):
 
         return {
@@ -225,6 +240,12 @@ class ServicesCronjobs():
     def add_wma(self,id_cronjobs,date):
 
         data = self.init_add_wma_repository(id_cronjobs,date)
+
+        return self.add_repository(data)
+    
+    def add_wma_recent(self,id_cronjobs,date):
+
+        data = self.init_add_wma_recent_repository(id_cronjobs,date)
 
         return self.add_repository(data)
     

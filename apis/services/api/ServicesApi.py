@@ -98,6 +98,10 @@ class ServicesApi():
             
         return self.entity.get_apis_name_wma()
     
+    def get_apis_name_wma_recent(self):
+            
+        return self.entity.get_apis_name_wma_recent()
+    
     def get_apis_name_wma_ml(self):
 
         return self.entity.get_apis_name_wma_ml()
