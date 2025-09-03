@@ -74,6 +74,10 @@ class ServicesCronjobs():
 
         return self.entity.get_id_api_trends_minus()
     
+    def get_id_api_trends_minus_recent(self):
+
+        return self.entity.get_id_api_trends_minus_recent()
+    
     def get_id_api_envolvent(self):
 
         return self.entity.get_id_api_envolvent()
@@ -217,6 +221,23 @@ class ServicesCronjobs():
     def add_trends_minus(self,id_cronjobs,date):
 
         data = self.init_data_add_trends_minus_repository(id_cronjobs,date)
+
+        return self.add_repository(data)
+    
+    def init_data_add_trends_minus_recent_repository(self,id_cronjobs,date):
+
+        return {
+            'id':id_cronjobs,
+            'date':date,
+            'condition':self.get_condition(),
+            'id_api':self.get_id_api_trends_minus_recent(),
+            'id_financial_asset':self.get_id_financial_asset(),
+            'default_execute':self.get_default_execute()
+        }
+    
+    def add_trends_minus_recent(self,id_cronjobs,date):
+
+        data = self.init_data_add_trends_minus_recent_repository(id_cronjobs,date)
 
         return self.add_repository(data)
     
