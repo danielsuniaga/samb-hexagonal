@@ -35,6 +35,7 @@ class EntityApi():
             'envolvent':config("ID_API_ENVOLVENT"),
             'trends_recent':config("ID_API_TRENDS_RECENT"),
             'wma_recent':config("ID_API_WMA_RECENT"),
+            'trends_minus_recent':config("ID_API_TRENDS_MINUS_RECENT"),
             'endpoinst':config("ID_API_ENDPOINT"),
         }
 
@@ -107,6 +108,12 @@ class EntityApi():
         id = self.get_apis_ids('trends_minus')
 
         return self.get_apis_name(id)
+    
+    def get_apis_name_trends_minus_recent(self):
+
+        id = self.get_apis_ids('trends_minus_recent')
+
+        return self.get_apis_name(id)    
     
     def get_apis_name_envolvent(self):
 

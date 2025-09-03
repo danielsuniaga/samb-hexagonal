@@ -114,6 +114,10 @@ class ServicesApi():
 
         return self.entity.get_apis_name_trends_minus()
 
+    def get_apis_name_trends_minus_recent(self):
+
+        return self.entity.get_apis_name_trends_minus_recent()
+
     def get_apis_name_envolvent(self):
 
         return self.entity.get_apis_name_envolvent()
