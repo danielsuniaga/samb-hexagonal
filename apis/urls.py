@@ -1,12 +1,13 @@
 # apis/urls.py
 from django.urls import path
-from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent
+from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent
 
 urlpatterns = [
     path('get-data-analysis-deriv-minus/', GetDataAnalysisDerivMinus.as_view(), name='get-data-analysis-deriv-minus'),
     path('get-data-analysis-deriv-minus-recent/', GetDataAnalysisDerivMinusRecent.as_view(), name='get-data-analysis-deriv-minus-recent'),
     path('get-data-analysis-deriv-minus-ml/', GetDataAnalysisDerivMinusML.as_view(), name='get-data-analysis-deriv-minus-ml'),
     path('get-data-analysis-deriv-expansive/', GetDataAnalysisDerivExpansive.as_view(), name='get-data-analysis-deriv-expansive'),
+    path('get-data-analysis-deriv-expansive-recent/', GetDataAnalysisDerivExpansiveRecent.as_view(), name='get-data-analysis-deriv-expansive-recent'),
     path('get-data-analysis-deriv-wma/', GetDataAnalysisDerivWMA.as_view(), name='get-data-analysis-deriv-wma'),
     path('get-data-analysis-deriv-wma-recent/', GetDataAnalysisDerivWMARecent.as_view(), name='get-data-analysis-deriv-wma-recent'),
     path('get-data-analysis-deriv-wma-ml/', GetDataAnalysisDerivWMAML.as_view(), name='get-data-analysis-deriv-wma-ml'),

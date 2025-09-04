@@ -110,6 +110,10 @@ class ServicesApi():
                 
         return self.entity.get_apis_name_trends_expansive()
     
+    def get_apis_name_trends_expansive_recent(self):
+                
+        return self.entity.get_apis_name_trends_expansive_recent()
+    
     def get_apis_name_trends_minus(self):
 
         return self.entity.get_apis_name_trends_minus()
