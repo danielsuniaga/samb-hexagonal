@@ -2,29 +2,29 @@ from decouple import config
 
 from decimal import Decimal
 
-class EntityMethodologyTrendsRecent():
+class EntityMethodologyTrendsExpansiveRecent():
+
+    config = None
 
     candle_removed = None
 
-    type_entry = None
+    type_entry_positions = None
 
     metrics_rsi = None
 
     metrics_sma = None
 
-    type_entry_positions = None
-
-    result_entrys = None
+    indicators = None
 
     condition_entry = None
 
-    indicators = None
-
-    config = None
+    result_entrys = None
 
     def __init__(self):
 
-        self.init_candle_removed()
+        self.init_config()
+
+        self.init_candle_removed()  
 
         self.init_type_entry()
 
@@ -32,44 +32,14 @@ class EntityMethodologyTrendsRecent():
 
         self.init_metrics_sma()
 
-        self.init_condition_entry()
-
         self.init_entrys_results()
 
-        self.init_config()
+        self.init_condition_entry()
 
-    def init_config(self):
+    def get_result_entrys_result(self):
 
-        self.config = {
-            'name':config("NAME_METHODOLOGY_TRENDS_RECENT"),
-            'id':config("ID_METHODOLOGY_TRENDS_RECENT")
-        }
+        return self.result_entrys['result']
 
-        return True
-
-    def get_name(self):
-
-        return self.config['name']
-
-    def get_id(self):
-
-        return self.config['id']  
-
-    def init_entrys_results(self):
-
-        self.result_entrys = {
-            'result':None,
-            'candles':None
-        }
-
-        return True 
-
-    def add_indicators(self,value):
-
-        self.indicators = value
-
-        return True
-    
     def get_indicators(self):
 
         return self.indicators
@@ -77,40 +47,6 @@ class EntityMethodologyTrendsRecent():
     def init_condition_entry(self):
 
         self.condition_entry = config("CONDITION_ENTRY")
-
-    def get_condition_entry(self):
-        
-        return self.condition_entry
-
-    def set_result_entrys_result(self,result_entrys):
-        
-        self.result_entrys['result'] = result_entrys
-
-        return True
-    
-    def set_result_entrys_candles(self,result_candles):
-        
-        self.result_entrys['candles'] = result_candles
-
-        return True
-    
-    def get_result_entrys_result(self):
-
-        return self.result_entrys['result']
-
-    def get_type_entry_positions(self):
-
-        return self.type_entry_positions    
-
-    def set_type_entry(self,type_entry):
-        
-        self.type_entry_positions = type_entry
-
-        return True
-    
-    def get_type_entry(self):
-
-        return self.type_entry
 
     def init_metrics_sma(self):
 
@@ -129,14 +65,6 @@ class EntityMethodologyTrendsRecent():
         }
 
         return True
-    
-    def get_metrics_rsi_min(self):
-
-        return self.metrics_rsi['min']
-    
-    def get_metrics_rsi_max(self):
-
-        return self.metrics_rsi['max']
 
     def init_type_entry(self):
 
@@ -157,14 +85,37 @@ class EntityMethodologyTrendsRecent():
 
     def init_candle_removed(self):
 
-        self.candle_removed = int(config("CANDLE_REMOVED"))
+        self.candle_removed = int(config("CANDLE_REMOVED_EXPANSIVE"))
+
+        return True
+
+    def init_config(self):
+
+        self.config = {
+            'name':config("NAME_METHODOLOGY_TRENDS_EXPANSIVE_RECENT"),
+            'id':config("ID_METHODOLOGY_TRENDS_EXPANSIVE_RECENT")
+        }
 
         return True
     
-    def get_candle_removed(self):
+    def get_name(self):
 
-        return self.candle_removed
+        return self.config['name']
+    
+    def add_indicators(self,value):
 
+        self.indicators = value
+
+        return True
+    
+    def get_indicators(self):
+
+        return self.indicators
+
+    def get_id(self):
+
+        return self.config['id']  
+    
     def get_candles_trends(self,candles):
         
         return candles[-self.candle_removed:]
@@ -172,6 +123,16 @@ class EntityMethodologyTrendsRecent():
     def get_candles_close(self,array_candles):
 
         return [candle['close'] for candle in array_candles]
+    
+    def get_type_entry_positions(self):
+
+        return self.type_entry_positions    
+
+    def set_type_entry(self,type_entry):
+        
+        self.type_entry_positions = type_entry
+
+        return True
     
     def check_candles_trends(self,candles):
 
@@ -195,7 +156,7 @@ class EntityMethodologyTrendsRecent():
 
         candles_trends_close = self.get_candles_close(candles_trends)
 
-        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]
+        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45, 6.32, 7.65, 8.08, 9.08, 10.09]
 
         result = self.check_candles_trends(candles_trends_close)
 
@@ -260,3 +221,34 @@ class EntityMethodologyTrendsRecent():
             return True
         
         return False
+    
+    def get_candle_removed(self):
+
+        return self.candle_removed
+    
+    def get_condition_entry(self):
+        
+        return self.condition_entry
+    
+    def init_entrys_results(self):
+
+        self.result_entrys = {
+            'result':None,
+            'candles':None
+        }
+
+        return True 
+    
+    def set_result_entrys_result(self,result_entrys):
+        
+        self.result_entrys['result'] = result_entrys
+
+        return True
+    
+    def set_result_entrys_candles(self,result_candles):
+        
+        self.result_entrys['candles'] = result_candles
+
+        return True
+    
+    

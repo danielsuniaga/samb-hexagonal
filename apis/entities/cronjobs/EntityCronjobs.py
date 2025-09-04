@@ -81,6 +81,7 @@ class EntityCronjobs():
             'envolvent':config("ID_API_ENVOLVENT"),
             'trends_recent':config("ID_API_TRENDS_RECENT"),
             'wma_recent':config("ID_API_WMA_RECENT"),
+            'trends_expansive_recent':config("ID_API_TRENDS_EXPANSIVE_RECENT"),
             'trends_minus_recent':config("ID_API_TRENDS_MINUS_RECENT"),
         }
 
@@ -106,6 +107,10 @@ class EntityCronjobs():
 
         return self.get_id_api_key('trends_expansive')
     
+    def get_id_api_trends_expansive_recent(self):
+
+        return self.get_id_api_key('trends_expansive_recent')
+
     def get_id_api_trends_minus(self):
 
         return self.get_id_api_key('trends_minus')
