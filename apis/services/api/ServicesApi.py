@@ -125,6 +125,10 @@ class ServicesApi():
     def get_apis_name_envolvent(self):
 
         return self.entity.get_apis_name_envolvent()
+    
+    def get_apis_name_pinbar(self):
+
+        return self.entity.get_apis_name_pinbar()
 
     def get_apis_name_endpoints(self):
                 
