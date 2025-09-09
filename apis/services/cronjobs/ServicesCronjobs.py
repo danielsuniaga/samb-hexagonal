@@ -57,7 +57,11 @@ class ServicesCronjobs():
     def get_id_api_trends_expansive(self):
 
         return self.entity.get_id_api_trends_expansive()
-    
+
+    def get_id_api_trends_expansive_ml(self):
+
+        return self.entity.get_id_api_trends_expansive_ml()
+
     def get_id_api_trends_expansive_recent(self):
 
         return self.entity.get_id_api_trends_expansive_recent()
@@ -116,6 +120,17 @@ class ServicesCronjobs():
             'date':date,
             'condition':self.get_condition(),
             'id_api':self.get_id_api_trends_expansive(),
+            'id_financial_asset':self.get_id_financial_asset(),
+            'default_execute':self.get_default_execute()
+        }
+    
+    def init_add_trends_expansive_ml_repository(self,id_cronjobs,date):
+
+        return {
+            'id':id_cronjobs,
+            'date':date,
+            'condition':self.get_condition(),
+            'id_api':self.get_id_api_trends_expansive_ml(),
             'id_financial_asset':self.get_id_financial_asset(),
             'default_execute':self.get_default_execute()
         }
@@ -229,6 +244,14 @@ class ServicesCronjobs():
     def add_trends_expansive(self,id_cronjobs,date):
 
         data = self.init_add_trends_expansive_repository(id_cronjobs,date)
+
+        return self.add_repository(data)
+    
+    def add_trends_expansive_ml(self,id_cronjobs,date):
+
+        data = self.init_add_trends_expansive_ml_repository(id_cronjobs,date)
+
+        return self.add_repository(data)
 
         return self.add_repository(data)
 
