@@ -130,6 +130,10 @@ class ServicesApi():
 
         return self.entity.get_apis_name_envolvent()
     
+    def get_apis_name_envolvent_ml(self):
+
+        return self.entity.get_apis_name_envolvent_ml()
+
     def get_apis_name_pinbar(self):
 
         return self.entity.get_apis_name_pinbar()

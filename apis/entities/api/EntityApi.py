@@ -39,6 +39,7 @@ class EntityApi():
             'trends_expansive_recent':config("ID_API_TRENDS_EXPANSIVE_RECENT"),
             'pinbar':config("ID_API_PINBAR"),
             'trends_expansive_ml':config("ID_API_TRENDS_EXPANSIVE_ML"),
+            'envolvent_ml':config("ID_API_ENVOLVENT_ML"),
             'endpoinst':config("ID_API_ENDPOINT"),
         }
 
@@ -139,6 +140,12 @@ class EntityApi():
     def get_apis_name_envolvent(self):
 
         id = self.get_apis_ids('envolvent')
+
+        return self.get_apis_name(id)
+
+    def get_apis_name_envolvent_ml(self):
+
+        id = self.get_apis_ids('envolvent_ml')
 
         return self.get_apis_name(id)
 
