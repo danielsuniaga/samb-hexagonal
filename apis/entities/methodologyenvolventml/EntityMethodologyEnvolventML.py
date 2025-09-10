@@ -153,6 +153,8 @@ class EntityMethodologyEnvolventML:
         - Patrón envolvente alcista
         - Patrón envolvente bajista
         """
+        # self.set_type_entry(self.get_type_entry_short())
+        # return self.get_type_entry_short()
         # Patrón envolvente alcista
         if Decimal(curr_candle['open']) < Decimal(curr_candle['close']) and \
            Decimal(prev_candle['open']) > Decimal(prev_candle['close']) and \

@@ -93,106 +93,105 @@ class ControllerGetDataAnalysisDerivEnvolventML:
         self.ServicesCheckEnvolventML.init_services_methodologys(self.ServicesMethodologys)
         self.ServicesCheckEnvolventML.init_services_entrys_predict_models(self.ServicesEntrysPredictModels)
 
-    # def get_apis_name_envolvent_ml(self):
-    #     return self.ServicesApi.get_apis_name_envolvent_ml()
+    def get_apis_name_envolvent_ml(self):
+        return self.ServicesApi.get_apis_name_envolvent_ml()
 
-    # def set_apis_name_smtp(self):
-    #     return self.ServicesSmtp.set_apis_name(self.get_apis_name_envolvent_ml())
+    def set_apis_name_smtp(self):
+        return self.ServicesSmtp.set_apis_name(self.get_apis_name_envolvent_ml())
 
-    # def initialize_request_data(self):
-    #     now = self.ServicesDates.get_current_utc5()
-    #     date = self.ServicesDates.get_current_date(now)
-    #     hour = self.ServicesDates.get_current_hour(now)
-    #     self.ServicesDates.set_start_date()
-    #     self.set_apis_name_smtp()
-    #     self.ServicesEvents.set_events_field('start_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
-    #     id_cronjobs = self.ServicesCronjobs.generate_cronjobs_id()
-    #     return now, date, hour, id_cronjobs
+    def initialize_request_data(self):
+        now = self.ServicesDates.get_current_utc5()
+        date = self.ServicesDates.get_current_date(now)
+        hour = self.ServicesDates.get_current_hour(now)
+        self.ServicesDates.set_start_date()
+        self.set_apis_name_smtp()
+        self.ServicesEvents.set_events_field('start_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
+        id_cronjobs = self.ServicesCronjobs.generate_cronjobs_id()
+        return now, date, hour, id_cronjobs
     
-    # def verify_services(self, request, hour, date, id_cronjobs):
-    #     servicios_a_verificar = self.init_verify_services(hour, date, id_cronjobs)
-    #     for servicio_info in servicios_a_verificar:
-    #         resultado = self.execute_service_check(servicio_info)
-    #         if not resultado['status']:
-    #             self.handle_service_error(servicio_info, date, resultado)
-    #             return resultado
-    #     return {'status': True}
+    def verify_services(self, request, hour, date, id_cronjobs):
+        servicios_a_verificar = self.init_verify_services(hour, date, id_cronjobs)
+        for servicio_info in servicios_a_verificar:
+            resultado = self.execute_service_check(servicio_info)
+            if not resultado['status']:
+                self.handle_service_error(servicio_info, date, resultado)
+                return resultado
+        return {'status': True}
 
-    # def init_verify_services(self, hour, date, id_cronjobs):
-    #     return [
-    #         {
-    #             'name': 'schedule_service',
-    #             'function': lambda: self.ServicesShedule.get_shedule_result(hour),
-    #             'send_email_on_error': True
-    #         },
-    #         {
-    #             'name': 'api_service',
-    #             'function': lambda: self.ServicesApi.get_api_result(),
-    #             'send_email_on_error': True
-    #         },
-    #         {
-    #             'name': 'cronjobs_service',
-    #             'function': lambda: self.ServicesCronjobs.add_envolvent_ml(id_cronjobs, date),
-    #             'send_email_on_error': True
-    #         },
-    #         {
-    #             'name': 'models_service',
-    #             'function': lambda: self.ServicesModels.check_models(),
-    #             'send_email_on_error': False
-    #         }
-    #     ]
+    def init_verify_services(self, hour, date, id_cronjobs):
+        return [
+            {
+                'name': 'schedule_service',
+                'function': lambda: self.ServicesShedule.get_shedule_result(hour),
+                'send_email_on_error': True
+            },
+            {
+                'name': 'api_service',
+                'function': lambda: self.ServicesApi.get_api_result(),
+                'send_email_on_error': True
+            },
+            {
+                'name': 'cronjobs_service',
+                'function': lambda: self.ServicesCronjobs.add_envolvent_ml(id_cronjobs, date),
+                'send_email_on_error': True
+            },
+            {
+                'name': 'models_service',
+                'function': lambda: self.ServicesModels.check_models(),
+                'send_email_on_error': False
+            }
+        ]
 
-    # def execute_service_check(self, servicio_info):
-    #     servicio_function = servicio_info['function']
-    #     resultado = servicio_function() if callable(servicio_function) else servicio_function
-    #     return resultado
+    def execute_service_check(self, servicio_info):
+        servicio_function = servicio_info['function']
+        resultado = servicio_function() if callable(servicio_function) else servicio_function
+        return resultado
 
-    # def handle_service_error(self, servicio_info, date, resultado):
-    #     if servicio_info.get('send_email_on_error', False):
-    #         self.ServicesSmtp.send_notification_email(date, resultado['message'])
+    def handle_service_error(self, servicio_info, date, resultado):
+        if servicio_info.get('send_email_on_error', False):
+            self.ServicesSmtp.send_notification_email(date, resultado['message'])
     
-    # def get_tokens(self):
-    #     return self.ServicesDeriv.get_tokens_ursa_minor()
+    def get_tokens(self):
+        return self.ServicesDeriv.get_tokens_ursa_minor()
     
-    # def init_tokens_asignado(self, account):
-    #     self.ServicesDeriv.init_tokens_asignado(account)
-    #     return True
+    def init_tokens_asignado(self, account):
+        self.ServicesDeriv.init_tokens_asignado(account)
+        return True
     
-    # async def initialize_deriv_services(self, date):
-    #     self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
-    #     tokens = self.get_tokens()
-    #     self.init_tokens_asignado(tokens)
-    #     result = await self.ServicesCheckEnvolventML.init()
-    #     if not result['status']:
-    #         return result
-    #     self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
-    #     await self.ServicesCheckEnvolventML.set_balance(self.ServicesDates.get_day())
-    #     self.ServicesEvents.set_events_field('config_broker', self.ServicesDates.get_current_date_mil_dynamic())
-    #     self.ServicesCheckEnvolventML.init_services_events(self.ServicesEvents)
-    #     self.ServicesCheckEnvolventML.init_services_dates(self.ServicesDates)
-    #     return {'status': True, 'message': 'Initialization successful'}
+    async def initialize_deriv_services(self, date):
+        self.ServicesEvents.set_events_field('init_endpoint', self.ServicesDates.get_current_date_mil_dynamic())
+        tokens = self.get_tokens()
+        self.init_tokens_asignado(tokens)
+        result = await self.ServicesCheckEnvolventML.init()
+        if not result['status']:
+            return result
+        self.ServicesEvents.set_events_field('init_broker', self.ServicesDates.get_current_date_mil_dynamic())
+        await self.ServicesCheckEnvolventML.set_balance(self.ServicesDates.get_day())
+        self.ServicesEvents.set_events_field('config_broker', self.ServicesDates.get_current_date_mil_dynamic())
+        self.ServicesCheckEnvolventML.init_services_events(self.ServicesEvents)
+        self.ServicesCheckEnvolventML.init_services_dates(self.ServicesDates)
+        return {'status': True, 'message': 'Initialization successful'}
     
-    # async def process_deriv_services(self):
-    #     await self.ServicesCheckEnvolventML.loops()
-    #     await self.ServicesCheckEnvolventML.closed()
+    async def process_deriv_services(self):
+        await self.ServicesCheckEnvolventML.loops()
+        await self.ServicesCheckEnvolventML.closed()
 
-    # def generate_diferences_events(self):
-    #     return self.ServicesEvents.generate_diferences_events()
+    def generate_diferences_events(self):
+        return self.ServicesEvents.generate_diferences_events()
     
-    # def get_events(self):
-    #     return self.ServicesEvents.get_events()
+    def get_events(self):
+        return self.ServicesEvents.get_events()
     
-    # def add_events(self, details, differences, id_cronjobs):
-    #     return self.ServicesEvents.add_events(details, differences, id_cronjobs)
+    def add_events(self, details, differences, id_cronjobs):
+        return self.ServicesEvents.add_events(details, differences, id_cronjobs)
 
-    # def finalize_request(self, now, id_cronjobs):
-    #     now = self.ServicesDates.get_current_utc5()
-    #     self.ServicesDates.set_end_date()
-    #     self.add_events(self.get_events(), self.generate_diferences_events(), id_cronjobs)
-    #     return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
+    def finalize_request(self, now, id_cronjobs):
+        now = self.ServicesDates.get_current_utc5()
+        self.ServicesDates.set_end_date()
+        self.add_events(self.get_events(), self.generate_diferences_events(), id_cronjobs)
+        return self.ServicesCronjobs.set_ejecution(self.ServicesDates.get_current_date(now), self.ServicesDates.get_time_execution(), id_cronjobs)
 
     async def GetDataAnalysisDerivEnvolventML(self, request):
-        return True
         now, date, hour, id_cronjobs = self.initialize_request_data()
         resultado = self.verify_services(request, hour, date, id_cronjobs)
         if not resultado['status']:
