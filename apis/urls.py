@@ -1,6 +1,6 @@
 # apis/urls.py
 from django.urls import path
-from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML
+from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML,GetDataAnalysisDerivEnvolventML
 
 urlpatterns = [
     path('get-data-analysis-deriv-minus/', GetDataAnalysisDerivMinus.as_view(), name='get-data-analysis-deriv-minus'),
@@ -21,5 +21,6 @@ urlpatterns = [
     path('add-models/', AddModels.as_view(), name='add-models'),
     path('send-data-session/', SendDataSession.as_view(), name='send-data-session'),
     path('get-data-analysis-deriv-envolvent/', GetDataAnalysisDerivEnvolvent.as_view(), name='get-data-analysis-deriv-envolvent'),
+    path('get-data-analysis-deriv-envolvent-ml/', GetDataAnalysisDerivEnvolventML.as_view(), name='get-data-analysis-deriv-envolvent-ml'),
     path('get-data-analysis-deriv-pinbar/', GetDataAnalysisDerivPinbar.as_view(), name='get-data-analysis-deriv-pinbar'),
 ]
