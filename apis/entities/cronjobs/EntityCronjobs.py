@@ -86,6 +86,7 @@ class EntityCronjobs():
             'trends_minus_recent':config("ID_API_TRENDS_MINUS_RECENT"),
             'pinbar':config("ID_API_PINBAR"),
             'envolvent_ml':config("ID_API_ENVOLVENT_ML"),
+            'wma_recent_ml':config("ID_API_WMA_RECENT_ML"),
         }
 
         return True
@@ -133,6 +134,10 @@ class EntityCronjobs():
     def get_id_api_envolvent_ml(self):
 
         return self.get_id_api_key('envolvent_ml')
+
+    def get_id_api_wma_recent_ml(self):
+
+        return self.get_id_api_key('wma_recent_ml')
 
     def get_id_api_pinbar(self):
 

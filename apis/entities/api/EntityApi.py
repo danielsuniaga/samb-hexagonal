@@ -40,6 +40,7 @@ class EntityApi():
             'pinbar':config("ID_API_PINBAR"),
             'trends_expansive_ml':config("ID_API_TRENDS_EXPANSIVE_ML"),
             'envolvent_ml':config("ID_API_ENVOLVENT_ML"),
+            'wma_recent_ml':config("ID_API_WMA_RECENT_ML"),
             'endpoinst':config("ID_API_ENDPOINT"),
         }
 
@@ -92,6 +93,12 @@ class EntityApi():
     def get_apis_name_wma_recent(self):
 
         id = self.get_apis_ids('wma_recent')
+
+        return self.get_apis_name(id)
+
+    def get_apis_name_wma_recent_ml(self):
+
+        id = self.get_apis_ids('wma_recent_ml')
 
         return self.get_apis_name(id)
     
