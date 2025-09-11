@@ -308,6 +308,27 @@ class GetDataAnalysisDerivWMARecent(APIView):
 
         return result
     
+class GetDataAnalysisDerivWMARecentML(APIView):
+
+    # controller = None
+
+    # def __init__(self):
+    #     self.controller = ControllerGetDataAnalysisDerivWMARecent.ControllerGetDataAnalysisDerivWMARecent()
+
+    def post(self, request, format=None):
+
+        return Response(True)
+
+        response_data = async_to_sync(self.async_post)(request)
+
+        return Response(response_data)
+
+    # async def async_post(self, request):
+
+    #     result = await self.controller.GetDataAnalysisDerivWMARecent(request)
+
+    #     return result
+    
 class GetDataAnalysisDerivWMAML(APIView):
 
     controller = None
