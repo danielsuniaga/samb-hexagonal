@@ -23,6 +23,7 @@ import apis.controllers.GetDataAnalysisDerivTrendsMinusRecent.GetDataAnalysisDer
 import apis.controllers.GetDataAnalysisDerivTrendsExpansiveRecent.GetDataAnalysisDerivTrendsExpansiveRecent as ControllerGetDataAnalysisDerivTrendsExpansiveRecent
 import apis.controllers.GetDataAnalysisDerivTrendsExpansiveML.GetDataAnalysisDerivTrendsExpansiveML as ControllerGetDataAnalysisDerivTrendsExpansiveML
 import apis.controllers.GetDataAnalysisDerivEnvolventML.GetDataAnalysisDerivEnvolventML as ControllerGetDataAnalysisDerivEnvolventML
+import apis.controllers.GetDataAnalysisDerivWMARecentML.GetDataAnalysisDerivWMARecentML as ControllerGetDataAnalysisDerivWMARecentML
 import apis.controllers.GetDataAnalysisDerivPinBar.GetDataAnalysisDerivPinBar as ControllerGetDataAnalysisDerivPinBar
 
 class GetDataAnalysisDerivEnvolvent(APIView):
@@ -308,27 +309,6 @@ class GetDataAnalysisDerivWMARecent(APIView):
 
         return result
     
-class GetDataAnalysisDerivWMARecentML(APIView):
-
-    # controller = None
-
-    # def __init__(self):
-    #     self.controller = ControllerGetDataAnalysisDerivWMARecent.ControllerGetDataAnalysisDerivWMARecent()
-
-    def post(self, request, format=None):
-
-        return Response(True)
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    # async def async_post(self, request):
-
-    #     result = await self.controller.GetDataAnalysisDerivWMARecent(request)
-
-    #     return result
-    
 class GetDataAnalysisDerivWMAML(APIView):
 
     controller = None
@@ -410,4 +390,24 @@ class AddModels(APIView):
         result = self.controller.AddModels()
 
         return Response(result)
+
+class GetDataAnalysisDerivWMARecentML(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDataAnalysisDerivWMARecentML.ControllerGetDataAnalysisDerivWMARecentML()
+
+    def post(self, request, format=None):
+
+        response_data = async_to_sync(self.async_post)(request)
+
+        return Response(response_data)
+
+    async def async_post(self, request):
+
+        result = await self.controller.GetDataAnalysisDerivWMARecentML(request)
+
+        return result
         
