@@ -85,6 +85,7 @@ class EntityCronjobs():
             'trends_expansive_recent':config("ID_API_TRENDS_EXPANSIVE_RECENT"),
             'trends_minus_recent':config("ID_API_TRENDS_MINUS_RECENT"),
             'pinbar':config("ID_API_PINBAR"),
+            'pinbar_ml':config("ID_API_PINBAR_ML"),
             'envolvent_ml':config("ID_API_ENVOLVENT_ML"),
             'wma_recent_ml':config("ID_API_WMA_RECENT_ML"),
         }
@@ -142,6 +143,10 @@ class EntityCronjobs():
     def get_id_api_pinbar(self):
 
         return self.get_id_api_key('pinbar')
+
+    def get_id_api_pinbar_ml(self):
+
+        return self.get_id_api_key('pinbar_ml')
 
     def get_id_api_wma(self):
 

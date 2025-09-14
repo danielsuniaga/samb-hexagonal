@@ -25,6 +25,7 @@ import apis.controllers.GetDataAnalysisDerivTrendsExpansiveML.GetDataAnalysisDer
 import apis.controllers.GetDataAnalysisDerivEnvolventML.GetDataAnalysisDerivEnvolventML as ControllerGetDataAnalysisDerivEnvolventML
 import apis.controllers.GetDataAnalysisDerivWMARecentML.GetDataAnalysisDerivWMARecentML as ControllerGetDataAnalysisDerivWMARecentML
 import apis.controllers.GetDataAnalysisDerivPinBar.GetDataAnalysisDerivPinBar as ControllerGetDataAnalysisDerivPinBar
+import apis.controllers.GetDataAnalysisDerivPinBarML.GetDataAnalysisDerivPinBarML as ControllerGetDataAnalysisDerivPinBarML
 
 class GetDataAnalysisDerivEnvolvent(APIView):
     controller = None
@@ -408,6 +409,26 @@ class GetDataAnalysisDerivWMARecentML(APIView):
     async def async_post(self, request):
 
         result = await self.controller.GetDataAnalysisDerivWMARecentML(request)
+
+        return result
+
+class GetDataAnalysisDerivPinBarML(APIView):
+
+    controller = None
+
+    def __init__(self):
+
+        self.controller = ControllerGetDataAnalysisDerivPinBarML.ControllerGetDataAnalysisDerivPinBarML()
+
+    def post(self, request, format=None):
+
+        response_data = async_to_sync(self.async_post)(request)
+
+        return Response(response_data)
+
+    async def async_post(self, request):
+
+        result = await self.controller.GetDataAnalysisDerivPinBarML(request)
 
         return result
         
