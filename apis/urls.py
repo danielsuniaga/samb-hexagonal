@@ -1,6 +1,6 @@
 # apis/urls.py
 from django.urls import path
-from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML,GetDataAnalysisDerivEnvolventML, GetDataAnalysisDerivWMARecentML, GetDataAnalysisDerivPinbarML
+from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML,GetDataAnalysisDerivEnvolventML, GetDataAnalysisDerivWMARecentML, GetDataAnalysisDerivPinBarML
 
 urlpatterns = [
     path('get-data-analysis-deriv-minus/', GetDataAnalysisDerivMinus.as_view(), name='get-data-analysis-deriv-minus'),
@@ -24,5 +24,5 @@ urlpatterns = [
     path('get-data-analysis-deriv-envolvent/', GetDataAnalysisDerivEnvolvent.as_view(), name='get-data-analysis-deriv-envolvent'),
     path('get-data-analysis-deriv-envolvent-ml/', GetDataAnalysisDerivEnvolventML.as_view(), name='get-data-analysis-deriv-envolvent-ml'),
     path('get-data-analysis-deriv-pinbar/', GetDataAnalysisDerivPinbar.as_view(), name='get-data-analysis-deriv-pinbar'),
-    path('get-data-analysis-deriv-pinbar-ml/', GetDataAnalysisDerivPinbarML.as_view(), name='get-data-analysis-deriv-pinbar-ml'),
+    path('get-data-analysis-deriv-pinbar-ml/', GetDataAnalysisDerivPinBarML.as_view(), name='get-data-analysis-deriv-pinbar-ml'),
 ]
