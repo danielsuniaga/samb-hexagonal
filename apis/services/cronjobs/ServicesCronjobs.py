@@ -102,6 +102,10 @@ class ServicesCronjobs():
 
         return self.entity.get_id_api_pinbar()
     
+    def get_id_api_pinbar_ml(self):
+
+        return self.entity.get_id_api_pinbar_ml()
+    
     def get_id_financial_asset(self):
 
         return self.entity.get_id_financial_asset()
@@ -353,9 +357,26 @@ class ServicesCronjobs():
             'default_execute':self.get_default_execute()
         }
     
+    def init_data_add_pinbar_ml_repository(self,id_cronjobs,date):
+
+        return {
+            'id':id_cronjobs,
+            'date':date,
+            'condition':self.get_condition(),
+            'id_api':self.get_id_api_pinbar_ml(),
+            'id_financial_asset':self.get_id_financial_asset(),
+            'default_execute':self.get_default_execute()
+        }
+    
     def add_pinbar(self,id_cronjobs,date):
 
         data = self.init_data_add_pinbar_repository(id_cronjobs,date)
+
+        return self.add_repository(data)
+    
+    def add_pinbar_ml(self,id_cronjobs,date):
+
+        data = self.init_data_add_pinbar_ml_repository(id_cronjobs,date)
 
         return self.add_repository(data)
     
