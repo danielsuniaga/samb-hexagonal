@@ -154,8 +154,8 @@ class EntityMethodologyTrendsRecentML:
         """
         candles_trends = self.get_candles_trends(candles['candles'])
         candles_trends_close = self.get_candles_close(candles_trends)
-        
-        # Ejemplo: candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45] (tendencia alcista)
+
+        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45]  # (tendencia alcista)
         result = self.check_candles_trends(candles_trends_close)
         
         return True  # Siempre retorna True para continuar el análisis

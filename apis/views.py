@@ -18,6 +18,7 @@ import apis.controllers.GetDataAnalysisDerivTrendsML.GetDataAnalysisDerivTrendsM
 import apis.controllers.GetDataAnalysisDerivTrendsMinusML.GetDataAnalysisDerivTrendsMinusML as ControllerGetDataAnalysisDerivTrendsMinusML
 import apis.controllers.GetDataAnalysisDerivWMAML.GetDataAnalysisDerivWMAML as ControllerGetDataAnalysisDerivWMAML
 import apis.controllers.GetDataAnalysisDerivTrendsRecent.GetDataAnalysisDerivTrendsRecent as ControllerGetDataAnalysisDerivTrendRecent
+import apis.controllers.GetDataAnalysisDerivTrendsRecentML.GetDataAnalysisDerivTrendsRecentML as ControllerGetDataAnalysisDerivTrendsRecentML
 import apis.controllers.GetDataAnalysisDerivWMARecent.GetDataAnalysisDerivWMARecent as ControllerGetDataAnalysisDerivWMARecent
 import apis.controllers.GetDataAnalysisDerivTrendsMinusRecent.GetDataAnalysisDerivTrendsMinusRecent as ControllerGetDataAnalysisDerivTrendsMinusRecent
 import apis.controllers.GetDataAnalysisDerivTrendsExpansiveRecent.GetDataAnalysisDerivTrendsExpansiveRecent as ControllerGetDataAnalysisDerivTrendsExpansiveRecent
@@ -131,27 +132,19 @@ class GetDataAnalysisDerivRecent(APIView):
 
         return result
     
-class GetDataAnalysisDerivRecentML(APIView):
+class GetDataAnalysisDerivTrendsRecentML(APIView):
+    controller = None
 
-    # controller = None
-
-    # def __init__(self):
-
-    #     self.controller = ControllerGetDataAnalysisDerivTrendRecent.ControllerGetDataAnalysisDerivTrendRecent()
+    def __init__(self):
+        self.controller = ControllerGetDataAnalysisDerivTrendsRecentML.ControllerGetDataAnalysisDerivTrendsRecentML()
 
     def post(self, request, format=None):
-
-        return Response(True)
-
         response_data = async_to_sync(self.async_post)(request)
-
         return Response(response_data)
-        
-    # async def async_post(self, request):
 
-    #     result = await self.controller.GetDataAnalysisDerivRecent(request)
-
-    #     return result
+    async def async_post(self, request):
+        result = await self.controller.GetDataAnalysisDerivTrendsRecentML(request)
+        return result
     
 class GetDataAnalysisDerivML(APIView):
 

@@ -146,6 +146,10 @@ class ServicesApi():
 
         return self.entity.get_apis_name_pinbar_ml()
 
+    def get_apis_name_trends_recent_ml(self):
+
+        return self.entity.get_apis_name_trends_recent_ml()
+
     def get_apis_name_endpoints(self):
                 
         return self.entity.get_apis_name_endpoints()
