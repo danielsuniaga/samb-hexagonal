@@ -49,6 +49,10 @@ class ServicesCronjobs():
     def get_id_api_trends_recent_ml(self):
 
         return self.entity.get_id_api_trends_recent_ml()
+    
+    def get_id_api_trends_minus_recent_ml(self):
+
+        return self.entity.get_id_api_trends_minus_recent_ml()
 
     def get_id_api_trends_ml(self):
 
@@ -184,6 +188,17 @@ class ServicesCronjobs():
             'default_execute':self.get_default_execute()
         }
     
+    def init_add_trends_minus_recent_ml_repository(self,id_cronjobs,date):
+
+        return {
+            'id':id_cronjobs,
+            'date':date,
+            'condition':self.get_condition(),
+            'id_api':self.get_id_api_trends_minus_recent_ml(),
+            'id_financial_asset':self.get_id_financial_asset(),
+            'default_execute':self.get_default_execute()
+        }
+    
     def init_add_trends_ml_repository(self,id_cronjobs,date):
 
         return {
@@ -276,6 +291,12 @@ class ServicesCronjobs():
     def add_trends_recent_ml(self,id_cronjobs,date):
 
         data = self.init_add_trends_recent_ml_repository(id_cronjobs,date)
+
+        return self.add_repository(data)
+    
+    def add_trends_minus_recent_ml(self,id_cronjobs,date):
+
+        data = self.init_add_trends_minus_recent_ml_repository(id_cronjobs,date)
 
         return self.add_repository(data)
     

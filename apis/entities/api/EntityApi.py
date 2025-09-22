@@ -35,6 +35,7 @@ class EntityApi():
             'envolvent':config("ID_API_ENVOLVENT"),
             'trends_recent':config("ID_API_TRENDS_RECENT"),
             'trends_recent_ml':config("ID_API_TRENDS_RECENT_ML"),
+            'trends_minus_recent_ml':config("ID_API_TRENDS_MINUS_RECENT_ML"),
             'wma_recent':config("ID_API_WMA_RECENT"),
             'trends_minus_recent':config("ID_API_TRENDS_MINUS_RECENT"),
             'trends_expansive_recent':config("ID_API_TRENDS_EXPANSIVE_RECENT"),
@@ -83,6 +84,12 @@ class EntityApi():
     def get_apis_name_trends_recent_ml(self):
 
         id = self.get_apis_ids('trends_recent_ml')
+
+        return self.get_apis_name(id)
+    
+    def get_apis_name_trends_minus_recent_ml(self):
+
+        id = self.get_apis_ids('trends_minus_recent_ml')
 
         return self.get_apis_name(id)
 

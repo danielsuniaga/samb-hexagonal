@@ -1,10 +1,11 @@
 # apis/urls.py
 from django.urls import path
-from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML,GetDataAnalysisDerivEnvolventML, GetDataAnalysisDerivWMARecentML, GetDataAnalysisDerivPinBarML, GetDataAnalysisDerivTrendsRecentML
+from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML,GetDataAnalysisDerivEnvolventML, GetDataAnalysisDerivWMARecentML, GetDataAnalysisDerivPinBarML, GetDataAnalysisDerivTrendsRecentML,GetDataAnalysisDerivMinusRecentML
 
 urlpatterns = [
     path('get-data-analysis-deriv-minus/', GetDataAnalysisDerivMinus.as_view(), name='get-data-analysis-deriv-minus'),
     path('get-data-analysis-deriv-minus-recent/', GetDataAnalysisDerivMinusRecent.as_view(), name='get-data-analysis-deriv-minus-recent'),
+    path('get-data-analysis-deriv-minus-recent-ml/', GetDataAnalysisDerivMinusRecentML.as_view(), name='get-data-analysis-deriv-minus-recent-ml'),
     path('get-data-analysis-deriv-minus-ml/', GetDataAnalysisDerivMinusML.as_view(), name='get-data-analysis-deriv-minus-ml'),
     path('get-data-analysis-deriv-expansive/', GetDataAnalysisDerivExpansive.as_view(), name='get-data-analysis-deriv-expansive'),
     path('get-data-analysis-deriv-expansive-ml/', GetDataAnalysisDerivExpansiveML.as_view(), name='get-data-analysis-deriv-expansive-ml'),
