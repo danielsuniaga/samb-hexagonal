@@ -459,6 +459,7 @@ class EntityDeriv():
         max_attempts = 5
 
         for attempt in range(max_attempts):
+            
             try:
 
                 response = await self.api.proposal_open_contract(
