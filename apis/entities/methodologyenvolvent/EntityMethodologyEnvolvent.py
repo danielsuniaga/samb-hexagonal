@@ -189,3 +189,19 @@ class EntityMethodologyEnvolvent:
 
     def get_result_entrys_result(self):
         return self.result_entrys['result']
+    
+    def check_sma(self, sma, last_candle):
+        """
+        Verificación SMA con lógica específica de envolvente
+        """
+        if not self.get_metrics_sma_active():
+            return True
+        
+        # Lógica específica basada en el tipo de entrada detectado por envolvente
+        if self.type_entry_positions == self.get_type_entry_long():
+            return sma < last_candle  # Para CALL, SMA debe estar por debajo
+        
+        if self.type_entry_positions == self.get_type_entry_short():
+            return sma > last_candle  # Para PUT, SMA debe estar por encima
+
+        return False
