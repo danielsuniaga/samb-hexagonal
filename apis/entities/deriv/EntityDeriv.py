@@ -335,26 +335,63 @@ class EntityDeriv():
     async def get_candles(self):
 
         if self.api is None:
-
             return {'status': False, 'message': 'API no inicializada'}
 
-        try:
+        max_attempts = 5
+        retry_delay = 2  # segundos entre reintentos
 
-            data = await self.init_data_ticks_history()
+        for attempt in range(1, max_attempts + 1):
+            try:
+                data = await self.init_data_ticks_history()
+                candles_response = await self.api.ticks_history(data)
 
-            candles_response = await self.api.ticks_history(data)
+                # Validar que la respuesta tenga la estructura esperada
+                if not candles_response or not isinstance(candles_response, dict):
+                    if attempt < max_attempts:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    return {'status': False, 'message': 'Deriv retornó respuesta inválida después de 5 intentos'}
 
-            candles = candles_response.get("candles", [])
+                candles = candles_response.get("candles", [])
 
-            return {
-                'status': True,
-                'message': f'{len(candles)} velas obtenidas correctamente',
-                'candles': candles
-            }
+                # Validar que las velas no estén vacías
+                if not candles:
+                    if attempt < max_attempts:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    return {'status': False, 'message': 'Deriv retornó velas vacías después de 5 intentos'}
 
-        except Exception as err:
+                # Validar que las velas tengan la estructura correcta
+                if not isinstance(candles, list) or len(candles) == 0:
+                    if attempt < max_attempts:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    return {'status': False, 'message': 'Estructura de velas inválida después de 5 intentos'}
 
-            return {'status': False, 'message': f'Error al obtener velas: {err}'}
+                # Validar que cada vela tenga las propiedades básicas
+                sample_candle = candles[0] if candles else {}
+                required_fields = ['open', 'high', 'low', 'close']
+                if not all(field in sample_candle for field in required_fields):
+                    if attempt < max_attempts:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    return {'status': False, 'message': 'Velas con campos faltantes después de 5 intentos'}
+
+                # Éxito - respuesta válida
+                return {
+                    'status': True,
+                    'message': f'{len(candles)} velas obtenidas correctamente en intento {attempt}',
+                    'candles': candles,
+                    'attempts': attempt
+                }
+
+            except Exception as err:
+                if attempt < max_attempts:
+                    await asyncio.sleep(retry_delay)
+                    continue
+                return {'status': False, 'message': f'Error después de {max_attempts} intentos: {err}'}
+
+        return {'status': False, 'message': f'Falló después de {max_attempts} intentos'}
         
     def get_proposal_data(self,amount,contract_type,duration,duration_unit,symbol):
 
