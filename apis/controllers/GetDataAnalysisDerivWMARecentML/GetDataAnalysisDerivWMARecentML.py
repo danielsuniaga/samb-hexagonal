@@ -149,7 +149,8 @@ class ControllerGetDataAnalysisDerivWMARecentML:
 
     def handle_service_error(self, servicio_info, date, resultado):
         if servicio_info.get('send_email_on_error', False):
-            self.ServicesSmtp.send_notification_email(date, resultado['message'])
+            error_message = resultado.get('message') or resultado.get('msj') or 'Error desconocido en verificación de servicios'               
+            self.ServicesSmtp.send_notification_email(date, error_message)
     
     def get_tokens(self):
         return self.ServicesDeriv.get_tokens_ursa_major()
@@ -199,6 +200,6 @@ class ControllerGetDataAnalysisDerivWMARecentML:
             return resultado
         resultado_deriv = await self.initialize_deriv_services(date)
         if not resultado_deriv['status']:
-            return self.ServicesSmtp.send_notification_email(date, resultado_deriv['message']) 
+            return resultado_deriv 
         await self.process_deriv_services()
         return self.finalize_request(now, id_cronjobs)
