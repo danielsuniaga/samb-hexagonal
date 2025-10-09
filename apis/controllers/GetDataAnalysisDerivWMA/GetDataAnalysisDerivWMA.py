@@ -166,7 +166,8 @@ class ControllerGetDataAnalysisDerivWMA:
 
             if not resultado['status']:
 
-                self.ServicesSmtp.send_notification_email(date, resultado['message'])
+                error_message = resultado.get('message') or resultado.get('msj') or 'Error desconocido en verificación de servicios'               
+                self.ServicesSmtp.send_notification_email(date, error_message)
                 
                 return resultado
 
@@ -243,14 +244,12 @@ class ControllerGetDataAnalysisDerivWMA:
         resultado = self.verify_services(request, hour, date, id_cronjobs)
         
         if not resultado['status']:
-
-            return 
+            return resultado 
         
         resultado_deriv = await self.initialize_deriv_services(date)
 
         if not resultado_deriv['status']:
-
-            return self.ServicesSmtp.send_notification_email(date, resultado_deriv['message'])  
+            return resultado_deriv  
         
         await self.process_deriv_services()
 

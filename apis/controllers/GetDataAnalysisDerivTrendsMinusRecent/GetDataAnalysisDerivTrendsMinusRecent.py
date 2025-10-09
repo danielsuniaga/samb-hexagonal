@@ -173,7 +173,8 @@ class ControllerGetDataAnalysisDerivTrendsMinusRecent:
 
             if not resultado['status']:
 
-                self.ServicesSmtp.send_notification_email(date, resultado['message'])
+                error_message = resultado.get('message') or resultado.get('msj') or 'Error desconocido en verificación de servicios'               
+                self.ServicesSmtp.send_notification_email(date, error_message)
                 
                 return resultado
 
