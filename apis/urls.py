@@ -1,6 +1,6 @@
 # apis/urls.py
 from django.urls import path
-from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML,GetDataAnalysisDerivEnvolventML, GetDataAnalysisDerivWMARecentML, GetDataAnalysisDerivPinBarML, GetDataAnalysisDerivTrendsRecentML,GetDataAnalysisDerivMinusRecentML
+from .views import GetDataAnalysisDeriv, GetEndPoint, GetDailyReportEntrys,AddModels, GetDailyReportCrons, GetDataAnalysisDerivWMA, GetDataAnalysisDerivExpansive, SendDataSession, GetDataAnalysisDerivMinus, GetDataAnalysisDerivML,GetDataAnalysisDerivMinusML, GetDataAnalysisDerivWMAML, GetDataAnalysisDerivEnvolvent,GetDataAnalysisDerivRecent,GetDataAnalysisDerivWMARecent, GetDataAnalysisDerivMinusRecent, GetDataAnalysisDerivExpansiveRecent, GetDataAnalysisDerivPinbar,GetDataAnalysisDerivExpansiveML,GetDataAnalysisDerivEnvolventML, GetDataAnalysisDerivWMARecentML, GetDataAnalysisDerivPinBarML, GetDataAnalysisDerivTrendsRecentML,GetDataAnalysisDerivMinusRecentML, GetDataAnalysisDerivTrendsExpansiveRecentML
 
 urlpatterns = [
     path('get-data-analysis-deriv-minus/', GetDataAnalysisDerivMinus.as_view(), name='get-data-analysis-deriv-minus'),
@@ -10,6 +10,7 @@ urlpatterns = [
     path('get-data-analysis-deriv-expansive/', GetDataAnalysisDerivExpansive.as_view(), name='get-data-analysis-deriv-expansive'),
     path('get-data-analysis-deriv-expansive-ml/', GetDataAnalysisDerivExpansiveML.as_view(), name='get-data-analysis-deriv-expansive-ml'),
     path('get-data-analysis-deriv-expansive-recent/', GetDataAnalysisDerivExpansiveRecent.as_view(), name='get-data-analysis-deriv-expansive-recent'),
+    path('get-data-analysis-deriv-expansive-recent-ml/', GetDataAnalysisDerivTrendsExpansiveRecentML.as_view(), name='get-data-analysis-deriv-expansive-recent-ml'),
     path('get-data-analysis-deriv-wma/', GetDataAnalysisDerivWMA.as_view(), name='get-data-analysis-deriv-wma'),
     path('get-data-analysis-deriv-wma-recent/', GetDataAnalysisDerivWMARecent.as_view(), name='get-data-analysis-deriv-wma-recent'),
     path('get-data-analysis-deriv-wma-recent-ml/', GetDataAnalysisDerivWMARecentML.as_view(), name='get-data-analysis-deriv-wma-recent-ml'),
