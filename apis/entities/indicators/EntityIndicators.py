@@ -142,33 +142,34 @@ class EntityIndicators():
 
                 gains.append(change)
 
-                losses.append(0)
+                losses.append(Decimal('0'))
 
             elif change < 0:
 
-                gains.append(0)
+                gains.append(Decimal('0'))
 
                 losses.append(-change)
 
             else:
 
-                gains.append(0)
+                gains.append(Decimal('0'))
 
-                losses.append(0)
+                losses.append(Decimal('0'))
 
-        avg_gain = sum(gains) / periodos  # Promedio de ganancias en los últimos 10 períodos
+        # Usar Decimal para mantener consistencia de tipos
+        avg_gain = sum(gains) / Decimal(str(periodos))  # Promedio de ganancias en los últimos períodos
 
-        avg_loss = sum(losses) / periodos  # Promedio de pérdidas en los últimos 10 períodos
+        avg_loss = sum(losses) / Decimal(str(periodos))  # Promedio de pérdidas en los últimos períodos
 
         if avg_loss == 0:
 
-            return 100
+            return Decimal('100')
 
         rs = avg_gain / avg_loss
 
-        rsi = 100 - (100 / (1 + rs))
+        rsi = Decimal('100') - (Decimal('100') / (Decimal('1') + rs))
 
-        return rsi
+        return float(rsi)  # Convertir a float al final para compatibilidad
 
     def generate_rsi(self,candles):
 
