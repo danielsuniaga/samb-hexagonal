@@ -409,43 +409,50 @@ class EntityDeriv():
     async def generate_proposal(self,data):
 
         if self.api is None:
-
             return {'status': False, 'message': 'API no inicializada'}
 
-        try:
+        if data['amount'] <= 0:
+            return {'status': False, 'message': 'El monto debe ser mayor que 0'}
 
-            if data['amount'] <= 0:
+        max_attempts = 5
+        retry_delay = 2  # segundos entre reintentos
 
-                return {'status': False, 'message': 'El monto debe ser mayor que 0'}
+        for attempt in range(1, max_attempts + 1):
+            try:
+                proposal_data = self.get_proposal_data(data['amount'],data['contract_type'],data['duration'],data['duration_unit'],data['symbol'])
 
-            proposal_data = self.get_proposal_data(data['amount'],data['contract_type'],data['duration'],data['duration_unit'],data['symbol'])
+                proposal_response = await self.api.proposal(proposal_data)
 
-            proposal_response = await self.api.proposal(proposal_data)
+                if proposal_response is None:
+                    if attempt < max_attempts:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    return {'status': False, 'message': 'La respuesta de la API es None después de 5 intentos'}
 
-            if proposal_response is None:
+                if 'proposal' in proposal_response:
+                    # ✅ ÉXITO - Retorna inmediatamente sin más intentos
+                    return {
+                        'status': True,
+                        'message': f'Propuesta generada correctamente en intento {attempt}',
+                        'proposal_id': proposal_response["proposal"]["id"],
+                        'proposal_details': proposal_response,
+                        'attempts': attempt
+                    }
+                else:
+                    error_message = proposal_response.get("error", {}).get("message", "Respuesta desconocida")
+                    if attempt < max_attempts:
+                        await asyncio.sleep(retry_delay)
+                        continue
+                    return {'status': False, 'message': f'Error al generar la propuesta después de 5 intentos: {error_message}'}
 
-                return {'status': False, 'message': 'La respuesta de la API es None'}
+            except Exception as err:
+                if attempt < max_attempts:
+                    await asyncio.sleep(retry_delay)
+                    continue
+                return {'status': False, 'message': f'Error al generar la propuesta después de 5 intentos: {err}'}
 
-            if 'proposal' in proposal_response:
+        return {'status': False, 'message': 'Falló después de 5 intentos'}
 
-                return {
-                    'status': True,
-                    'message': 'Propuesta generada correctamente',
-                    'proposal_id': proposal_response["proposal"]["id"],
-                    'proposal_details': proposal_response,
-                }
-            
-            else:
-
-                error_message = proposal_response.get("error", {}).get("message", "Respuesta desconocida")
-
-                return {'status': False, 'message': f'Error al generar la propuesta: {error_message}'}
-
-        except Exception as err:
-
-            return {'status': False, 'message': f'Error al generar la propuesta: {err}'}
-
-        return True
     
     async def execute_proposal(self, proposal_id):
 
