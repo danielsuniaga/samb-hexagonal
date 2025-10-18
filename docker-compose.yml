@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   database:
-    image: mysql
+    image: mysql:9.1.0
     ports:
       - "${DB_PORT_EXTERNAL}:${DB_PORT}"
     expose:
