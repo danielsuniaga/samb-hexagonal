@@ -3,6 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from asgiref.sync import async_to_sync
+from django.db import close_old_connections
+import gc
 
 import apis.controllers.GetDataAnalysisDerivTrends.GetDataAnalysisDerivTrends as ControllerGetDataAnalysisDerivTrends
 import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
@@ -31,456 +33,520 @@ import apis.controllers.GetDataAnalysisDerivPinBar.GetDataAnalysisDerivPinBar as
 import apis.controllers.GetDataAnalysisDerivPinBarML.GetDataAnalysisDerivPinBarML as ControllerGetDataAnalysisDerivPinBarML
 
 class GetDataAnalysisDerivEnvolvent(APIView):
-    controller = None
-
-    def __init__(self):
-        self.controller = ControllerGetDataAnalysisDerivEnvolvent.ControllerGetDataAnalysisDerivEnvolvent()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-        response_data = async_to_sync(self.async_post)(request)
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivEnvolvent.ControllerGetDataAnalysisDerivEnvolvent()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-    async def async_post(self, request):
-        result = await self.controller.GetDataAnalysisDerivEnvolvent(request)
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivEnvolvent(request)
         return result
     
 class GetDataAnalysisDerivEnvolventML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivEnvolventML.ControllerGetDataAnalysisDerivEnvolventML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivEnvolventML.ControllerGetDataAnalysisDerivEnvolventML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivEnvolventML(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivEnvolventML(request)
         return result
     
 class GetDataAnalysisDerivPinbar(APIView):
-    controller = None
-
-    def __init__(self):
-        self.controller = ControllerGetDataAnalysisDerivPinBar.ControllerGetDataAnalysisDerivPinBar()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivPinBar.ControllerGetDataAnalysisDerivPinBar()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-        response_data = async_to_sync(self.async_post)(request)
-        return Response(response_data)
-
-    async def async_post(self, request):
-        result = await self.controller.GetDataAnalysisDerivPinBar(request)
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivPinBar(request)
         return result
 
 class SendDataSession(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerSendDataSession.ControllerSendDataSession() 
-
-    def send_data(self):
-
-        return self.controller.send_data()  
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerSendDataSession.ControllerSendDataSession()
+            result = controller.send_data()
+            return Response(result)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-        return Response(self.send_data())
+
 class GetDataAnalysisDeriv(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrends.ControllerGetDataAnalysisDerivTrends()
+    """✅ Controller se crea por request para evitar problemas de cursores DB cerrados"""
 
     def post(self, request, format=None):
+        controller = None
+        try:
+            # ✅ Limpiar conexiones DB viejas
+            close_old_connections()
+            
+            # ✅ Crear controller nuevo para este request
+            controller = ControllerGetDataAnalysisDerivTrends.ControllerGetDataAnalysisDerivTrends()
+            
+            # ✅ Ejecutar lógica async
+            response_data = async_to_sync(self.async_post)(request, controller)
+            
+            return Response(response_data)
+            
+        finally:
+            # ✅ Limpieza explícita del controller y sus recursos
+            if controller:
+                del controller
+            
+            # ✅ Limpiar conexiones después del request
+            close_old_connections()
+            
+            # ✅ Forzar recolección de basura
 
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDeriv(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDeriv(request)
         return result
     
 class GetDataAnalysisDerivRecent(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendRecent.ControllerGetDataAnalysisDerivTrendRecent()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendRecent.ControllerGetDataAnalysisDerivTrendRecent()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivRecent(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivRecent(request)
         return result
     
 class GetDataAnalysisDerivTrendsRecentML(APIView):
-    controller = None
-
-    def __init__(self):
-        self.controller = ControllerGetDataAnalysisDerivTrendsRecentML.ControllerGetDataAnalysisDerivTrendsRecentML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-        response_data = async_to_sync(self.async_post)(request)
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsRecentML.ControllerGetDataAnalysisDerivTrendsRecentML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-    async def async_post(self, request):
-        result = await self.controller.GetDataAnalysisDerivTrendsRecentML(request)
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivTrendsRecentML(request)
         return result
     
 class GetDataAnalysisDerivML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsML.ControllerGetDataAnalysisDerivTrendsML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsML.ControllerGetDataAnalysisDerivTrendsML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivML(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivML(request)
         return result
     
 class GetDataAnalysisDerivExpansive(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsExpansive.ControllerGetDataAnalysisDerivTrendsExpansive()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsExpansive.ControllerGetDataAnalysisDerivTrendsExpansive()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivExpansive(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivExpansive(request)
         return result
     
 class GetDataAnalysisDerivExpansiveML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsExpansiveML.ControllerGetDataAnalysisDerivTrendsExpansiveML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsExpansiveML.ControllerGetDataAnalysisDerivTrendsExpansiveML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivExpansiveML(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivExpansiveML(request)
         return result
     
 class GetDataAnalysisDerivExpansiveRecent(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsExpansiveRecent.ControllerGetDataAnalysisDerivTrendsExpansiveRecent()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsExpansiveRecent.ControllerGetDataAnalysisDerivTrendsExpansiveRecent()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivExpansiveRecent(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivExpansiveRecent(request)
         return result
     
 class GetDataAnalysisDerivMinus(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsMinus.ControllerGetDataAnalysisDerivTrendsMinus()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivMinus(request)
-
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsMinus.ControllerGetDataAnalysisDerivTrendsMinus()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
+        
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivMinus(request)
         return result
-    
+
 class GetDataAnalysisDerivMinusRecent(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsMinusRecent.ControllerGetDataAnalysisDerivTrendsMinusRecent()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivMinusRecent(request)
-
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsMinusRecent.ControllerGetDataAnalysisDerivTrendsMinusRecent()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
+        
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivMinusRecent(request)
         return result
     
 class GetDataAnalysisDerivMinusRecentML(APIView):
-
-    controller = None
-
-    def __init__(self):
-        self.controller = ControllerGetDataAnalysisDerivTrendsMinusRecentML.ControllerGetDataAnalysisDerivTrendsMinusRecentML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-        response_data = async_to_sync(self.async_post)(request)
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsMinusRecentML.ControllerGetDataAnalysisDerivTrendsMinusRecentML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-    async def async_post(self, request):
-        result = await self.controller.GetDataAnalysisDerivTrendsMinusRecentML(request)
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivTrendsMinusRecentML(request)
         return result
 
 class GetDataAnalysisDerivMinusML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsMinusML.ControllerGetDataAnalysisDerivTrendsMinusML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivMinusML(request)
-
-        return result
-    
-class GetDataAnalysisDerivWMA(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivWMA.ControllerGetDataAnalysisDerivWMA()
-
-    def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsMinusML.ControllerGetDataAnalysisDerivTrendsMinusML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivWMA(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivMinusML(request)
         return result
-    
+
 class GetDataAnalysisDerivWMARecent(APIView):
-
-    controller = None
-
-    def __init__(self):
-        self.controller = ControllerGetDataAnalysisDerivWMARecent.ControllerGetDataAnalysisDerivWMARecent()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivWMARecent(request)
-
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivWMARecent.ControllerGetDataAnalysisDerivWMARecent()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
+        
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivWMARecent(request)
         return result
     
-class GetDataAnalysisDerivWMAML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivWMAML.ControllerGetDataAnalysisDerivWMAML()
+class GetDataAnalysisDerivExpansiveRecentML(APIView):
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsExpansiveRecentML.ControllerGetDataAnalysisDerivTrendsExpansiveRecentML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
         
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivWMAML(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivExpansiveRecentML(request)
         return result
 
 class GetEndPoint(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetEndPoint.ControllerGetEndPoint()   
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetEndPoint.ControllerGetEndPoint()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    async def async_post(self, request):
-
-        result = await self.controller.GetEndPoint()
-
+    async def async_post(self, request, controller):
+        result = await controller.GetEndPoint()
         return result
     
 class GetDailyReportEntrys(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDailyReportEntrys.ControllerGetDailyReportEntrys()   
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        result = self.controller.GetDailyReportEntrys()
-
-        return Response(result)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDailyReportEntrys.ControllerGetDailyReportEntrys()
+            result = controller.GetDailyReportEntrys()
+            return Response(result)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
     
 class GetDailyReportCrons(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDailyReportCrons.ControllerGetDailyReportCrons()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        result = self.controller.GetDailyReportCrons()
-
-        return Response(result)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDailyReportCrons.ControllerGetDailyReportCrons()
+            result = controller.GetDailyReportCrons()
+            return Response(result)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
     
 class AddModels(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerAddModels.ControllerAddModels()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
-
-        result = self.controller.AddModels()
-
-        return Response(result)
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerAddModels.ControllerAddModels()
+            result = controller.AddModels()
+            return Response(result)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
 class GetDataAnalysisDerivWMARecentML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivWMARecentML.ControllerGetDataAnalysisDerivWMARecentML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivWMARecentML.ControllerGetDataAnalysisDerivWMARecentML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivWMARecentML(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivWMARecentML(request)
         return result
 
 class GetDataAnalysisDerivPinBarML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivPinBarML.ControllerGetDataAnalysisDerivPinBarML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivPinBarML.ControllerGetDataAnalysisDerivPinBarML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-        response_data = async_to_sync(self.async_post)(request)
-
-        return Response(response_data)
-
-    async def async_post(self, request):
-
-        result = await self.controller.GetDataAnalysisDerivPinBarML(request)
-
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivPinBarML(request)
         return result
 
 class GetDataAnalysisDerivTrendsExpansiveRecentML(APIView):
-
-    controller = None
-
-    def __init__(self):
-
-        self.controller = ControllerGetDataAnalysisDerivTrendsExpansiveRecentML.ControllerGetDataAnalysisDerivTrendsExpansiveRecentML()
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
     def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivTrendsExpansiveRecentML.ControllerGetDataAnalysisDerivTrendsExpansiveRecentML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
 
-        response_data = async_to_sync(self.async_post)(request)
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivTrendsExpansiveRecentML(request)
+        return result
 
-        return Response(response_data)
+class GetDataAnalysisDerivWMA(APIView):
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
-    async def async_post(self, request):
+    def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivWMA.ControllerGetDataAnalysisDerivWMA()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
+        
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivWMA(request)
+        return result
 
-        result = await self.controller.GetDataAnalysisDerivTrendsExpansiveRecentML(request)
+class GetDataAnalysisDerivWMAML(APIView):
+    """✅ Optimizado: Limpieza de memoria y conexiones DB"""
 
+    def post(self, request, format=None):
+        controller = None
+        try:
+            close_old_connections()
+            controller = ControllerGetDataAnalysisDerivWMAML.ControllerGetDataAnalysisDerivWMAML()
+            response_data = async_to_sync(self.async_post)(request, controller)
+            return Response(response_data)
+        finally:
+            if controller:
+                del controller
+            close_old_connections()
+            gc.collect()
+
+    async def async_post(self, request, controller):
+        result = await controller.GetDataAnalysisDerivWMAML(request)
         return result
         
