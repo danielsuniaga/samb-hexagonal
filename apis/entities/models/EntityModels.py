@@ -18,12 +18,43 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, Ma
 import pickle
 import numpy as np
 import pandas as pd
+import threading
+import os
+from datetime import datetime, timedelta
+import logging
+import time
+
+# 🔍 Logger para tracking completo de operaciones
+logger = logging.getLogger(__name__)
 
 class EntityModels():
 
     config=None
     scaler=None
     feature_names=None  # Guardar feature_names como atributo de la clase
+    
+    # ========================================
+    # 🚀 CACHE CONFIGURATION (Class-level)
+    # ========================================
+    _model_cache = {}
+    _cache_access_times = {}
+    _cache_file_mtimes = {}
+    _cache_lock = threading.Lock()
+    _cache_max_size = 10
+    _cache_ttl = timedelta(hours=24)
+    
+    # ========================================
+    # 📊 MONITORING & METRICS (Production)
+    # ========================================
+    _cache_hits = 0
+    _cache_misses = 0
+    _cache_evictions = 0
+    _cache_invalidations = 0
+    _concurrent_requests = 0
+    _max_concurrent_requests = 0
+    _total_predictions = 0
+    _failed_predictions = 0
+    _metrics_lock = threading.Lock()
 
     def __init__(self):
         
@@ -442,13 +473,64 @@ class EntityModels():
         
         return message
     
-    def open_model(self, path): 
+    def open_model(self, path):
+        """
+        🚀 OPTIMIZADO: Carga modelo con cache interno.
+        1. Intenta obtener del cache
+        2. Si no existe o expiró, carga desde disco
+        3. Guarda en cache para próximos requests
+        """
+        start_time = time.time()
+        model_name = os.path.basename(path)
+        
+        # 1️⃣ Intentar obtener del cache
+        cached_model = self._get_from_cache(path)
+        if cached_model is not None:
+            elapsed_time = (time.time() - start_time) * 1000  # ms
+            logger.info(
+                f"🟢 CACHE HIT | Model: {model_name} | "
+                f"Time: {elapsed_time:.2f}ms | Cache: {len(self._model_cache)}/{self._cache_max_size}"
+            )
+            return {
+                'status': True,
+                'model': cached_model,
+                'path': path,
+                'source': 'cache',
+                'load_time_ms': elapsed_time
+            }
+        
+        # 2️⃣ Cache miss - cargar desde disco (lógica original)
+        logger.warning(f"🔴 CACHE MISS | Model: {model_name} | Loading from disk...")
+        
         try:
+            load_start = time.time()
             with open(path, 'rb') as model_file:
                 loaded_model = pickle.load(model_file)
                 if loaded_model is None:
+                    logger.error(f"❌ LOAD FAILED | Model: {model_name} | Reason: pickle.load returned None")
                     return {'status': False, 'message': 'Failed to load model'}
-                return {'status': True, 'model': loaded_model, 'path': path}
+                
+                load_time = (time.time() - load_start) * 1000  # ms
+                file_size_mb = os.path.getsize(path) / (1024 * 1024)  # MB
+                
+                # 3️⃣ Guardar en cache para próximos requests
+                self._set_in_cache(path, loaded_model)
+                
+                total_time = (time.time() - start_time) * 1000  # ms
+                logger.info(
+                    f"💾 MODEL LOADED & CACHED | Model: {model_name} | "
+                    f"Size: {file_size_mb:.2f}MB | Load time: {load_time:.2f}ms | "
+                    f"Total: {total_time:.2f}ms | Cache: {len(self._model_cache)}/{self._cache_max_size}"
+                )
+                
+                return {
+                    'status': True,
+                    'model': loaded_model,
+                    'path': path,
+                    'source': 'disk',
+                    'load_time_ms': total_time,
+                    'file_size_mb': file_size_mb
+                }
         except FileNotFoundError:
             return {'status': False, 'message': f'Model file not found: {path}'}
         except Exception as e:
@@ -456,17 +538,65 @@ class EntityModels():
     
     def open_scaler(self, path):
         """
-        Cargar el scaler guardado desde un archivo pickle
+        🚀 OPTIMIZADO: Carga scaler con cache interno.
+        Reutiliza la misma lógica de cache que open_model.
         """
+        start_time = time.time()
+        scaler_name = os.path.basename(path)
+        
+        # 1️⃣ Intentar obtener del cache
+        cached_scaler = self._get_from_cache(path)
+        if cached_scaler is not None:
+            elapsed_time = (time.time() - start_time) * 1000  # ms
+            logger.info(
+                f"🟢 CACHE HIT | Scaler: {scaler_name} | "
+                f"Time: {elapsed_time:.2f}ms | Cache: {len(self._model_cache)}/{self._cache_max_size}"
+            )
+            return {
+                'status': True,
+                'scaler': cached_scaler,
+                'path': path,
+                'source': 'cache',
+                'load_time_ms': elapsed_time
+            }
+        
+        # 2️⃣ Cache miss - cargar desde disco (lógica original)
+        logger.warning(f"🔴 CACHE MISS | Scaler: {scaler_name} | Loading from disk...")
+        
         try:
+            load_start = time.time()
             with open(path, 'rb') as scaler_file:
                 loaded_scaler = pickle.load(scaler_file)
                 if loaded_scaler is None:
+                    logger.error(f"❌ LOAD FAILED | Scaler: {scaler_name} | Reason: pickle.load returned None")
                     return {'status': False, 'message': 'Failed to load scaler'}
-                return {'status': True, 'scaler': loaded_scaler, 'path': path}
+                
+                load_time = (time.time() - load_start) * 1000  # ms
+                file_size_mb = os.path.getsize(path) / (1024 * 1024)  # MB
+                
+                # 3️⃣ Guardar en cache para próximos requests
+                self._set_in_cache(path, loaded_scaler)
+                
+                total_time = (time.time() - start_time) * 1000  # ms
+                logger.info(
+                    f"💾 SCALER LOADED & CACHED | Scaler: {scaler_name} | "
+                    f"Size: {file_size_mb:.2f}MB | Load time: {load_time:.2f}ms | "
+                    f"Total: {total_time:.2f}ms | Cache: {len(self._model_cache)}/{self._cache_max_size}"
+                )
+                
+                return {
+                    'status': True,
+                    'scaler': loaded_scaler,
+                    'path': path,
+                    'source': 'disk',
+                    'load_time_ms': total_time,
+                    'file_size_mb': file_size_mb
+                }
         except FileNotFoundError:
+            logger.error(f"❌ FILE NOT FOUND | Scaler: {scaler_name} | Path: {path}")
             return {'status': False, 'message': f'Scaler file not found: {path}'}
         except Exception as e:
+            logger.error(f"❌ ERROR LOADING SCALER | Scaler: {scaler_name} | Error: {str(e)}")
             return {'status': False, 'message': f'Error loading scaler: {str(e)}'}
         
     def init_data_get_predict_model(self,data):
@@ -587,37 +717,90 @@ class EntityModels():
         Método principal para obtener predicciones del modelo.
         Responsabilidad: Orquestación del proceso de predicción.
         """
+        prediction_start = time.time()
         model = None
         scaler = None
+        
+        # 📊 Track concurrent requests
+        with self._metrics_lock:
+            self._concurrent_requests += 1
+            self._total_predictions += 1
+            if self._concurrent_requests > self._max_concurrent_requests:
+                self._max_concurrent_requests = self._concurrent_requests
+            concurrent_now = self._concurrent_requests
+        
+        logger.info(f"🚀 PREDICTION START | Model ID: {id_models} | Concurrent: {concurrent_now}")
+        
         try:
             # 1. Cargar modelo y scaler
+            load_start = time.time()
             load_result = self.load_model_and_scaler(id_models)
             if not load_result['status']:
+                logger.error(f"❌ LOAD FAILED | Model ID: {id_models} | Reason: {load_result.get('message', 'Unknown')}")
+                with self._metrics_lock:
+                    self._failed_predictions += 1
                 return load_result
             
+            load_time = (time.time() - load_start) * 1000
             model = load_result['model']
             model_name = load_result['model_name'] 
             scaler = load_result['scaler']
+            
+            logger.info(f"✅ MODEL & SCALER LOADED | Model: {model_name} | Time: {load_time:.2f}ms")
             
             # Asignar scaler al atributo de clase (para compatibilidad)
             self.scaler = scaler
 
             # 2. Preparar datos
+            prep_start = time.time()
             data_scaled = self.prepare_prediction_data(data, scaler)
+            prep_time = (time.time() - prep_start) * 1000
+            logger.debug(f"📊 DATA PREPARED | Time: {prep_time:.2f}ms | Shape: {data_scaled.shape}")
             
             # 3. Realizar predicción
+            pred_start = time.time()
             prediction = model.predict(data_scaled)
             prediction_result = int(prediction[0])  # 0 = pérdida, 1 = ganancia
+            pred_time = (time.time() - pred_start) * 1000
             
             # 4. Calcular probabilidades
+            prob_start = time.time()
             probability_loss, probability_win, confidence = self.calculate_probabilities(model, data_scaled)
+            prob_time = (time.time() - prob_start) * 1000
+            
+            total_time = (time.time() - prediction_start) * 1000
+            
+            logger.info(
+                f"✅ PREDICTION COMPLETE | Model: {model_name} | "
+                f"Result: {'WIN' if prediction_result == 1 else 'LOSS'} | "
+                f"Confidence: {confidence:.2%} | Win prob: {probability_win:.2%} | "
+                f"Times [Load: {load_time:.0f}ms, Prep: {prep_time:.0f}ms, "
+                f"Pred: {pred_time:.0f}ms, Prob: {prob_time:.0f}ms] | "
+                f"TOTAL: {total_time:.0f}ms | Concurrent: {concurrent_now}"
+            )
             
             # 5. Formatear resultado
             return self.format_prediction_result(
                 id_models, model_name, prediction_result,
                 probability_loss, probability_win, confidence, data_scaled
             )
+            
+        except Exception as e:
+            total_time = (time.time() - prediction_start) * 1000
+            with self._metrics_lock:
+                self._failed_predictions += 1
+            logger.error(
+                f"❌ PREDICTION ERROR | Model ID: {id_models} | "
+                f"Error: {str(e)} | Time: {total_time:.0f}ms | Concurrent: {concurrent_now}",
+                exc_info=True
+            )
+            return {'status': False, 'message': f'Prediction error: {str(e)}'}
+            
         finally:
+            # Decrementar concurrent requests
+            with self._metrics_lock:
+                self._concurrent_requests -= 1
+            
             # Limpieza explícita de memoria
             if 'model' in locals() and model is not None:
                 del model
@@ -635,3 +818,150 @@ class EntityModels():
             return {'status': False, 'message': f"Probability {data['probability_win']} is below the minimum required {self.get_config_probability_min()}"}
 
         return {'status': True, 'message': 'Probability is acceptable.'}
+    # ========================================
+    #  CACHE METHODS (Private - Internal Use Only)
+    # ========================================
+    
+    @classmethod
+    def _get_from_cache(cls, path):
+        with cls._cache_lock:
+            if path not in cls._model_cache:
+                with cls._metrics_lock:
+                    cls._cache_misses += 1
+                return None
+            if not cls._is_cache_valid(path):
+                logger.warning(f"⚠️ CACHE INVALIDATED | Path: {os.path.basename(path)} | Reason: Expired or file modified")
+                with cls._metrics_lock:
+                    cls._cache_invalidations += 1
+                cls._invalidate_cache(path)
+                return None
+            
+            # Cache HIT
+            with cls._metrics_lock:
+                cls._cache_hits += 1
+            cls._cache_access_times[path] = datetime.now()
+            return cls._model_cache[path]
+    
+    @classmethod
+    def _set_in_cache(cls, path, obj):
+        with cls._cache_lock:
+            if len(cls._model_cache) >= cls._cache_max_size:
+                logger.warning(f"⚠️ CACHE FULL | Evicting LRU entry | Cache: {len(cls._model_cache)}/{cls._cache_max_size}")
+                with cls._metrics_lock:
+                    cls._cache_evictions += 1
+                cls._evict_lru()
+            cls._model_cache[path] = obj
+            cls._cache_access_times[path] = datetime.now()
+            if os.path.exists(path):
+                cls._cache_file_mtimes[path] = os.path.getmtime(path)
+    
+    @classmethod
+    def _is_cache_valid(cls, path):
+        if path in cls._cache_access_times:
+            age = datetime.now() - cls._cache_access_times[path]
+            if age > cls._cache_ttl:
+                logger.debug(f"🕐 CACHE TTL EXPIRED | Path: {os.path.basename(path)} | Age: {age}")
+                return False
+        if os.path.exists(path):
+            current_mtime = os.path.getmtime(path)
+            cached_mtime = cls._cache_file_mtimes.get(path)
+            if cached_mtime and current_mtime != cached_mtime:
+                logger.debug(f"🔄 FILE MODIFIED | Path: {os.path.basename(path)} | Reloading...")
+                return False
+        return True
+    
+    @classmethod
+    def _evict_lru(cls):
+        if not cls._cache_access_times:
+            return
+        lru_path = min(cls._cache_access_times, key=cls._cache_access_times.get)
+        lru_name = os.path.basename(lru_path)
+        lru_age = datetime.now() - cls._cache_access_times[lru_path]
+        logger.info(f"🗑️ CACHE EVICTION | Removed: {lru_name} | Age: {lru_age} | Cache: {len(cls._model_cache)-1}/{cls._cache_max_size}")
+        cls._invalidate_cache(lru_path)
+    
+    @classmethod
+    def _invalidate_cache(cls, path):
+        cls._model_cache.pop(path, None)
+        cls._cache_access_times.pop(path, None)
+        cls._cache_file_mtimes.pop(path, None)
+    
+    @classmethod
+    def clear_cache(cls):
+        """Limpia completamente el cache (útil para debugging o maintenance)"""
+        with cls._cache_lock:
+            cache_size = len(cls._model_cache)
+            cls._model_cache.clear()
+            cls._cache_access_times.clear()
+            cls._cache_file_mtimes.clear()
+            logger.info(f"🧹 CACHE CLEARED | Removed {cache_size} entries")
+    
+    @classmethod
+    def get_cache_stats(cls):
+        """Obtiene estadísticas completas del cache y métricas de producción"""
+        with cls._cache_lock, cls._metrics_lock:
+            total_requests = cls._cache_hits + cls._cache_misses
+            hit_rate = (cls._cache_hits / total_requests * 100) if total_requests > 0 else 0
+            
+            stats = {
+                # Cache Status
+                'cache': {
+                    'size': len(cls._model_cache),
+                    'max_size': cls._cache_max_size,
+                    'ttl_hours': cls._cache_ttl.total_seconds() / 3600,
+                    'utilization_pct': (len(cls._model_cache) / cls._cache_max_size * 100) if cls._cache_max_size > 0 else 0,
+                },
+                # Performance Metrics
+                'metrics': {
+                    'cache_hits': cls._cache_hits,
+                    'cache_misses': cls._cache_misses,
+                    'cache_hit_rate_pct': hit_rate,
+                    'cache_evictions': cls._cache_evictions,
+                    'cache_invalidations': cls._cache_invalidations,
+                    'total_cache_requests': total_requests,
+                },
+                # Concurrency Metrics
+                'concurrency': {
+                    'current_concurrent': cls._concurrent_requests,
+                    'max_concurrent': cls._max_concurrent_requests,
+                },
+                # Prediction Metrics
+                'predictions': {
+                    'total': cls._total_predictions,
+                    'failed': cls._failed_predictions,
+                    'success_rate_pct': ((cls._total_predictions - cls._failed_predictions) / cls._total_predictions * 100) if cls._total_predictions > 0 else 0,
+                },
+                # Cached Items Detail
+                'cached_items': []
+            }
+            
+            for path, access_time in cls._cache_access_times.items():
+                age = datetime.now() - access_time
+                stats['cached_items'].append({
+                    'name': os.path.basename(path),
+                    'age_seconds': age.total_seconds(),
+                    'last_access': access_time.isoformat()
+                })
+            
+            logger.info(
+                f"📊 PRODUCTION METRICS | "
+                f"Cache: {stats['cache']['size']}/{stats['cache']['max_size']} ({stats['cache']['utilization_pct']:.1f}%) | "
+                f"Hit Rate: {hit_rate:.1f}% ({cls._cache_hits}/{total_requests}) | "
+                f"Concurrent: {cls._concurrent_requests} (max: {cls._max_concurrent_requests}) | "
+                f"Predictions: {cls._total_predictions} (failed: {cls._failed_predictions}) | "
+                f"Evictions: {cls._cache_evictions} | Invalidations: {cls._cache_invalidations}"
+            )
+            return stats
+    
+    @classmethod
+    def reset_metrics(cls):
+        """Reinicia las métricas (útil para testing o reportes periódicos)"""
+        with cls._metrics_lock:
+            cls._cache_hits = 0
+            cls._cache_misses = 0
+            cls._cache_evictions = 0
+            cls._cache_invalidations = 0
+            cls._total_predictions = 0
+            cls._failed_predictions = 0
+            cls._max_concurrent_requests = 0
+            logger.info("📊 METRICS RESET | All counters reset to zero")
