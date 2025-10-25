@@ -34,6 +34,8 @@ class EntityDeriv():
 
     tokens_asignado = None
 
+    max_attempts_broker_deriv = None
+
     def __init__(self):
 
         self.init_par()
@@ -57,6 +59,15 @@ class EntityDeriv():
         self.init_conection_broker_atents()
 
         self.init_tokens()
+
+        self.init_max_attempts_broker_deriv()
+
+    def init_max_attempts_broker_deriv(self):
+        self.max_attempts_broker_deriv = int(config("MAX_ATTEMPTS_BROKER_DERIV"))
+        return True
+    
+    def get_max_attempts_broker_deriv(self):
+        return self.max_attempts_broker_deriv
 
     def init_tokens(self):
 
@@ -337,7 +348,7 @@ class EntityDeriv():
         if self.api is None:
             return {'status': False, 'message': 'API no inicializada'}
 
-        max_attempts = 5
+        max_attempts = self.get_max_attempts_broker_deriv()
         retry_delay = 2  # segundos entre reintentos
 
         for attempt in range(1, max_attempts + 1):
@@ -414,7 +425,7 @@ class EntityDeriv():
         if data['amount'] <= 0:
             return {'status': False, 'message': 'El monto debe ser mayor que 0'}
 
-        max_attempts = 5
+        max_attempts = self.get_max_attempts_broker_deriv()
         retry_delay = 2  # segundos entre reintentos
 
         for attempt in range(1, max_attempts + 1):
@@ -500,7 +511,7 @@ class EntityDeriv():
             
             return {'status': False, 'message': 'API no inicializada'}
 
-        max_attempts = 5
+        max_attempts = self.get_max_attempts_broker_deriv()
 
         for attempt in range(max_attempts):
             
