@@ -66,6 +66,10 @@ class ServicesReportEntrys():
 
         return True
     
+    def get_max_attempts_reports_entrys(self):
+
+        return self.entity.get_max_attempts_reports_entrys()
+    
     def get_types_reports_daily(self):
 
         return self.entity.get_types_reports_daily()
@@ -332,7 +336,7 @@ class ServicesReportEntrys():
         Returns:
             dict con status y message
         """
-        max_attempts = 5
+        max_attempts = self.get_max_attempts_reports_entrys()
         last_error = None
         
         for attempt in range(1, max_attempts + 1):
@@ -358,7 +362,7 @@ class ServicesReportEntrys():
         Returns:
             dict con status y message
         """
-        max_attempts = 5
+        max_attempts = self.get_max_attempts_reports_entrys()
         last_error = None
         
         for attempt in range(1, max_attempts + 1):

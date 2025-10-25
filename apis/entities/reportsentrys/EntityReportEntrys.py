@@ -10,15 +10,29 @@ class EntityReportEntrys():
 
     message_params = None
 
+    max_attempts_reports_entrys = None
+
     def __init__(self):
 
         self.init_types_reports()
+
+        self.init_max_attempts_reports_entrys()
 
         self.init_data_reports()
 
         self.init_titles_reports()
 
         self.init_message_params()
+
+    def init_max_attempts_reports_entrys(self):
+
+        self.max_attempts_reports_entrys = int(config("MAX_ATTEMPTS_REPORTS_ENTRYS"))
+
+        return True
+
+    def get_max_attempts_reports_entrys(self):
+
+        return self.max_attempts_reports_entrys
 
     def set_message_params(self, message):
 
