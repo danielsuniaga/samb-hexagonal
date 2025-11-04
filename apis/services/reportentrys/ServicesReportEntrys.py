@@ -1,4 +1,7 @@
 import apis.entities.reportsentrys.EntityReportEntrys as EntityReportEntrys
+import json
+import os
+from datetime import datetime
 
 class ServicesReportEntrys():
 
@@ -240,29 +243,92 @@ class ServicesReportEntrys():
                 # No retornamos error aquí porque las metodologías individuales ya se procesaron
                 pass
             
+            # NUEVO: Exportar archivos para análisis
+            export_tracking = {
+                'successful': [],
+                'failed': [],
+                'successful_count': 0,
+                'failed_count': 0,
+                'files_created': [],
+                'export_folder': None,
+                'error': None
+            }
+            
+            try:
+                export_data = {
+                    'methodologys': methodologys,
+                    'day': day
+                }
+                export_result = self.save_export_files(export_data)
+                
+                if export_result.get('status'):
+                    print(f"✅ Exportación exitosa: {export_result.get('message')}")
+                    # Extraer datos de tracking de la exportación
+                    details = export_result.get('details', {})
+                    tracking = details.get('tracking', {})
+                    
+                    export_tracking.update({
+                        'successful': tracking.get('successful', []),
+                        'failed': tracking.get('failed', []),
+                        'successful_count': tracking.get('successful_count', 0),
+                        'failed_count': tracking.get('failed_count', 0),
+                        'files_created': details.get('files', []),
+                        'export_folder': details.get('export_folder'),
+                        'success_rate': tracking.get('success_rate', '0/0')
+                    })
+                else:
+                    print(f"⚠️ Error en exportación: {export_result.get('message')}")
+                    export_tracking['error'] = export_result.get('message')
+                    
+            except Exception as e:
+                error_msg = f"Error crítico en exportación: {str(e)}"
+                print(f"⚠️ {error_msg}")
+                export_tracking['error'] = error_msg
+                # No afectamos el flujo principal por errores de exportación
+            
             # Preparar respuesta final
             total_methodologies = len(methodologys)
             successful_count = len(successful_methodologies)
             failed_count = len(failed_methodologies)
             
+            # Crear mensaje combinado
+            telegram_msg = f"Telegram: {successful_count}/{total_methodologies}"
+            export_msg = f"Exportación: {export_tracking['successful_count']}/{total_methodologies}"
+            combined_message = f"Reportes procesados. {telegram_msg}, {export_msg}"
+            
             if failed_count == 0:
                 return {
                     'status': True, 
-                    'message': f'Reportes procesados exitosamente. {successful_count}/{total_methodologies} metodologías completadas',
+                    'message': f'{combined_message} - Proceso exitoso',
                     'details': {
-                        'successful': successful_methodologies,
-                        'failed': failed_methodologies,
-                        'total': total_methodologies
+                        'telegram': {
+                            'successful': successful_methodologies,
+                            'failed': failed_methodologies,
+                            'successful_count': successful_count,
+                            'failed_count': failed_count,
+                            'success_rate': f"{successful_count}/{total_methodologies}"
+                        },
+                        'exports': export_tracking,
+                        'total_methodologies': total_methodologies,
+                        'overall_status': 'success'
                     }
                 }
             else:
+                overall_status = 'partial_success' if successful_count > 0 else 'failure'
                 return {
                     'status': False if failed_count == total_methodologies else True,
-                    'message': f'Proceso completado con errores. {successful_count}/{total_methodologies} metodologías exitosas',
+                    'message': f'{combined_message} - Proceso con errores',
                     'details': {
-                        'successful': successful_methodologies,
-                        'failed': failed_methodologies,
-                        'total': total_methodologies
+                        'telegram': {
+                            'successful': successful_methodologies,
+                            'failed': failed_methodologies,
+                            'successful_count': successful_count,
+                            'failed_count': failed_count,
+                            'success_rate': f"{successful_count}/{total_methodologies}"
+                        },
+                        'exports': export_tracking,
+                        'total_methodologies': total_methodologies,
+                        'overall_status': overall_status
                     }
                 }
                 
@@ -270,7 +336,13 @@ class ServicesReportEntrys():
             return {
                 'status': False, 
                 'message': f'Error crítico en el proceso de reportes: {str(e)}',
-                'details': {'error_type': 'critical', 'error': str(e)}
+                'details': {
+                    'error_type': 'critical', 
+                    'error': str(e),
+                    'telegram': {'successful': [], 'failed': [], 'successful_count': 0, 'failed_count': 0},
+                    'exports': {'successful': [], 'failed': [], 'successful_count': 0, 'failed_count': 0, 'error': str(e)},
+                    'overall_status': 'critical_failure'
+                }
             }
 
     def process_methodology_report(self, methodology, day):
@@ -380,3 +452,176 @@ class ServicesReportEntrys():
         
         error_message = f'Failed to send complete report after {max_attempts} attempts. Last error: {last_error}'
         return {'status': False, 'message': error_message}
+
+    def save_export_files(self, report_data=None):
+        """
+        Guarda los reportes en archivos JSON para análisis posterior
+        Args:
+            report_data: datos del reporte (opcional, se obtienen si no se proporcionan)
+        Returns: dict con status y detalles de la exportación
+        """
+        try:
+            # Crear timestamp para la carpeta (solo fecha)
+            timestamp = datetime.now().strftime('%Y-%m-%d')
+            
+            # Crear ruta base
+            base_path = '/export-reporting-sessions'
+            export_folder = os.path.join(base_path, timestamp)
+            
+            # Crear directorio si no existe
+            os.makedirs(export_folder, exist_ok=True)
+            
+            # Obtener datos si no se proporcionaron
+            if report_data is None:
+                methodologys = self.get_methodologys()
+                day = self.get_day()
+            else:
+                methodologys = report_data.get('methodologys', [])
+                day = report_data.get('day', {})
+            
+            exported_files = []
+            export_successful = []
+            export_failed = []
+            
+            # Exportar cada metodología
+            for methodology in methodologys:
+                methodology_name = methodology.get('descriptions', 'unknown')
+                container = methodology.get('container', '')
+                
+                try:
+                    # Generar datos del reporte para esta metodología
+                    report_result = self._generate_methodology_data(methodology, day)
+                    
+                    # Crear nombre de archivo (solo metodología si container está vacío o unknown)
+                    if container and container != 'unknown' and container.strip():
+                        filename = f"{methodology_name}_{container}.json"
+                    else:
+                        filename = f"{methodology_name}.json"
+                    filepath = os.path.join(export_folder, filename)
+                    
+                    # Estructura de datos para exportar
+                    export_data = {
+                        'timestamp': timestamp,
+                        'methodology': methodology_name,
+                        'container': container,
+                        'day_info': day,
+                        'report_data': report_result,
+                        'metadata': {
+                            'export_date': datetime.now().isoformat(),
+                            'methodology_id': methodology.get('id'),
+                            'version': '1.0'
+                        }
+                    }
+                    
+                    # Guardar archivo
+                    with open(filepath, 'w', encoding='utf-8') as f:
+                        json.dump(export_data, f, indent=2, ensure_ascii=False, default=str)
+                    
+                    exported_files.append(filename)
+                    export_successful.append(methodology_name)
+                    
+                except Exception as e:
+                    error_msg = f"Error exportando metodología {methodology_name}: {str(e)}"
+                    print(error_msg)
+                    export_failed.append({
+                        'methodology': methodology_name,
+                        'error': str(e)
+                    })
+                    continue
+            
+            # Crear archivo resumen
+            summary_data = {
+                'export_summary': {
+                    'timestamp': timestamp,
+                    'total_methodologies': len(methodologys),
+                    'exported_files': len(exported_files),
+                    'export_folder': export_folder,
+                    'files': exported_files,
+                    'day_info': day,
+                    'metadata': {
+                        'export_date': datetime.now().isoformat(),
+                        'total_files_expected': len(methodologys),
+                        'success_rate': f"{len(exported_files)}/{len(methodologys)}"
+                    }
+                }
+            }
+            
+            summary_filepath = os.path.join(export_folder, '_export_summary.json')
+            with open(summary_filepath, 'w', encoding='utf-8') as f:
+                json.dump(summary_data, f, indent=2, ensure_ascii=False, default=str)
+            
+            return {
+                'status': True,
+                'message': f'Reportes exportados exitosamente. {len(exported_files)} archivos creados',
+                'details': {
+                    'export_folder': export_folder,
+                    'files_exported': len(exported_files),
+                    'total_methodologies': len(methodologys),
+                    'timestamp': timestamp,
+                    'files': exported_files,
+                    'tracking': {
+                        'successful': export_successful,
+                        'failed': export_failed,
+                        'successful_count': len(export_successful),
+                        'failed_count': len(export_failed),
+                        'success_rate': f"{len(export_successful)}/{len(methodologys)}"
+                    }
+                }
+            }
+            
+        except Exception as e:
+            return {
+                'status': False,
+                'message': f'Error durante la exportación: {str(e)}',
+                'details': {'error': str(e)}
+            }
+
+    def _generate_methodology_data(self, methodology, day):
+        """
+        Genera los datos específicos de una metodología para exportar
+        Usa la MISMA lógica que process_methodology_report pero retorna datos estructurados
+        """
+        methodology_name = methodology.get('descriptions', 'Unknown')
+        methodology_id = methodology.get('id', 'Unknown')
+        
+        try:
+            # Usar la MISMA lógica que funciona para Telegram
+            
+            # 1. Inicializar datos de reportes
+            self.init_data_reports()
+            
+            # 2. Obtener parámetros del día
+            data_param = self.get_type_manager_days_reporting(day, methodology_id)
+            message_param = self.generate_message_parameters(data_param)
+            self.set_message_params(message_param)
+            
+            # 3. Generar datos del reporte (MISMA lógica que Telegram)
+            report_data = self.generate_data_reports_daily(methodology_id)
+            
+            # 4. Generar mensaje (para tener el texto también)
+            telegram_message = self.generate_message(report_data, methodology_name)
+            
+            # 5. Retornar datos estructurados
+            return {
+                'methodology_info': {
+                    'name': methodology_name,
+                    'id': methodology_id,
+                    'container': methodology.get('container', ''),
+                },
+                'day_params': data_param,
+                'message_params': message_param,
+                'report_data': report_data,
+                'telegram_message': telegram_message,
+                'status': 'success'
+            }
+            
+        except Exception as e:
+            return {
+                'error': str(e), 
+                'methodology': methodology_name,
+                'status': 'error',
+                'error_details': {
+                    'methodology_id': methodology_id,
+                    'day': day
+                }
+            }

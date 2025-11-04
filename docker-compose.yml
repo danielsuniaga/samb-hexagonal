@@ -24,6 +24,7 @@ services:
     volumes:
       - .:/code
       - persistent_models:/machine_learning
+      - export_reports:/export-reporting-sessions
     ports:
       - '${PROJECT_PORT_EXTERNAL}:${PROJECT_PORT_INTERNAL}'
     expose:
@@ -44,3 +45,4 @@ networks:
 volumes:
   persistent:
   persistent_models:
+  export_reports:
