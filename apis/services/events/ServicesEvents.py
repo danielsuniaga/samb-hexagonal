@@ -1,6 +1,11 @@
+import logging
+import time
+
 import apis.entities.events.EntityEvents as EntityEvents
 
 import apis.repositories.events.RepositoryEvents as RepositoryEvents
+
+logger = logging.getLogger('apis.services.events')
 
 class ServicesEvents():
 
@@ -15,6 +20,10 @@ class ServicesEvents():
         self.entity = EntityEvents.EntityEvents()
 
         self.repository = RepositoryEvents.RepositoryEvents()
+
+    def get_project_name(self):
+
+        return self.entity.get_project_name()
 
     def get_current_date_hour(self):
 
@@ -83,7 +92,41 @@ class ServicesEvents():
         )
     
     def get_events_daily_cron(self):
+        # Iniciar medición de tiempo
+        start_time = time.time()
 
         data = self.get_events_daily_cron_repository()
+        
+        # Calcular tiempo de ejecución
+        query_time = (time.time() - start_time) * 1000  # en milisegundos
+        
+        # Obtener información de contexto
+        project_name = self.get_project_name()
+        
+        # Extraer datos del resultado
+        if data.get('status') and data.get('result'):
+            result = data['result']
+            execution_time = result.get('execution_time', 0)
+            difference = result.get('difference', 'N/A')
+            condition = result.get('cond', 'unknown')
+            
+            # Log de rendimiento
+            logger.info(
+                f"⏱️ EVENTS DAILY QUERY | "
+                f"Project: {project_name} | "
+                f"Method: get_events_daily_cron | "
+                f"Condition: {condition} | "
+                f"Execution Time: {execution_time}s | "
+                f"Difference: {difference} | "
+                f"Query Time: {query_time:.2f}ms"
+            )
+        else:
+            logger.warning(
+                f"⚠️ EVENTS DAILY WARNING | "
+                f"Project: {project_name} | "
+                f"Method: get_events_daily_cron | "
+                f"Message: {data.get('message', 'No events found')} | "
+                f"Time: {query_time:.2f}ms"
+            )
 
         return self.init_data_result_events_daily_cron(data['result']) if data['status'] else data['message']

@@ -2,11 +2,15 @@ import uuid
 
 from datetime import datetime
 
+from decouple import config
+
 class EntityEvents():
 
     events = None
 
-    config = None
+    config_data = None
+
+    project_name = None
 
     def __init__(self):
 
@@ -14,9 +18,21 @@ class EntityEvents():
 
         self.init_config()
 
+        self.init_project_name()
+
+    def init_project_name(self):
+
+        self.project_name = config("PROJECT_NAME")
+
+        return True
+    
+    def get_project_name(self):
+
+        return self.project_name
+
     def init_config(self):
 
-        self.config = {
+        self.config_data = {
             'conditioon': '1'
         }
 
@@ -24,11 +40,11 @@ class EntityEvents():
     
     def get_config(self,key):
 
-        if not self.config:
+        if not self.config_data:
 
             self.init_config()
 
-        return self.config[key] 
+        return self.config_data[key] 
     
     def get_config_condition(self): 
 

@@ -1,6 +1,12 @@
+import logging
+import time
+import os
+
 import apis.entities.cronjobs.EntityCronjobs as EntityCronjobs
 
 import apis.repositories.cronjobs.RepositoryCronjobs as RepositoryCronjobs
+
+logger = logging.getLogger('apis.services.cronjobs')
 
 class ServicesCronjobs():
 
@@ -501,7 +507,35 @@ class ServicesCronjobs():
         return data
     
     def get_data_cronjobs_curdate(self,data):
+        # Iniciar medición de tiempo
+        start_time = time.time()
 
         result = self.repository.get_data_cronjobs_curdate(data)
+        
+        # Calcular tiempo de ejecución
+        query_time = (time.time() - start_time) * 1000  # en milisegundos
+        
+        # Obtener información de contexto
+        project_name = self.entity.get_project_name()
+        condition = data.get('state', 'unknown')
+        
+        # Extraer datos del resultado
+        if result.get('status') and result.get('result'):
+            count = result['result'].get('quantities', 0)
+            max_time = result['result'].get('max_durations', 0)
+        else:
+            count = 0
+            max_time = 0
+        
+        # Log de rendimiento
+        logger.info(
+            f"⏰ CRONJOBS QUERY | "
+            f"Project: {project_name} | "
+            f"Method: get_data_cronjobs_curdate | "
+            f"Condition: {condition} | "
+            f"Count: {count} | "
+            f"Max Execution Time: {max_time}s | "
+            f"Query Time: {query_time:.2f}ms"
+        )
 
         return self.init_data_get_data_cronjobs_curdate(data,result)

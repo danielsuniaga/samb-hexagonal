@@ -1,5 +1,10 @@
 import apis.repositories.entrysresults.RepositoryEntrysResults as RepositoryEntrysResults
 import apis.entities.entrysresults.EntityEntrysResults as EntityEntrysResults
+import logging
+import time
+import os
+
+logger = logging.getLogger('apis.services.entrysresults')
 
 class ServicesEntrysResults():
 
@@ -12,6 +17,10 @@ class ServicesEntrysResults():
         self.repository = RepositoryEntrysResults.RepositoryEntrysResults()
 
         self.entity = EntityEntrysResults.EntityEntrysResults()
+
+    def get_project_name(self):
+
+        return self.entity.get_project_name()
 
     def get_condition(self):
 
@@ -26,8 +35,33 @@ class ServicesEntrysResults():
         return float(result['data'])
 
     def get_sums_entrys_date(self,date,id_methodology):
+        start_time = time.time()
 
         result = self.get_sums_entrys_date_repository(date,id_methodology)
+        
+        # Logging
+        if result['status']:
+            query_time = (time.time() - start_time) * 1000
+            logger.info(
+                f"💰 MONETARY FILTER | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: get_sums_entrys_date | "
+                f"Date: {date} | "
+                f"Methodology: {id_methodology} | "
+                f"Balance: ${result['data']:.2f} | "
+                f"Query Time: {query_time:.2f}ms"
+            )
+        else:
+            query_time = (time.time() - start_time) * 1000
+            logger.error(
+                f"❌ MONETARY FILTER ERROR | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: get_sums_entrys_date | "
+                f"Date: {date} | "
+                f"Methodology: {id_methodology} | "
+                f"Error: {result['msj']} | "
+                f"Time: {query_time:.2f}ms"
+            )
 
         return self.init_data_get_sums_entrys_date(result)
     
@@ -85,14 +119,70 @@ class ServicesEntrysResults():
         return data
     
     def get_data_entrys_results_curdate(self,data,id_methodology):
+        start_time = time.time()
 
         result = self.get_entrys_results_curdate_repository(id_methodology)
+        
+        # Logging
+        if result['status']:
+            query_time = (time.time() - start_time) * 1000
+            methodology_id = id_methodology[0] if isinstance(id_methodology, tuple) else id_methodology
+            for row in result['result']:
+                logger.info(
+                    f"💰 MONETARY FILTER | "
+                    f"Project: {self.get_project_name()} | "
+                    f"Method: get_data_entrys_results_curdate | "
+                    f"Methodology: {methodology_id} | "
+                    f"Account: {row['type_account']} | "
+                    f"Total: {row['total']} | "
+                    f"Positive: {row['positive_count']} | "
+                    f"Negative: {row['negative_count']} | "
+                    f"Balance: ${row['result']:.2f} | "
+                    f"Query Time: {query_time:.2f}ms"
+                )
+        else:
+            query_time = (time.time() - start_time) * 1000
+            methodology_id = id_methodology[0] if isinstance(id_methodology, tuple) else id_methodology
+            logger.error(
+                f"❌ MONETARY FILTER ERROR | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: get_data_entrys_results_curdate | "
+                f"Methodology: {methodology_id} | "
+                f"Error: {result['message']} | "
+                f"Time: {query_time:.2f}ms"
+            )
 
         return self.init_data_get_entrys_results(result,data)
     
     def get_data_entrys_results_curdate_complete(self,data):
+        start_time = time.time()
 
         result = self.get_entrys_results_curdate_repository_complete()
+        
+        # Logging
+        if result['status']:
+            query_time = (time.time() - start_time) * 1000
+            for row in result['result']:
+                logger.info(
+                    f"💰 MONETARY FILTER | "
+                    f"Project: {self.get_project_name()} | "
+                    f"Method: get_data_entrys_results_curdate_complete | "
+                    f"Account: {row['type_account']} | "
+                    f"Total: {row['total']} | "
+                    f"Positive: {row['positive_count']} | "
+                    f"Negative: {row['negative_count']} | "
+                    f"Balance: ${row['result']:.2f} | "
+                    f"Query Time: {query_time:.2f}ms"
+                )
+        else:
+            query_time = (time.time() - start_time) * 1000
+            logger.error(
+                f"❌ MONETARY FILTER ERROR | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: get_data_entrys_results_curdate_complete | "
+                f"Error: {result['message']} | "
+                f"Time: {query_time:.2f}ms"
+            )
 
         return self.init_data_get_entrys_results(result,data)   
     
