@@ -161,5 +161,25 @@ LOGGING = {
             'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
             'propagate': False,
         },
+        'apis.services.entrysresults': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
+            'propagate': False,
+        },
+        'apis.services.cronjobs': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
+            'propagate': False,
+        },
+        'apis.services.entrys': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
+            'propagate': False,
+        },
+        'apis.services.events': {
+            'handlers': ['console'],
+            'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
+            'propagate': False,
+        },
     },
 }
