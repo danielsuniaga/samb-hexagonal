@@ -579,7 +579,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'La respuesta no contiene información válida sobre el contrato después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(2)  # Esperar 2 segundos antes del siguiente intento
+                    await asyncio.sleep(random.randint(1, 3))
                     continue
 
                 contract_info = response['proposal_open_contract']
@@ -590,7 +590,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'contract_info no válido después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(random.randint(1, 3))
                     continue
 
                 if not contract_info.get('is_sold'):
@@ -598,7 +598,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'El contrato aún no ha sido vendido después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(random.randint(1, 3))
                     continue
 
                 status = contract_info.get('status', 'unknown')
@@ -617,7 +617,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'Estado desconocido: {status} después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(random.randint(1, 3))
                     continue
 
             except Exception as err:
@@ -625,7 +625,7 @@ class EntityDeriv():
                 if attempt == max_attempts - 1:
                     return {'status': False, 'message': f'Error al consultar contrato después de {max_attempts} intentos: {err}'}
                 
-                await asyncio.sleep(2)
+                await asyncio.sleep(random.randint(1, 3))
                 continue
 
         return {'status': False, 'message': f'No se pudo obtener resultado después de {max_attempts} intentos'}
