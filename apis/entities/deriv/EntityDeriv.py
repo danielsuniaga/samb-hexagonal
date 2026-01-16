@@ -6,6 +6,8 @@ import asyncio
 
 import gc
 
+import random
+
 class EntityDeriv():
 
     id_app = None
@@ -287,15 +289,31 @@ class EntityDeriv():
 
         token = await self.get_token_mode(mode)
 
-        try:
+        max_attempts = self.get_max_attempts_broker_deriv()
 
-            response = await self.api.authorize(token)
-            
-        except Exception as err:
-
-            return {'status': False, 'message':'Se genero una excepcion al chequear sincronizcion con deriv: '+str(err)}
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response = await self.api.authorize(token)
+                
+                if response:
+                    return {
+                        'status': True,
+                        'message': f'Conexion exitosa con deriv en intento {attempt}',
+                        'attempts': attempt
+                    }
+                else:
+                    if attempt < max_attempts:
+                        await asyncio.sleep(random.randint(1, 3))
+                        continue
+                    return {'status': False, 'message': f'Respuesta vacía de autorización después de {max_attempts} intentos'}
+                
+            except Exception as err:
+                if attempt < max_attempts:
+                    await asyncio.sleep(random.randint(1, 3))
+                    continue
+                return {'status': False, 'message': f'Se genero una excepcion al chequear sincronizcion con deriv después de {max_attempts} intentos: {str(err)}'}
         
-        return {'status': True, 'message':'Conexion exitosa con deriv'}
+        return {'status': False, 'message': f'Falló después de {max_attempts} intentos'}
 
     async def init(self):
 
@@ -303,15 +321,34 @@ class EntityDeriv():
 
         app_id = self.get_id_app()
 
-        try:
+        max_attempts = self.get_max_attempts_broker_deriv()
 
-            self.api = DerivAPI(app_id=app_id)
-        
-        except Exception as err:
+        for attempt in range(1, max_attempts + 1):
+            try:
+                self.api = DerivAPI(app_id=app_id)
+                
+                # Verificar la conexión
+                check_result = await self.check(False)
+                
+                if check_result['status']:
+                    return {
+                        'status': True,
+                        'message': f'Conexión inicializada correctamente en intento {attempt}',
+                        'attempts': attempt
+                    }
+                else:
+                    if attempt < max_attempts:
+                        await asyncio.sleep(random.randint(1, 3))
+                        continue
+                    return {'status': False, 'message': f'Error al verificar conexión después de {max_attempts} intentos: {check_result["message"]}'}
+            
+            except Exception as err:
+                if attempt < max_attempts:
+                    await asyncio.sleep(random.randint(1, 3))
+                    continue
+                return {'status': False, 'message': f'Error al inicializar conexión después de {max_attempts} intentos: {err}'}
 
-            return {'status': False, 'message':'Se genero una excepcion al inicializar la conexion con deriv: '+str(err)}
-        
-        return await self.check(False)
+        return {'status': False, 'message': f'Falló después de {max_attempts} intentos'}
     
     async def closed(self):
 
@@ -319,19 +356,29 @@ class EntityDeriv():
 
             return {'status': False, 'message': 'No hay conexión activa con deriv para cerrar'}
         
-        try:
+        max_attempts = self.get_max_attempts_broker_deriv()
 
-            await self.api.disconnect()
-        
-        except Exception as err:
+        for attempt in range(1, max_attempts + 1):
+            try:
+                await self.api.disconnect()
+                
+                self.api = None
 
-            return {'status': False, 'message': f'Se generó una excepción al cerrar la conexión con Deriv: {err}'}
+                gc.collect()
+                
+                return {
+                    'status': True,
+                    'message': f'Conexión con Deriv cerrada correctamente en intento {attempt}',
+                    'attempts': attempt
+                }
+            
+            except Exception as err:
+                if attempt < max_attempts:
+                    await asyncio.sleep(random.randint(1, 3))
+                    continue
+                return {'status': False, 'message': f'Se generó una excepción al cerrar la conexión con Deriv después de {max_attempts} intentos: {err}'}
         
-        self.api = None
-
-        gc.collect()
-        
-        return {'status': True, 'message': 'Conexión con Deriv cerrada correctamente'}
+        return {'status': False, 'message': f'Falló después de {max_attempts} intentos'}
     
     async def init_data_ticks_history(self):
 
@@ -349,7 +396,6 @@ class EntityDeriv():
             return {'status': False, 'message': 'API no inicializada'}
 
         max_attempts = self.get_max_attempts_broker_deriv()
-        retry_delay = 2  # segundos entre reintentos
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -359,7 +405,7 @@ class EntityDeriv():
                 # Validar que la respuesta tenga la estructura esperada
                 if not candles_response or not isinstance(candles_response, dict):
                     if attempt < max_attempts:
-                        await asyncio.sleep(retry_delay)
+                        await asyncio.sleep(random.randint(1, 3))
                         continue
                     return {'status': False, 'message': 'Deriv retornó respuesta inválida después de 5 intentos'}
 
@@ -368,14 +414,14 @@ class EntityDeriv():
                 # Validar que las velas no estén vacías
                 if not candles:
                     if attempt < max_attempts:
-                        await asyncio.sleep(retry_delay)
+                        await asyncio.sleep(random.randint(1, 3))
                         continue
                     return {'status': False, 'message': 'Deriv retornó velas vacías después de 5 intentos'}
 
                 # Validar que las velas tengan la estructura correcta
                 if not isinstance(candles, list) or len(candles) == 0:
                     if attempt < max_attempts:
-                        await asyncio.sleep(retry_delay)
+                        await asyncio.sleep(random.randint(1, 3))
                         continue
                     return {'status': False, 'message': 'Estructura de velas inválida después de 5 intentos'}
 
@@ -384,7 +430,7 @@ class EntityDeriv():
                 required_fields = ['open', 'high', 'low', 'close']
                 if not all(field in sample_candle for field in required_fields):
                     if attempt < max_attempts:
-                        await asyncio.sleep(retry_delay)
+                        await asyncio.sleep(random.randint(1, 3))
                         continue
                     return {'status': False, 'message': 'Velas con campos faltantes después de 5 intentos'}
 
@@ -398,7 +444,7 @@ class EntityDeriv():
 
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(retry_delay)
+                    await asyncio.sleep(random.randint(1, 3))
                     continue
                 return {'status': False, 'message': f'Error después de {max_attempts} intentos: {err}'}
 
@@ -426,7 +472,6 @@ class EntityDeriv():
             return {'status': False, 'message': 'El monto debe ser mayor que 0'}
 
         max_attempts = self.get_max_attempts_broker_deriv()
-        retry_delay = 2  # segundos entre reintentos
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -436,7 +481,7 @@ class EntityDeriv():
 
                 if proposal_response is None:
                     if attempt < max_attempts:
-                        await asyncio.sleep(retry_delay)
+                        await asyncio.sleep(random.randint(1, 3))
                         continue
                     return {'status': False, 'message': 'La respuesta de la API es None después de 5 intentos'}
 
@@ -452,13 +497,13 @@ class EntityDeriv():
                 else:
                     error_message = proposal_response.get("error", {}).get("message", "Respuesta desconocida")
                     if attempt < max_attempts:
-                        await asyncio.sleep(retry_delay)
+                        await asyncio.sleep(random.randint(1, 3))
                         continue
                     return {'status': False, 'message': f'Error al generar la propuesta después de 5 intentos: {error_message}'}
 
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(retry_delay)
+                    await asyncio.sleep(random.randint(1, 3))
                     continue
                 return {'status': False, 'message': f'Error al generar la propuesta después de 5 intentos: {err}'}
 
@@ -475,31 +520,39 @@ class EntityDeriv():
 
             return {'status': False, 'message': 'proposal_id es None'}
 
-        try:
+        max_attempts = self.get_max_attempts_broker_deriv()
 
-            execution_response = await self.api.buy({"buy": proposal_id, "price": 100})
+        for attempt in range(1, max_attempts + 1):
+            try:
+                execution_response = await self.api.buy({"buy": proposal_id, "price": 100})
 
-            if execution_response is None:
+                if execution_response is None:
+                    if attempt < max_attempts:
+                        await asyncio.sleep(random.randint(1, 3))
+                        continue
+                    return {'status': False, 'message': f'La respuesta de la API es None después de {max_attempts} intentos'}
 
-                return {'status': False, 'message': 'La respuesta de la API es None'}
+                if 'buy' in execution_response:
+                    return {
+                        'status': True,
+                        'message': f'Posición ejecutada correctamente en intento {attempt}',
+                        'execution_details': execution_response,
+                        'attempts': attempt
+                    }
+                else:
+                    error_message = execution_response.get("error", {}).get("message", "Respuesta desconocida")
+                    if attempt < max_attempts:
+                        await asyncio.sleep(random.randint(1, 3))
+                        continue
+                    return {'status': False, 'message': f'Error al ejecutar la posición después de {max_attempts} intentos: {error_message}'}
 
-            if 'buy' in execution_response:
+            except Exception as err:
+                if attempt < max_attempts:
+                    await asyncio.sleep(random.randint(1, 3))
+                    continue
+                return {'status': False, 'message': f'Error al ejecutar la posición después de {max_attempts} intentos: {err}'}
 
-                return {
-                    'status': True,
-                    'message': 'Posición ejecutada correctamente',
-                    'execution_details': execution_response,
-                }
-            
-            else:
-
-                error_message = execution_response.get("error", {}).get("message", "Respuesta desconocida")
-
-                return {'status': False, 'message': f'Error al ejecutar la posición: {error_message}'}
-
-        except Exception as err:
-            
-            return {'status': False, 'message': f'Error al ejecutar la posición: {err}'}
+        return {'status': False, 'message': f'Falló después de {max_attempts} intentos'}
         
     async def generate_duration_contract(self):
     
@@ -600,12 +653,22 @@ class EntityDeriv():
         result = await self.generate_proposal(data)
 
         if not result['status']:
-            return False
+            return {
+                'status': False,
+                'message': f'Error al generar propuesta: {result.get("message", "Error desconocido")}',
+                'error_stage': 'generate_proposal',
+                'contract_details': {}
+            }
 
         result = await self.execute_proposal(result['proposal_id'])
 
         if not result['status']:
-            return False
+            return {
+                'status': False,
+                'message': f'Error al ejecutar propuesta: {result.get("message", "Error desconocido")}',
+                'error_stage': 'execute_proposal',
+                'contract_details': {}
+            }
 
         await self.generate_duration_contract()
 
