@@ -4,40 +4,33 @@ from decimal import Decimal
 class EntityMethodologyWMARecent:
 
     config = None
-
     candle_removed = None
-
     data_candles = None
-
     indicators = None
-
     type_entry_positions = None
-
     type_entry = None
-
     metrics_rsi = None
-
     metrics_sma = None
-
     condition_entry = None
-
     result_entrys = None
+    project_name = None
 
     def __init__(self):
-
         self.init_config()
-
         self.init_candle_removed()
-
         self.init_type_entry()
-
         self.init_metrics_rsi()
-
         self.init_metrics_sma()
-
         self.init_condition_entry()
-
         self.init_entrys_results()
+        self.init_project_name()
+
+    def init_project_name(self):
+        self.project_name = config("PROJECT_NAME")
+        return True
+
+    def get_project_name(self):
+        return self.project_name
 
     def init_entrys_results(self):
 

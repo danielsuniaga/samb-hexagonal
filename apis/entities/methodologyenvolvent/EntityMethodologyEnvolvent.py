@@ -12,6 +12,7 @@ class EntityMethodologyEnvolvent:
     metrics_sma = None
     condition_entry = None
     result_entrys = None
+    project_name = None
 
     def __init__(self):
         self.init_config()
@@ -21,6 +22,7 @@ class EntityMethodologyEnvolvent:
         self.init_metrics_sma()
         self.init_condition_entry()
         self.init_entrys_results()
+        self.init_project_name()
 
     def init_entrys_results(self):
         self.result_entrys = {
@@ -39,6 +41,14 @@ class EntityMethodologyEnvolvent:
 
     def init_condition_entry(self):
         self.condition_entry = config("CONDITION_ENTRY")
+        return True
+    
+    def init_project_name(self):
+        self.project_name = config("PROJECT_NAME")
+        return True
+    
+    def get_project_name(self):
+        return self.project_name
 
     def init_metrics_sma(self):
         self.metrics_sma = {

@@ -7,6 +7,9 @@ class ServicesMethodologyTrendsML():
     def __init__(self):
         self.entity = EntityMethodologyTrendsML.EntityMethodologyTrendsML()
 
+    def get_project_name(self):
+        return self.entity.get_project_name()
+
     def get_condition_entry(self):
         return self.entity.get_condition_entry()
 

@@ -8,6 +8,9 @@ class ServicesMethodologyEnvolventML:
         self.entity = EntityMethodologyEnvolventML.EntityMethodologyEnvolventML()
         self.entity.init_config()
 
+    def get_project_name(self):
+        return self.entity.get_project_name()
+
     # --- Métodos base heredados de ServicesMethodologyEnvolvent ---
     def get_id(self):
         return self.entity.get_id()

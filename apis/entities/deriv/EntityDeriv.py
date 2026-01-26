@@ -179,7 +179,7 @@ class EntityDeriv():
     
     def init_duration_seconds(self):
         
-        self.duration_seconds = (int(config("DURATION"))*60)+5
+        self.duration_seconds = (int(config("DURATION"))*60)+10
 
         return True
     
@@ -303,13 +303,13 @@ class EntityDeriv():
                     }
                 else:
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': f'Respuesta vacía de autorización después de {max_attempts} intentos'}
                 
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
                 return {'status': False, 'message': f'Se genero una excepcion al chequear sincronizcion con deriv después de {max_attempts} intentos: {str(err)}'}
         
@@ -338,13 +338,13 @@ class EntityDeriv():
                     }
                 else:
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': f'Error al verificar conexión después de {max_attempts} intentos: {check_result["message"]}'}
             
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
                 return {'status': False, 'message': f'Error al inicializar conexión después de {max_attempts} intentos: {err}'}
 
@@ -374,7 +374,7 @@ class EntityDeriv():
             
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
                 return {'status': False, 'message': f'Se generó una excepción al cerrar la conexión con Deriv después de {max_attempts} intentos: {err}'}
         
@@ -405,7 +405,7 @@ class EntityDeriv():
                 # Validar que la respuesta tenga la estructura esperada
                 if not candles_response or not isinstance(candles_response, dict):
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': 'Deriv retornó respuesta inválida después de 5 intentos'}
 
@@ -414,14 +414,14 @@ class EntityDeriv():
                 # Validar que las velas no estén vacías
                 if not candles:
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': 'Deriv retornó velas vacías después de 5 intentos'}
 
                 # Validar que las velas tengan la estructura correcta
                 if not isinstance(candles, list) or len(candles) == 0:
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': 'Estructura de velas inválida después de 5 intentos'}
 
@@ -430,7 +430,7 @@ class EntityDeriv():
                 required_fields = ['open', 'high', 'low', 'close']
                 if not all(field in sample_candle for field in required_fields):
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': 'Velas con campos faltantes después de 5 intentos'}
 
@@ -444,7 +444,7 @@ class EntityDeriv():
 
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
                 return {'status': False, 'message': f'Error después de {max_attempts} intentos: {err}'}
 
@@ -481,7 +481,7 @@ class EntityDeriv():
 
                 if proposal_response is None:
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': 'La respuesta de la API es None después de 5 intentos'}
 
@@ -497,13 +497,13 @@ class EntityDeriv():
                 else:
                     error_message = proposal_response.get("error", {}).get("message", "Respuesta desconocida")
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': f'Error al generar la propuesta después de 5 intentos: {error_message}'}
 
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
                 return {'status': False, 'message': f'Error al generar la propuesta después de 5 intentos: {err}'}
 
@@ -528,7 +528,7 @@ class EntityDeriv():
 
                 if execution_response is None:
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': f'La respuesta de la API es None después de {max_attempts} intentos'}
 
@@ -542,13 +542,13 @@ class EntityDeriv():
                 else:
                     error_message = execution_response.get("error", {}).get("message", "Respuesta desconocida")
                     if attempt < max_attempts:
-                        await asyncio.sleep(random.randint(1, 3))
+                        await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': f'Error al ejecutar la posición después de {max_attempts} intentos: {error_message}'}
 
             except Exception as err:
                 if attempt < max_attempts:
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
                 return {'status': False, 'message': f'Error al ejecutar la posición después de {max_attempts} intentos: {err}'}
 
@@ -579,7 +579,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'La respuesta no contiene información válida sobre el contrato después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
 
                 contract_info = response['proposal_open_contract']
@@ -590,7 +590,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'contract_info no válido después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
 
                 if not contract_info.get('is_sold'):
@@ -598,7 +598,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'El contrato aún no ha sido vendido después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
 
                 status = contract_info.get('status', 'unknown')
@@ -617,7 +617,7 @@ class EntityDeriv():
                     if attempt == max_attempts - 1:
                         return {'status': False, 'message': f'Estado desconocido: {status} después de {max_attempts} intentos'}
                     
-                    await asyncio.sleep(random.randint(1, 3))
+                    await asyncio.sleep(random.randint(0, 1))
                     continue
 
             except Exception as err:
@@ -625,7 +625,7 @@ class EntityDeriv():
                 if attempt == max_attempts - 1:
                     return {'status': False, 'message': f'Error al consultar contrato después de {max_attempts} intentos: {err}'}
                 
-                await asyncio.sleep(random.randint(1, 3))
+                await asyncio.sleep(random.randint(0, 1))
                 continue
 
         return {'status': False, 'message': f'No se pudo obtener resultado después de {max_attempts} intentos'}
@@ -653,22 +653,12 @@ class EntityDeriv():
         result = await self.generate_proposal(data)
 
         if not result['status']:
-            return {
-                'status': False,
-                'message': f'Error al generar propuesta: {result.get("message", "Error desconocido")}',
-                'error_stage': 'generate_proposal',
-                'contract_details': {}
-            }
+            return False
 
         result = await self.execute_proposal(result['proposal_id'])
 
         if not result['status']:
-            return {
-                'status': False,
-                'message': f'Error al ejecutar propuesta: {result.get("message", "Error desconocido")}',
-                'error_stage': 'execute_proposal',
-                'contract_details': {}
-            }
+            return False
 
         await self.generate_duration_contract()
 

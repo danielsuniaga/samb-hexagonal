@@ -20,6 +20,8 @@ class EntityMethodologyTrendsExpansive():
 
     result_entrys = None
 
+    project_name = None
+
     def __init__(self):
 
         self.init_config()
@@ -36,6 +38,8 @@ class EntityMethodologyTrendsExpansive():
 
         self.init_condition_entry()
 
+        self.init_project_name()
+
     def get_result_entrys_result(self):
 
         return self.result_entrys['result']
@@ -47,6 +51,13 @@ class EntityMethodologyTrendsExpansive():
     def init_condition_entry(self):
 
         self.condition_entry = config("CONDITION_ENTRY")
+
+    def init_project_name(self):
+        self.project_name = config("PROJECT_NAME")
+        return True
+    
+    def get_project_name(self):
+        return self.project_name
 
     def init_metrics_sma(self):
 

@@ -1,6 +1,8 @@
 import apis.entities.methodologywmarecent.EntityMethodologyWMARecent as EntityMethodologyWMARecent
 
 class ServicesMethodologyWMARecent:
+    def get_project_name(self):
+        return self.entity.get_project_name()
 
     entity = None
 

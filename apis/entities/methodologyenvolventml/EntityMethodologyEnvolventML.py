@@ -13,6 +13,7 @@ class EntityMethodologyEnvolventML:
     metrics_sma = None
     condition_entry = None
     result_entrys = None
+    project_name = None
 
     def __init__(self):
         self.init_config()
@@ -22,6 +23,7 @@ class EntityMethodologyEnvolventML:
         self.init_metrics_sma()
         self.init_condition_entry()
         self.init_entrys_results()
+        self.init_project_name()
 
     # --- Configuración específica para EnvolventML ---
     def init_config(self):
@@ -30,6 +32,13 @@ class EntityMethodologyEnvolventML:
             'id': config("ID_METHODOLOGY_ENVOLVENT_ML", default="5")
         }
         return True
+
+    def init_project_name(self):
+        self.project_name = config("PROJECT_NAME")
+        return True
+    
+    def get_project_name(self):
+        return self.project_name
 
     def get_name(self):
         return self.config['name']

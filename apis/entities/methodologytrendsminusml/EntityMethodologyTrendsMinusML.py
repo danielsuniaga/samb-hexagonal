@@ -13,6 +13,7 @@ class EntityMethodologyTrendsMinusML:
     result_entrys = None
 
     def __init__(self):
+        self.project_name = None
         self.init_config()
         self.init_candle_removed()
         self.init_type_entry()
@@ -20,6 +21,14 @@ class EntityMethodologyTrendsMinusML:
         self.init_metrics_sma()
         self.init_entrys_results()
         self.init_condition_entry()
+        self.init_project_name()
+
+    def init_project_name(self):
+        self.project_name = config("PROJECT_NAME")
+        return True
+
+    def get_project_name(self):
+        return self.project_name
 
     def init_config(self):
         self.config = {

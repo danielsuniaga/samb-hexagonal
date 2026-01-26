@@ -12,6 +12,7 @@ class EntityMethodologyTrendsExpansiveRecentML:
     indicators = None
     condition_entry = None
     result_entrys = None
+    project_name = None
 
     def __init__(self):
         self.init_config()
@@ -21,6 +22,7 @@ class EntityMethodologyTrendsExpansiveRecentML:
         self.init_metrics_sma()
         self.init_entrys_results()
         self.init_condition_entry()
+        self.init_project_name()
 
     # --- Configuración base ---
     def init_config(self):
@@ -30,6 +32,13 @@ class EntityMethodologyTrendsExpansiveRecentML:
         }
         return True
     
+    def init_project_name(self):
+        self.project_name = config("PROJECT_NAME")
+        return True
+    
+    def get_project_name(self):
+        return self.project_name
+
     def get_name(self):
         return self.config['name']
 
@@ -153,7 +162,7 @@ class EntityMethodologyTrendsExpansiveRecentML:
         candles_trends = self.get_candles_trends(candles['candles'])
         candles_trends_close = self.get_candles_close(candles_trends)
         
-        # Ejemplo: [1.32, 2.79, 3.33, 4.61, 5.45, 6.32, 7.65] - Patrón alcista expansivo
+        # candles_trends_close = [1.32, 2.79, 3.33, 4.61, 5.45, 6.32, 7.65, 8.08, 9.08, 10.09]
         result = self.check_candles_trends(candles_trends_close)
         return True
     

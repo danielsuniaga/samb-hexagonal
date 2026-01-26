@@ -7,6 +7,9 @@ class ServicesMethodologyTrendsRecentML:
     def __init__(self):
         self.entity = EntityMethodologyTrendsRecentML.EntityMethodologyTrendsRecentML()
 
+    def get_project_name(self):
+        return self.entity.get_project_name()
+
     # --- Métodos base heredados de ServicesMethodologyTrendsRecent ---
     def get_id(self):
         return self.entity.get_id()

@@ -7,6 +7,9 @@ class ServicesMethodologyEnvolvent:
         self.entity = EntityMethodologyEnvolvent.EntityMethodologyEnvolvent()
         self.entity.init_config()
 
+    def get_project_name(self):
+        return self.entity.get_project_name()
+
     def get_id(self):
         return self.entity.get_id()
 
