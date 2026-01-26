@@ -1,6 +1,9 @@
 import apis.entities.methodologywmaml.EntityMethodologyWMAML as EntityMethodologyWMAML
 
+
 class ServicesMethodologyWMAML:
+    def get_project_name(self):
+        return self.entity.get_project_name()
     entity = None
 
     def __init__(self):

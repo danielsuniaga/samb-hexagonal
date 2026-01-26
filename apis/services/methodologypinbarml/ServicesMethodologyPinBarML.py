@@ -1,6 +1,11 @@
 import apis.entities.methodologypinbarml.EntityMethodologyPinBarML as EntityMethodologyPinBarML
 
 class ServicesMethodologyPinBarML:
+    def set_project_name(self, project_name):
+        return self.entity.set_project_name(project_name)
+
+    def get_project_name(self):
+        return self.entity.get_project_name()
 
     entity = None
 

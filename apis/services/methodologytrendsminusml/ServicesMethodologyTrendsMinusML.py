@@ -1,6 +1,13 @@
 import apis.entities.methodologytrendsminusml.EntityMethodologyTrendsMinusML as EntityMethodologyTrendsMinusML
+
 class ServicesMethodologyTrendsMinusML:
 	entity = None
+
+	def set_project_name(self, project_name):
+		return self.entity.set_project_name(project_name)
+
+	def get_project_name(self):
+		return self.entity.get_project_name()
 
 	def __init__(self):
 		self.entity = EntityMethodologyTrendsMinusML.EntityMethodologyTrendsMinusML()

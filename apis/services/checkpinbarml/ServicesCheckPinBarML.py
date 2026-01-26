@@ -1,4 +1,12 @@
+import logging
+import uuid
+
 class ServicesCheckPinBarML:
+    def set_project_name(self, project_name):
+        return self.ServicesMethodologyPinBarML.set_project_name(project_name)
+
+    def get_project_name(self):
+        return self.ServicesMethodologyPinBarML.get_project_name()
     # --- Servicios base de CheckPinBar ---
     ServicesDeriv = None
     ServicesMethodologyPinBarML = None
@@ -423,31 +431,66 @@ class ServicesCheckPinBarML:
 
     # --- Método principal loops (combinando PinBar + ML) ---
     async def loops(self):
+        logger = logging.getLogger('apis.services.checkpinbarml')
+        execution_id = str(uuid.uuid4())[:8]
+        methodology = self.get_name_methodology()
+        project_name = self.get_project_name() or 'PinBarML'
+
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 1. Iniciando loops")
         self.set_events_field('init_loop', self.get_current_date_mil_dynamic())
-        
+
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 2. Obteniendo candles")
         result_candles = await self.get_candles()
+        candles_status = result_candles.get('status') if isinstance(result_candles, dict) else bool(result_candles)
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 2.1. Candles obtenidas | Status: {candles_status}")
+
         self.set_events_field('get_candles', self.get_current_date_mil_dynamic())
-        
+
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 3. Verificando candles")
         result = self.check_candles(result_candles)
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 3.1. Check candles | Valid: {bool(result)}")
+
         self.set_events_field('check_candles', self.get_current_date_mil_dynamic())
-        
+
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 4. Verificando indicadores")
         result = self.check_indicators(result, result_candles)
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 4.1. Check indicators | Valid: {bool(result)}")
+
         self.set_events_field('generate_indicators', self.get_current_date_mil_dynamic())
 
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 5. Verificando filtro monetario")
         result = self.check_monetary_filter(result)
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 5.1. Check monetary filter | Valid: {bool(result)}")
+
         self.set_events_field('get_filter_monetary', self.get_current_date_mil_dynamic())
 
-        # Integración ML - verificación de modelos predictivos específica para PinBar
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 6. Integración ML - verificando modelos predictivos")
         result = self.check_predict_models(result, result_candles)
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 6.1. ML check_predict_models | Valid: {bool(result)}")
+
         self.set_events_field('get_model_ml', self.get_current_date_mil_dynamic())
 
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 7. Agregando entrada al broker")
         result = await self.add_entry_broker(result)
+        if isinstance(result, dict):
+            entry_status = f"Status: {result.get('status')} | Message: {result.get('message', 'N/A')}"
+        else:
+            entry_status = f"Valid: {bool(result)}"
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 7.1. Entry broker | {entry_status}")
+
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 8. Agregando datos a reportes")
         self.add_data_entrys_results_reports(result)
+
         self.set_events_field('add_positions_brokers', self.get_current_date_mil_dynamic())
 
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 9. Agregando entrada a persistencia")
         result = self.add_entry_persistence(result, result_candles)
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 9.1. Entry persistence | Status: {bool(result)}")
+
         self.set_events_field('add_persistence', self.get_current_date_mil_dynamic())
 
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 10. Enviando reporte")
         self.send_report_management(result)
 
+        logger.info(f"🎯 LOOPS EXECUTION | Execution: {execution_id} | Project: {project_name} | Method: loops | Methodology: {methodology} | Step: 11. Loops completado exitosamente")
         return True

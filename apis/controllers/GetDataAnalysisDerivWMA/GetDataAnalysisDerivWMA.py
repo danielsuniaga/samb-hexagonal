@@ -249,8 +249,9 @@ class ControllerGetDataAnalysisDerivWMA:
         resultado_deriv = await self.initialize_deriv_services(date)
 
         if not resultado_deriv['status']:
-            return resultado_deriv  
-        
+            self.ServicesSmtp.send_notification_email(date, resultado_deriv.get('message', 'Error al inicializar Deriv'))
+            return resultado_deriv
+
         await self.process_deriv_services()
 
         return self.finalize_request(now, id_cronjobs)

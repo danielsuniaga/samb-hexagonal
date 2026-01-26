@@ -8,6 +8,10 @@ class ServicesMethodologyTrends():
 
         self.entity = EntityMethodologyTrends.EntityMethodologyTrends()
 
+    def get_project_name(self):
+
+        return self.entity.get_project_name()
+
     def get_condition_entry(self):
         
         return self.entity.get_condition_entry()

@@ -12,6 +12,7 @@ class EntityMethodologyPinBar:
     metrics_sma = None
     condition_entry = None
     result_entrys = None
+    project_name = None
 
     def __init__(self):
         self.init_config()
@@ -21,6 +22,14 @@ class EntityMethodologyPinBar:
         self.init_metrics_sma()
         self.init_condition_entry()
         self.init_entrys_results()
+        self.init_project_name()
+
+    def init_project_name(self):
+        self.project_name = config("PROJECT_NAME")
+        return True
+    
+    def get_project_name(self):
+        return self.project_name
 
     def init_entrys_results(self):
         self.result_entrys = {
@@ -148,8 +157,8 @@ class EntityMethodologyPinBar:
         - Pin Bar alcista (Hammer): Sombra inferior larga, cuerpo pequeño
         - Pin Bar bajista (Shooting Star): Sombra superior larga, cuerpo pequeño
         """
-        # print("Checking Pin Bar pattern...")
-        # print(f"Candle: {candle}")
+        # self.set_type_entry(self.get_type_entry_long())
+        # return self.get_type_entry_long()
 
         # Calculamos las medidas de la vela
         body = abs(Decimal(candle['close']) - Decimal(candle['open']))
