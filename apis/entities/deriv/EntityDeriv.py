@@ -561,74 +561,49 @@ class EntityDeriv():
     async def check_position_result(self, contract_id):
 
         if self.api is None:
-            
-            return {'status': False, 'message': 'API no inicializada'}
+            return False
 
         max_attempts = self.get_max_attempts_broker_deriv()
 
         for attempt in range(max_attempts):
-            
             try:
-
                 response = await self.api.proposal_open_contract(
                     {"proposal_open_contract": 1, "contract_id": contract_id}
                 )
-                
                 if not response or 'proposal_open_contract' not in response:
-                    
                     if attempt == max_attempts - 1:
-                        return {'status': False, 'message': f'La respuesta no contiene información válida sobre el contrato después de {max_attempts} intentos'}
-                    
+                        return False
                     await asyncio.sleep(random.randint(0, 1))
                     continue
-
                 contract_info = response['proposal_open_contract']
-                
                 # Verificar que tengamos contract_details completos
                 if not contract_info or not isinstance(contract_info, dict):
-                    
                     if attempt == max_attempts - 1:
-                        return {'status': False, 'message': f'contract_info no válido después de {max_attempts} intentos'}
-                    
+                        return False
                     await asyncio.sleep(random.randint(0, 1))
                     continue
-
                 if not contract_info.get('is_sold'):
-                    
                     if attempt == max_attempts - 1:
-                        return {'status': False, 'message': f'El contrato aún no ha sido vendido después de {max_attempts} intentos'}
-                    
+                        return False
                     await asyncio.sleep(random.randint(0, 1))
                     continue
-
                 status = contract_info.get('status', 'unknown')
                 profit_or_loss = contract_info.get('profit', 0)
-
                 if status == 'won':
-                    
                     return self.get_won_contract(profit_or_loss, contract_info)
-                
                 elif status == 'lost':
-
                     return self.get_lost_contract(profit_or_loss, contract_info)
-                
                 else:
-                    
                     if attempt == max_attempts - 1:
-                        return {'status': False, 'message': f'Estado desconocido: {status} después de {max_attempts} intentos'}
-                    
+                        return False
                     await asyncio.sleep(random.randint(0, 1))
                     continue
-
             except Exception as err:
-                
                 if attempt == max_attempts - 1:
-                    return {'status': False, 'message': f'Error al consultar contrato después de {max_attempts} intentos: {err}'}
-                
+                    return False
                 await asyncio.sleep(random.randint(0, 1))
                 continue
-
-        return {'status': False, 'message': f'No se pudo obtener resultado después de {max_attempts} intentos'}
+        return False
         
     def get_won_contract(self, profit, contract_info):
 
