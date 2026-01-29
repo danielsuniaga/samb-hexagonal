@@ -38,6 +38,8 @@ class EntityDeriv():
 
     max_attempts_broker_deriv = None
 
+    max_attempts_broker_deriv_execute_proposal = None
+
     def __init__(self):
 
         self.init_par()
@@ -63,6 +65,15 @@ class EntityDeriv():
         self.init_tokens()
 
         self.init_max_attempts_broker_deriv()
+
+        self.init_max_attempts_broker_deriv_execute_proposal()
+
+    def init_max_attempts_broker_deriv_execute_proposal(self):
+        self.max_attempts_broker_deriv_execute_proposal = int(config("MAX_ATTEMPTS_BROKER_DERIV_EXECUTE_PROPOSAL"))
+        return True
+    
+    def get_max_attempts_broker_deriv_execute_proposal(self):
+        return self.max_attempts_broker_deriv_execute_proposal
 
     def init_max_attempts_broker_deriv(self):
         self.max_attempts_broker_deriv = int(config("MAX_ATTEMPTS_BROKER_DERIV"))
@@ -471,7 +482,7 @@ class EntityDeriv():
         if data['amount'] <= 0:
             return {'status': False, 'message': 'El monto debe ser mayor que 0'}
 
-        max_attempts = self.get_max_attempts_broker_deriv()
+        max_attempts = self.get_max_attempts_broker_deriv_execute_proposal()
 
         for attempt in range(1, max_attempts + 1):
             try:
@@ -520,7 +531,7 @@ class EntityDeriv():
 
             return {'status': False, 'message': 'proposal_id es None'}
 
-        max_attempts = self.get_max_attempts_broker_deriv()
+        max_attempts = self.get_max_attempts_broker_deriv_execute_proposal()
 
         for attempt in range(1, max_attempts + 1):
             try:
