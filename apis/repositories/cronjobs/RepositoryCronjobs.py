@@ -36,7 +36,7 @@ class RepositoryCronjobs():
 
         try:
 
-            self.cursor_db.execute("SELECT COUNT(samb_cronjobs.id) AS quantities, IFNULL(MAX(samb_cronjobs.execution_time),0) AS max_durations FROM samb_cronjobs WHERE DATE(samb_cronjobs.start_date) = CURDATE() AND samb_cronjobs.condition = %s",
+            self.cursor_db.execute("SELECT COUNT(samb_cronjobs.id) AS quantities, IFNULL(MAX(samb_cronjobs.execution_time),0) AS max_durations FROM samb_cronjobs WHERE samb_cronjobs.start_date >= CURDATE() AND samb_cronjobs.start_date < DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND samb_cronjobs.condition = %s",
             [data['state']])
 
             rows = self.cursor_db.fetchall()
