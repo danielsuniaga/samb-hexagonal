@@ -62,15 +62,16 @@ class EntityDatasets():
 
         if 'entry_registration_date' in data.columns:
                     
-            data['entry_registration_date'] = data['entry_registration_date'].astype(str)
+            # Convertir a datetime (funciona con VARCHAR "20251128143025" y DATETIME "2025-11-28 14:30:25")
+            data['entry_registration_date'] = pd.to_datetime(data['entry_registration_date'])
             
-            data['year'] = data['entry_registration_date'].str[:4].astype(int)
+            data['year'] = data['entry_registration_date'].dt.year
             
-            data['month'] = data['entry_registration_date'].str[4:6].astype(int)
+            data['month'] = data['entry_registration_date'].dt.month
 
-            data['day'] = data['entry_registration_date'].str[6:8].astype(int)
+            data['day'] = data['entry_registration_date'].dt.day
 
-            data['hour'] = data['entry_registration_date'].str[8:10].astype(int) 
+            data['hour'] = data['entry_registration_date'].dt.hour
 
             data.drop(columns=['entry_registration_date'], inplace=True)
 
