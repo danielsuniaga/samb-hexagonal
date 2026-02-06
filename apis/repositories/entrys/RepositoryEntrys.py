@@ -208,10 +208,15 @@ class RepositoryEntrys():
             INNER JOIN samb_methodologys ON samb_entrys.id_methodology = samb_methodologys.id
             INNER JOIN samb_entrys_results ON samb_entrys.id = samb_entrys_results.id_entrys_id 
             INNER JOIN PivotedCandles ON samb_entrys.id = PivotedCandles.id_entry_id 
+            INNER JOIN (
+                SELECT id_entrys_id, MAX(registration_date) AS max_date
+                FROM samb_entrys_results
+                GROUP BY id_entrys_id
+            ) AS latest ON samb_entrys_results.id_entrys_id = latest.id_entrys_id 
+            AND samb_entrys_results.registration_date = latest.max_date
             LEFT JOIN samb_indicators_entrys sma_30 ON sma_30.id_entry_id = samb_entrys.id AND sma_30.id_indicators_id = %s 
             LEFT JOIN samb_indicators_entrys sma_10 ON sma_10.id_entry_id = samb_entrys.id AND sma_10.id_indicators_id = %s 
             LEFT JOIN samb_indicators_entrys rsi ON rsi.id_entry_id = samb_entrys.id AND rsi.id_indicators_id = %s 
-            WHERE samb_entrys_results.registration_date = ( SELECT MAX(registration_date) FROM samb_entrys_results AS ser WHERE ser.id_entrys_id = samb_entrys.id ) 
             ORDER BY samb_entrys.registration_date DESC"""
 
             parameters = (data['sma30'],data['sma10'],data['rsi10'])
