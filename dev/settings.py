@@ -181,6 +181,11 @@ LOGGING = {
             'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
             'propagate': False,
         },
+        'apis.services.managerdays': {
+            'handlers': ['console'],
+            'level': 'INFO',  # WARNING para solo ver problemas
+            'propagate': False,
+        },
         'apis.services.checkpinbar': {
             'handlers': ['console'],
             'level': 'INFO',
