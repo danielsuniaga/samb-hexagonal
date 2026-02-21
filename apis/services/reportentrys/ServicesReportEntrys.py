@@ -461,14 +461,17 @@ class ServicesReportEntrys():
         Returns: dict con status y detalles de la exportación
         """
         try:
-            # Crear timestamp para la carpeta (solo fecha)
-            timestamp = datetime.now().strftime('%Y-%m-%d')
+            # Crear timestamp para la carpeta (año-mes/día)
+            now = datetime.now()
+            year_month = now.strftime('%Y%m')           # Ejemplo: 202602
+            date_day = now.strftime('%Y-%m-%d')         # Ejemplo: 2026-02-21
+            timestamp = date_day  # Mantener compatibilidad con código existente
             
-            # Crear ruta base
+            # Crear ruta base con estructura año-mes/día
             base_path = '/export-reporting-sessions'
-            export_folder = os.path.join(base_path, timestamp)
+            export_folder = os.path.join(base_path, year_month, date_day)
             
-            # Crear directorio si no existe
+            # Crear directorio si no existe (creará carpetas intermedias)
             os.makedirs(export_folder, exist_ok=True)
             
             # Obtener datos si no se proporcionaron
