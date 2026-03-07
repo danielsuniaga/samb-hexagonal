@@ -260,9 +260,40 @@ class EntityReportEntrys():
 
         return message + self.get_message_params() +"\n".join(report_lines) + "\n"
     
+    def generate_message_parameters_index(self, data):
+        import re
+        # Limpiar y convertir profit y loss
+        try:
+            profit = float(str(data.get('profit', 0)).replace(',', '.').strip())
+        except Exception:
+            profit = 0
+        try:
+            loss = float(str(data.get('loss', 0)).replace(',', '.').strip())
+        except Exception:
+            loss = 0
+        # Limpiar type de espacios, tabs, saltos de línea, zero-width chars
+        type_value = str(data.get('type', '')).strip()
+        type_clean = re.sub(r'[\s\u200b\u200c\u200d\ufeff]+', '', type_value).upper()
+        # Calcular resultado neto
+        result = profit - abs(loss)
+        is_success = result >= 0
+        # El index será 'true|TYPE' o 'false|TYPE' (TYPE limpio)
+        return f"{str(is_success).lower()}|{type_clean}"
+    
     def generate_message_parameters(self, data):
-
-        return "PARAMS: (Type: "+str(data['type'])+", Day: "+str(data['day_description'])+" Permission real: "+str(data['permision_real'])+", Profit: "+str(data['profit'])+", Loss: "+str(data['loss'])+", Money: "+str(data['money'])+", Obs:"+str(data['observations'])+") \n"
+        # El campo index es igual al type por ahora
+        index = self.generate_message_parameters_index(data)
+        
+        return (
+            "PARAMS: (Index: " + index +
+            ", Type: " + str(data['type']) +
+            ", Day: " + str(data['day_description']) +
+            " Permission real: " + str(data['permision_real']) +
+            ", Profit: " + str(data['profit']) +
+            ", Loss: " + str(data['loss']) +
+            ", Money: " + str(data['money']) +
+            ", Obs:" + str(data['observations']) + ") \n"
+        )
 
     def generate_report_lines(self, data):
 

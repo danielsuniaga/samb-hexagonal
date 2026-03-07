@@ -3,6 +3,8 @@ import apis.entities.entrysresults.EntityEntrysResults as EntityEntrysResults
 import logging
 import time
 import os
+import re
+import uuid
 
 logger = logging.getLogger('apis.services.entrysresults')
 
@@ -101,21 +103,60 @@ class ServicesEntrysResults():
 
         return self.repository.get_entrys_results_curdate_complete()
     
+    def generate_execution_id(self):
+        return str(uuid.uuid4())[:8]
+
+    def sanitize_type_account(self, type_account, execution_id=None):
+        if not type_account:
+            logger.warning(
+                f"⚠️ TYPE_ACCOUNT SANITIZATION | "
+                f"🆔 {execution_id or self.generate_execution_id()} | "
+                f"Container: {self.get_project_name()} | "
+                f"Issue: NULL OR EMPTY type_account | "
+                f"Original: {repr(type_account)}"
+            )
+            return ''
+        original = str(type_account)
+        cleaned = re.sub(r'[\s\u200b\u200c\u200d\ufeff]+', '', original).upper()
+        if cleaned != original.upper():
+            logger.warning(
+                f"🧹 TYPE_ACCOUNT SANITIZATION | "
+                f"🆔 {execution_id or self.generate_execution_id()} | "
+                f"Container: {self.get_project_name()} | "
+                f"Issue: DIRTY DATA DETECTED | "
+                f"Original: {repr(original)} | "
+                f"Cleaned: {repr(cleaned)} | "
+                f"Bytes: {original.encode('unicode_escape').decode('ascii')}"
+            )
+        return cleaned
+
     def init_data_get_entrys_results(self, result, data):
 
         if not result['status']:
             return False
-        
+
+        execution_id = self.generate_execution_id()
         account_types = {'PRACTICE': 'D', 'REAL': 'R'}
-        
+
         for item in result['result']:
-            account_type = account_types.get(item['type_account'])
+            type_account_clean = self.sanitize_type_account(item['type_account'], execution_id)
+            account_type = account_types.get(type_account_clean)
             if account_type:
                 data[account_type]['USD'] = float(item['result'])
                 data[account_type]['ENT'] = item['quantities']
                 data['E']['DEM'] += item['total'] if account_type == 'D' else 0
                 data['E']['REA'] += item['total'] if account_type == 'R' else 0
-        
+            else:
+                logger.warning(
+                    f"⚠️ UNKNOWN TYPE_ACCOUNT | "
+                    f"🆔 {execution_id} | "
+                    f"Container: {self.get_project_name()} | "
+                    f"Result: SKIPPED | "
+                    f"Reason: type_account not matched to PRACTICE or REAL | "
+                    f"Original: {repr(item['type_account'])} | "
+                    f"Cleaned: {repr(type_account_clean)}"
+                )
+
         return data
     
     def get_data_entrys_results_curdate(self,data,id_methodology):
