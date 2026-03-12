@@ -8,6 +8,15 @@ import gc
 
 import random
 
+import logging
+
+import uuid
+
+logger_request    = logging.getLogger('ServicesBrokerRequest')
+logger_response   = logging.getLogger('ServicesBrokerResponse')
+logger_validation = logging.getLogger('ServicesAccountValidation')
+logger_session    = logging.getLogger('ServicesBrokerSession')
+
 class EntityDeriv():
 
     id_app = None
@@ -39,6 +48,12 @@ class EntityDeriv():
     max_attempts_broker_deriv = None
 
     max_attempts_broker_deriv_execute_proposal = None
+
+    _current_mode = None
+
+    _broker_exec_id = None
+
+    _account_id_broker = None
 
     def __init__(self):
 
@@ -296,6 +311,13 @@ class EntityDeriv():
     
     async def check(self,mode):
 
+        self._current_mode = mode
+        mode_str = "REAL" if mode is True else ("DEMO" if mode is False else "UNKNOWN")
+        logger_validation.info(
+            f"🔐 ACCOUNT TYPE CHECK | account_type: {mode_str} | "
+            f"tokens_loaded: {self.tokens_asignado is not None}"
+        )
+
         await self.init_token()
 
         token = await self.get_token_mode(mode)
@@ -307,6 +329,17 @@ class EntityDeriv():
                 response = await self.api.authorize(token)
                 
                 if response:
+                    authorize_data = response.get('authorize', {})
+                    self._account_id_broker = (
+                        authorize_data.get('loginid')
+                        or authorize_data.get('account_id', 'N/A')
+                    )
+                    logger_validation.info(
+                        f"🔐 ACCOUNT TYPE CHECK | account_type: {mode_str} | "
+                        f"account_id_broker: {self._account_id_broker} | "
+                        f"currency: {authorize_data.get('currency', 'N/A')} | "
+                        f"is_virtual: {authorize_data.get('is_virtual', 'N/A')}"
+                    )
                     return {
                         'status': True,
                         'message': f'Conexion exitosa con deriv en intento {attempt}',
@@ -332,6 +365,11 @@ class EntityDeriv():
 
         app_id = self.get_id_app()
 
+        logger_session.info(
+            f"🔌 BROKER SESSION | Event: CONNECTION_INIT | "
+            f"app_id: {app_id} | tokens_loaded: {self.tokens_asignado is not None}"
+        )
+
         max_attempts = self.get_max_attempts_broker_deriv()
 
         for attempt in range(1, max_attempts + 1):
@@ -342,6 +380,10 @@ class EntityDeriv():
                 check_result = await self.check(False)
                 
                 if check_result['status']:
+                    logger_session.info(
+                        f"🔌 BROKER SESSION | Event: CONNECTION_OK | "
+                        f"app_id: {app_id} | attempt: {attempt}"
+                    )
                     return {
                         'status': True,
                         'message': f'Conexión inicializada correctamente en intento {attempt}',
@@ -366,7 +408,11 @@ class EntityDeriv():
         if not self.api:
 
             return {'status': False, 'message': 'No hay conexión activa con deriv para cerrar'}
-        
+
+        logger_session.info(
+            f"🔌 BROKER SESSION | Event: CONNECTION_CLOSE_START"
+        )
+
         max_attempts = self.get_max_attempts_broker_deriv()
 
         for attempt in range(1, max_attempts + 1):
@@ -376,6 +422,10 @@ class EntityDeriv():
                 self.api = None
 
                 gc.collect()
+
+                logger_session.info(
+                    f"🔌 BROKER SESSION | Event: CONNECTION_CLOSED_OK | attempt: {attempt}"
+                )
                 
                 return {
                     'status': True,
@@ -488,6 +538,17 @@ class EntityDeriv():
             try:
                 proposal_data = self.get_proposal_data(data['amount'],data['contract_type'],data['duration'],data['duration_unit'],data['symbol'])
 
+                mode_str = "REAL" if self._current_mode is True else ("DEMO" if self._current_mode is False else "UNKNOWN")
+                logger_request.info(
+                    f"📤 BROKER REQUEST | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                    f"account_type: {mode_str} | "
+                    f"contract_type: {data['contract_type']} | "
+                    f"amount: {data['amount']} | "
+                    f"symbol: {data['symbol']} | "
+                    f"duration: {data['duration']}{data['duration_unit']} | "
+                    f"attempt: {attempt}"
+                )
+
                 proposal_response = await self.api.proposal(proposal_data)
 
                 if proposal_response is None:
@@ -544,6 +605,14 @@ class EntityDeriv():
                     return {'status': False, 'message': f'La respuesta de la API es None después de {max_attempts} intentos'}
 
                 if 'buy' in execution_response:
+                    buy_data = execution_response.get('buy', {})
+                    logger_response.info(
+                        f"📥 BROKER RESPONSE OPEN | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"contract_id: {buy_data.get('contract_id', 'N/A')} | "
+                        f"buy_price: {buy_data.get('buy_price', 'N/A')} | "
+                        f"account_id_broker: {self._account_id_broker or 'N/A'} | "
+                        f"attempt: {attempt}"
+                    )
                     return {
                         'status': True,
                         'message': f'Posición ejecutada correctamente en intento {attempt}',
@@ -572,49 +641,105 @@ class EntityDeriv():
     async def check_position_result(self, contract_id):
 
         if self.api is None:
+            logger_response.warning(
+                f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                f"contract_id: {contract_id} | Result: FAILED | Reason: API not initialized"
+            )
             return False
 
-        max_attempts = self.get_max_attempts_broker_deriv()
+        max_api_errors       = self.get_max_attempts_broker_deriv()
+        max_settlement_polls = max_api_errors * 12  # e.g. 3×12=36 polls × 5s = 180s
+        api_error_count      = 0
+        settlement_poll_count = 0
 
-        for attempt in range(max_attempts):
+        while True:
             try:
                 response = await self.api.proposal_open_contract(
                     {"proposal_open_contract": 1, "contract_id": contract_id}
                 )
                 if not response or 'proposal_open_contract' not in response:
-                    if attempt == max_attempts - 1:
+                    api_error_count += 1
+                    if api_error_count >= max_api_errors:
+                        logger_response.warning(
+                            f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                            f"contract_id: {contract_id} | Result: FAILED | "
+                            f"Reason: empty or missing proposal_open_contract | "
+                            f"response_keys: {list(response.keys()) if isinstance(response, dict) else type(response).__name__}"
+                        )
                         return False
                     await asyncio.sleep(random.randint(0, 1))
                     continue
                 contract_info = response['proposal_open_contract']
-                # Verificar que tengamos contract_details completos
                 if not contract_info or not isinstance(contract_info, dict):
-                    if attempt == max_attempts - 1:
+                    api_error_count += 1
+                    if api_error_count >= max_api_errors:
+                        logger_response.warning(
+                            f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                            f"contract_id: {contract_id} | Result: FAILED | "
+                            f"Reason: contract_info invalid | value: {contract_info}"
+                        )
                         return False
                     await asyncio.sleep(random.randint(0, 1))
                     continue
                 if not contract_info.get('is_sold'):
-                    if attempt == max_attempts - 1:
+                    settlement_poll_count += 1
+                    if settlement_poll_count >= max_settlement_polls:
+                        logger_response.warning(
+                            f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                            f"contract_id: {contract_id} | Result: FAILED | "
+                            f"Reason: is_sold=False after {settlement_poll_count} settlement polls | "
+                            f"status: {contract_info.get('status', 'N/A')} | "
+                            f"expiry_time: {contract_info.get('expiry_time', 'N/A')}"
+                        )
                         return False
-                    await asyncio.sleep(random.randint(0, 1))
+                    logger_response.info(
+                        f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"contract_id: {contract_id} | is_sold: False | "
+                        f"settlement_poll: {settlement_poll_count}/{max_settlement_polls} | waiting 5s for broker settlement..."
+                    )
+                    await asyncio.sleep(5)
                     continue
                 status = contract_info.get('status', 'unknown')
                 profit_or_loss = contract_info.get('profit', 0)
                 if status == 'won':
+                    logger_response.info(
+                        f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"contract_id: {contract_id} | "
+                        f"profit: {profit_or_loss} | "
+                        f"status: won | Win: True"
+                    )
                     return self.get_won_contract(profit_or_loss, contract_info)
                 elif status == 'lost':
+                    logger_response.info(
+                        f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"contract_id: {contract_id} | "
+                        f"profit: {profit_or_loss} | "
+                        f"status: lost | Win: False"
+                    )
                     return self.get_lost_contract(profit_or_loss, contract_info)
                 else:
-                    if attempt == max_attempts - 1:
+                    api_error_count += 1
+                    if api_error_count >= max_api_errors:
+                        logger_response.warning(
+                            f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                            f"contract_id: {contract_id} | Result: FAILED | "
+                            f"Reason: unexpected status | status: {status} | "
+                            f"profit: {profit_or_loss}"
+                        )
                         return False
                     await asyncio.sleep(random.randint(0, 1))
                     continue
             except Exception as err:
-                if attempt == max_attempts - 1:
+                api_error_count += 1
+                if api_error_count >= max_api_errors:
+                    logger_response.warning(
+                        f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"contract_id: {contract_id} | Result: FAILED | "
+                        f"Reason: exception | error: {err}"
+                    )
                     return False
                 await asyncio.sleep(random.randint(0, 1))
                 continue
-        return False
         
     def get_won_contract(self, profit, contract_info):
 
@@ -635,6 +760,8 @@ class EntityDeriv():
         }
 
     async def add_entry(self, data):
+
+        self._broker_exec_id = uuid.uuid4().hex[:12]
 
         result = await self.generate_proposal(data)
 

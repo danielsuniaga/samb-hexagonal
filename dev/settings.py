@@ -286,5 +286,25 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'ServicesBrokerSession': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'ServicesBrokerRequest': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'ServicesBrokerResponse': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'ServicesAccountValidation': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }

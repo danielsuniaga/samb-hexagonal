@@ -69,6 +69,10 @@ class ServicesEntrys():
         result = self.add_entrys_repository(data)
         execution_time = (time.time() - start_time) * 1000
 
+        contract_details  = entrys.get('contract_details', {}) if isinstance(entrys, dict) else {}
+        contract_id_broker = contract_details.get('contract_id', 'N/A')
+        account_id_broker  = contract_details.get('account_id', 'N/A')
+
         if result.get('status'):
             logger.info(
                 f"⚡ ADD POSITIONS | "
@@ -79,6 +83,8 @@ class ServicesEntrys():
                 f"Position: {data['type_operations']} | "
                 f"Amount: ${data['amount']} | "
                 f"Entry ID: {data['id_entry']} | "
+                f"contract_id_broker: {contract_id_broker} | "
+                f"account_id_broker: {account_id_broker} | "
                 f"Cronjob: {data['id_cronjobs']} | "
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: SUCCESS"
@@ -93,6 +99,8 @@ class ServicesEntrys():
                 f"Position: {data['type_operations']} | "
                 f"Amount: ${data['amount']} | "
                 f"Entry ID: {data['id_entry']} | "
+                f"contract_id_broker: {contract_id_broker} | "
+                f"account_id_broker: {account_id_broker} | "
                 f"Cronjob: {data['id_cronjobs']} | "
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: FAILED | "
