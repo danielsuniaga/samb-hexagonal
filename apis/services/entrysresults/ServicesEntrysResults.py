@@ -93,7 +93,42 @@ class ServicesEntrysResults():
 
         data_persistence = self.init_data_add_persistence(data,data_indicators)
 
-        return self.add_persistence_repository(data_persistence)
+        start_time = time.time()
+        result = self.add_persistence_repository(data_persistence)
+        execution_time = (time.time() - start_time) * 1000
+
+        result_entry = data_persistence['result_entry']
+        win = result_entry > 0
+
+        if result.get('status'):
+            logger.info(
+                f"📝 ADD POSITIONS RESULT | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: add_persistence | "
+                f"Entry ID: {data_persistence['id_entry']} | "
+                f"Result ID: {data_persistence['id_entry_result']} | "
+                f"Result: ${result_entry:.2f} | "
+                f"Win: {win} | "
+                f"Date: {data_persistence['current_date']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger.error(
+                f"📝 ADD POSITIONS RESULT | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: add_persistence | "
+                f"Entry ID: {data_persistence['id_entry']} | "
+                f"Result ID: {data_persistence['id_entry_result']} | "
+                f"Result: ${result_entry:.2f} | "
+                f"Win: {win} | "
+                f"Date: {data_persistence['current_date']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('message', 'Unknown error')}"
+            )
+
+        return result
     
     def get_entrys_results_curdate_repository(self,id_methodology):
 

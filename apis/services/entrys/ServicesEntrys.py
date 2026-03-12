@@ -65,7 +65,41 @@ class ServicesEntrys():
 
         self.add_data_entity(data)
 
-        return self.add_entrys_repository(data)
+        start_time = time.time()
+        result = self.add_entrys_repository(data)
+        execution_time = (time.time() - start_time) * 1000
+
+        if result.get('status'):
+            logger.info(
+                f"⚡ ADD POSITIONS | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: add_entrys | "
+                f"Methodology: {data['id_methodology']} | "
+                f"Account: {data['mode']} | "
+                f"Position: {data['type_operations']} | "
+                f"Amount: ${data['amount']} | "
+                f"Entry ID: {data['id_entry']} | "
+                f"Cronjob: {data['id_cronjobs']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger.error(
+                f"⚡ ADD POSITIONS | "
+                f"Project: {self.get_project_name()} | "
+                f"Method: add_entrys | "
+                f"Methodology: {data['id_methodology']} | "
+                f"Account: {data['mode']} | "
+                f"Position: {data['type_operations']} | "
+                f"Amount: ${data['amount']} | "
+                f"Entry ID: {data['id_entry']} | "
+                f"Cronjob: {data['id_cronjobs']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('message', 'Unknown error')}"
+            )
+
+        return result
     
     def init_get_data_dataset_entrys(self,data):
 
