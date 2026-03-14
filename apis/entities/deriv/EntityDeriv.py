@@ -647,9 +647,9 @@ class EntityDeriv():
             )
             return False
 
-        max_api_errors       = self.get_max_attempts_broker_deriv()
-        max_settlement_polls = max_api_errors * 12  # e.g. 3×12=36 polls × 5s = 180s
-        api_error_count      = 0
+        max_api_errors        = self.get_max_attempts_broker_deriv()
+        max_settlement_polls  = int(config("BROKER_CLOSE_MAX_POLLS", default=40))
+        api_error_count       = 0
         settlement_poll_count = 0
 
         while True:
@@ -759,23 +759,85 @@ class EntityDeriv():
             'contract_details': contract_info,
         }
 
+    async def verify_contract_created(self, contract_id):
+
+        try:
+            response = await self.api.proposal_open_contract(
+                {"proposal_open_contract": 1, "contract_id": contract_id}
+            )
+            if response and 'proposal_open_contract' in response:
+                contract_info = response['proposal_open_contract']
+                if contract_info and isinstance(contract_info, dict) and contract_info.get('contract_id'):
+                    logger_response.info(
+                        f"📋 BROKER CONTRACT VERIFIED | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"contract_id: {contract_id} | status: OK"
+                    )
+                    return True
+            logger_response.warning(
+                f"📋 BROKER CONTRACT VERIFIED | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                f"contract_id: {contract_id} | status: FAILED | "
+                f"reason: contract not found in Deriv response"
+            )
+            return False
+        except Exception as err:
+            logger_response.warning(
+                f"📋 BROKER CONTRACT VERIFIED | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                f"contract_id: {contract_id} | status: FAILED | "
+                f"reason: exception | error: {err}"
+            )
+            return False
+
     async def add_entry(self, data):
 
         self._broker_exec_id = uuid.uuid4().hex[:12]
 
-        result = await self.generate_proposal(data)
+        max_retries = int(config("BROKER_ADD_ENTRY_MAX_RETRIES", default=1))
+        contract_id = None
 
-        if not result['status']:
-            return False
+        for attempt in range(1, max_retries + 2):
 
-        result = await self.execute_proposal(result['proposal_id'])
+            proposal_result = await self.generate_proposal(data)
+            if not proposal_result['status']:
+                if attempt <= max_retries:
+                    logger_request.warning(
+                        f"📤 BROKER REQUEST | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"Result: FAILED | Reason: proposal failed | "
+                        f"attempt: {attempt}/{max_retries + 1} | Retrying..."
+                    )
+                    await asyncio.sleep(random.randint(1, 2))
+                    continue
+                return False
 
-        if not result['status']:
-            return False
+            execute_result = await self.execute_proposal(proposal_result['proposal_id'])
+            if not execute_result['status']:
+                if attempt <= max_retries:
+                    logger_request.warning(
+                        f"📤 BROKER REQUEST | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"Result: FAILED | Reason: execute failed | "
+                        f"attempt: {attempt}/{max_retries + 1} | Retrying..."
+                    )
+                    await asyncio.sleep(random.randint(1, 2))
+                    continue
+                return False
+
+            contract_id = execute_result['execution_details'].get('buy', {}).get('contract_id')
+            if not contract_id:
+                logger_response.warning(
+                    f"📥 BROKER RESPONSE OPEN | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                    f"Result: FAILED | Reason: contract_id missing in buy response | "
+                    f"buy_keys: {list(execute_result['execution_details'].get('buy', {}).keys())}"
+                )
+                return False
+
+            verified = await self.verify_contract_created(contract_id)
+            if not verified:
+                return False
+
+            break
 
         await self.generate_duration_contract()
 
-        return await self.check_position_result(result['execution_details']['buy']['contract_id'])
+        return await self.check_position_result(contract_id)
     
     def init_result_return_attent_initialization(self):
 
