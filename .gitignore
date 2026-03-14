@@ -1,4 +1,5 @@
 *.env
+REPORTS/
 database/
 dev/__pycache__/
 apis/services/__pycache__/
