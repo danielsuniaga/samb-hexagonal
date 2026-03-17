@@ -11,6 +11,9 @@ COPY requirements.txt /code/
 RUN apt-get update && apt-get install -y curl tree
 RUN pip install --upgrade pip && pip install -r /code/requirements.txt
 
+# Crea los directorios de logs necesarios
+RUN mkdir -p /var/log/samb && chmod 755 /var/log/samb
+
 # Establece el directorio de trabajo
 WORKDIR /code
 

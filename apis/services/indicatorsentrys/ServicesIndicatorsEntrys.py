@@ -1,5 +1,10 @@
 import apis.repositories.indicatorsentrys.RepositoryIndicatorsEntrys as RepositoryIndicatorsEntrys
 import apis.entities.indicatorsentrys.EntityIndicatorsEntrys as EntityIndicatorsEntrys
+from decouple import config
+import logging
+import time
+
+logger = logging.getLogger('ServicesPersistence')
 
 class ServicesIndicatorsEntrys():
 
@@ -69,6 +74,8 @@ class ServicesIndicatorsEntrys():
     def add_persistence(self, data):
 
         data_persistence = self.init_data_add_persistence(data)
+        entry_id = data.get('data_entry', {}).get('id_entry', 'N/A')
+        start_time = time.time()
 
         for key in data_persistence:
 
@@ -76,8 +83,34 @@ class ServicesIndicatorsEntrys():
 
             if not result['status']:
 
+                execution_time = (time.time() - start_time) * 1000
+                logger.error(
+                    f"💾 ADD PERSISTENCE | "
+                    f"Table: samb_indicators_entrys | "
+                    f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                    f"Method: add_persistence | "
+                    f"Entry ID: {entry_id} | "
+                    f"Indicator: {key} | "
+                    f"Execution Time: {execution_time:.2f}ms | "
+                    f"Status: FAILED | "
+                    f"Error: {result.get('msj', 'Unknown error')}"
+                )
                 return False
-        
+
+        execution_time = (time.time() - start_time) * 1000
+        logger.info(
+            f"💾 ADD PERSISTENCE | "
+            f"Table: samb_indicators_entrys | "
+            f"Project: {config('PROJECT_NAME', default='N/A')} | "
+            f"Method: add_persistence | "
+            f"Entry ID: {entry_id} | "
+            f"RSI: {data.get('rsi', 'N/A')} | "
+            f"SMA10: {data.get('sma_short', 'N/A')} | "
+            f"SMA30: {data.get('sma_long', 'N/A')} | "
+            f"Execution Time: {execution_time:.2f}ms | "
+            f"Status: SUCCESS"
+        )
+
         return result
     
     def init_data_get_indicators_entrys(self, data):

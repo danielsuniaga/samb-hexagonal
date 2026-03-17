@@ -1,5 +1,10 @@
 import apis.repositories.framework.RepositoryFramework as RepositoryFramework
 import apis.entities.framework.EntityFramework as EntityFramework
+from decouple import config
+import logging
+import time
+
+logger = logging.getLogger('ServicesPersistence')
 
 class ServicesFramework:
 
@@ -37,6 +42,30 @@ class ServicesFramework:
 
         data_persistence = await self.init_data_add()
 
+        start_time = time.time()
         result = await self.repository.add(data_persistence)
+        execution_time = (time.time() - start_time) * 1000
+
+        if result.get('status'):
+            logger.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_framework | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add | "
+                f"Framework ID: {data_persistence['id_framework']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_framework | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add | "
+                f"Framework ID: {data_persistence['id_framework']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('message', 'Unknown error')}"
+            )
 
         return result

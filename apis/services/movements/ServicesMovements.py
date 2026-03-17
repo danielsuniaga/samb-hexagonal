@@ -1,5 +1,10 @@
 import apis.repositories.movements.RepositoryMovements as RepositoryMovements
-import apis.entities.movements.EntityMovements as EntityMovements   
+import apis.entities.movements.EntityMovements as EntityMovements
+from decouple import config
+import logging
+import time
+
+logger = logging.getLogger('ServicesPersistence')
 
 class ServicesMovements():
 
@@ -54,7 +59,38 @@ class ServicesMovements():
 
         data_persistence = self.init_data_add_persistence(self.get_candles(),data)
 
-        return self.add_movements_repository(data_persistence)
+        start_time = time.time()
+        result = self.add_movements_repository(data_persistence)
+        execution_time = (time.time() - start_time) * 1000
+
+        entry_id = data.get('data_entry', {}).get('id_entry', 'N/A')
+        candles_count = len(data_persistence)
+
+        if result.get('status'):
+            logger.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_movements | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add_persistence | "
+                f"Entry ID: {entry_id} | "
+                f"Candles: {candles_count} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_movements | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add_persistence | "
+                f"Entry ID: {entry_id} | "
+                f"Candles: {candles_count} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('message', 'Unknown error')}"
+            )
+
+        return result
     
     def init_data_get_movements_by_entry(self, entry):
 

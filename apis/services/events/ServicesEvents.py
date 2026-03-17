@@ -6,6 +6,7 @@ import apis.entities.events.EntityEvents as EntityEvents
 import apis.repositories.events.RepositoryEvents as RepositoryEvents
 
 logger = logging.getLogger('apis.services.events')
+logger_persistence = logging.getLogger('ServicesPersistence')
 
 class ServicesEvents():
 
@@ -77,7 +78,35 @@ class ServicesEvents():
 
         data = self.init_data_add_events(details,diferrences,id_cronjobs)
 
-        return self.add_events_repository(data)
+        start_time = time.time()
+        result = self.add_events_repository(data)
+        execution_time = (time.time() - start_time) * 1000
+
+        if result.get('status'):
+            logger_persistence.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_events | "
+                f"Project: {self.entity.get_project_name()} | "
+                f"Method: add_events | "
+                f"Event ID: {data['id']} | "
+                f"Cronjob ID: {id_cronjobs} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger_persistence.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_events | "
+                f"Project: {self.entity.get_project_name()} | "
+                f"Method: add_events | "
+                f"Event ID: {data['id']} | "
+                f"Cronjob ID: {id_cronjobs} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('msj', 'Unknown error')}"
+            )
+
+        return result
     
     def get_events_daily_cron_repository(self):
 

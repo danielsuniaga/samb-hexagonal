@@ -154,6 +154,15 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
+        'file_persistence': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/samb/persistence.log',
+            'maxBytes': 10485760,
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
     },
     'loggers': {
         'apis.entities.models.EntityModels': {
@@ -303,6 +312,11 @@ LOGGING = {
         },
         'ServicesAccountValidation': {
             'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'ServicesPersistence': {
+            'handlers': ['file_persistence', 'console'],
             'level': 'INFO',
             'propagate': False,
         },
