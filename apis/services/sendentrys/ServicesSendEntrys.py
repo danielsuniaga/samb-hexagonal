@@ -2,6 +2,12 @@ import apis.entities.sendentrys.EntitySendEntrys as EntitySendEntrys
 
 import apis.repositories.sendentrys.RepositorySendEntrys as RepositorySendEntrys
 
+from decouple import config
+import logging
+import time
+
+logger = logging.getLogger('ServicesPersistence')
+
 class ServicesSendEntrys:
 
     services_dates = None 
@@ -67,6 +73,32 @@ class ServicesSendEntrys:
 
         data_persistence = self.init_data_add_send_entrys(data, result)
 
+        start_time = time.time()
         result = self.add_send_entrys_repository(data_persistence)
+        execution_time = (time.time() - start_time) * 1000
+
+        if result.get('status'):
+            logger.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_send_entrys | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add_send_entrys | "
+                f"Send ID: {data_persistence['id']} | "
+                f"Response: {data_persistence['response']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_send_entrys | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add_send_entrys | "
+                f"Send ID: {data_persistence['id']} | "
+                f"Response: {data_persistence['response']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('msj', 'Unknown error')}"
+            )
 
         return result

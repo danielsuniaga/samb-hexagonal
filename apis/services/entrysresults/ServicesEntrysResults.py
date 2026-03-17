@@ -7,6 +7,7 @@ import re
 import uuid
 
 logger = logging.getLogger('apis.services.entrysresults')
+logger_persistence = logging.getLogger('ServicesPersistence')
 
 class ServicesEntrysResults():
 
@@ -99,30 +100,33 @@ class ServicesEntrysResults():
 
         result_entry = data_persistence['result_entry']
         win = result_entry > 0
+        contract_id = data.get('contract_details', {}).get('contract_id', 'N/A') if isinstance(data, dict) else 'N/A'
 
         if result.get('status'):
-            logger.info(
-                f"📝 ADD POSITIONS RESULT | "
+            logger_persistence.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_entrys_results | "
                 f"Project: {self.get_project_name()} | "
                 f"Method: add_persistence | "
                 f"Entry ID: {data_persistence['id_entry']} | "
                 f"Result ID: {data_persistence['id_entry_result']} | "
+                f"Contract ID: {contract_id} | "
                 f"Result: ${result_entry:.2f} | "
                 f"Win: {win} | "
-                f"Date: {data_persistence['current_date']} | "
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: SUCCESS"
             )
         else:
-            logger.error(
-                f"📝 ADD POSITIONS RESULT | "
+            logger_persistence.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_entrys_results | "
                 f"Project: {self.get_project_name()} | "
                 f"Method: add_persistence | "
                 f"Entry ID: {data_persistence['id_entry']} | "
                 f"Result ID: {data_persistence['id_entry_result']} | "
+                f"Contract ID: {contract_id} | "
                 f"Result: ${result_entry:.2f} | "
                 f"Win: {win} | "
-                f"Date: {data_persistence['current_date']} | "
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: FAILED | "
                 f"Error: {result.get('message', 'Unknown error')}"

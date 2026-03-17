@@ -2,6 +2,12 @@ import apis.repositories.entryspredictmodels.RepositoryEntrysPredictModels as Re
 
 import apis.entities.entryspredictmodels.EntityEntrysPredictModels as EntityEntrysPredictModels
 
+from decouple import config
+import logging
+import time
+
+logger = logging.getLogger('ServicesPersistence')
+
 class ServicesEntrysPredictModels: 
 
     ServicesDates = None   
@@ -49,7 +55,33 @@ class ServicesEntrysPredictModels:
 
         data_persistence = self.init_add(data)  
 
+        start_time = time.time()
         result = self.add_repository(data_persistence)
+        execution_time = (time.time() - start_time) * 1000
+
+        if result.get('status'):
+            logger.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_entrys_predict_models | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add | "
+                f"Entry ID: {data_persistence['id_entrys']} | "
+                f"Model ID: {data_persistence['id_predict_models']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_entrys_predict_models | "
+                f"Project: {config('PROJECT_NAME', default='N/A')} | "
+                f"Method: add | "
+                f"Entry ID: {data_persistence['id_entrys']} | "
+                f"Model ID: {data_persistence['id_predict_models']} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('msj', 'Unknown error')}"
+            )
 
         return result
         

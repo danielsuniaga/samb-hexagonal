@@ -5,6 +5,7 @@ import apis.entities.entrys.EntityEntrys as EntityEntrys
 import apis.repositories.entrys.RepositoryEntrys as RepositoryEntrys
 
 logger = logging.getLogger('apis.services.entrys')
+logger_persistence = logging.getLogger('ServicesPersistence')
 
 class ServicesEntrys():
 
@@ -74,34 +75,34 @@ class ServicesEntrys():
         account_id_broker  = contract_details.get('account_id', 'N/A')
 
         if result.get('status'):
-            logger.info(
-                f"⚡ ADD POSITIONS | "
+            logger_persistence.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_entrys | "
                 f"Project: {self.get_project_name()} | "
                 f"Method: add_entrys | "
                 f"Methodology: {data['id_methodology']} | "
                 f"Account: {data['mode']} | "
                 f"Position: {data['type_operations']} | "
-                f"Amount: ${data['amount']} | "
+                f"Stake: ${data['amount']} | "
                 f"Entry ID: {data['id_entry']} | "
-                f"contract_id_broker: {contract_id_broker} | "
-                f"account_id_broker: {account_id_broker} | "
-                f"Cronjob: {data['id_cronjobs']} | "
+                f"Contract ID: {contract_id_broker} | "
+                f"Cronjob ID: {data['id_cronjobs']} | "
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: SUCCESS"
             )
         else:
-            logger.error(
-                f"⚡ ADD POSITIONS | "
+            logger_persistence.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_entrys | "
                 f"Project: {self.get_project_name()} | "
                 f"Method: add_entrys | "
                 f"Methodology: {data['id_methodology']} | "
                 f"Account: {data['mode']} | "
                 f"Position: {data['type_operations']} | "
-                f"Amount: ${data['amount']} | "
+                f"Stake: ${data['amount']} | "
                 f"Entry ID: {data['id_entry']} | "
-                f"contract_id_broker: {contract_id_broker} | "
-                f"account_id_broker: {account_id_broker} | "
-                f"Cronjob: {data['id_cronjobs']} | "
+                f"Contract ID: {contract_id_broker} | "
+                f"Cronjob ID: {data['id_cronjobs']} | "
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: FAILED | "
                 f"Error: {result.get('message', 'Unknown error')}"

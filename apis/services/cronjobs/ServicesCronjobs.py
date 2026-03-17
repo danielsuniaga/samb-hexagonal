@@ -7,6 +7,7 @@ import apis.entities.cronjobs.EntityCronjobs as EntityCronjobs
 import apis.repositories.cronjobs.RepositoryCronjobs as RepositoryCronjobs
 
 logger = logging.getLogger('apis.services.cronjobs')
+logger_persistence = logging.getLogger('ServicesPersistence')
 
 class ServicesCronjobs():
 
@@ -22,7 +23,35 @@ class ServicesCronjobs():
 
     def add_repository(self,data):
 
-        return self.repository.add(data)
+        start_time = time.time()
+        result = self.repository.add(data)
+        execution_time = (time.time() - start_time) * 1000
+
+        if result.get('status'):
+            logger_persistence.info(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_cronjobs | "
+                f"Project: {self.entity.get_project_name()} | "
+                f"Method: add_repository | "
+                f"Cronjob ID: {data.get('id', 'N/A')} | "
+                f"API ID: {data.get('id_api', 'N/A')} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger_persistence.error(
+                f"💾 ADD PERSISTENCE | "
+                f"Table: samb_cronjobs | "
+                f"Project: {self.entity.get_project_name()} | "
+                f"Method: add_repository | "
+                f"Cronjob ID: {data.get('id', 'N/A')} | "
+                f"API ID: {data.get('id_api', 'N/A')} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('msj', 'Unknown error')}"
+            )
+
+        return result
     
     def set_id_cronjobs(self,id_cronjobs):
 
@@ -488,7 +517,33 @@ class ServicesCronjobs():
     
     def set_ejecution_repository(self,data):
 
-        return self.repository.set(data)
+        start_time = time.time()
+        result = self.repository.set(data)
+        execution_time = (time.time() - start_time) * 1000
+
+        if result.get('status'):
+            logger_persistence.info(
+                f"💾 UPDATE PERSISTENCE | "
+                f"Table: samb_cronjobs | "
+                f"Project: {self.entity.get_project_name()} | "
+                f"Method: set_ejecution_repository | "
+                f"Cronjob ID: {data.get('id_cronjobs', 'N/A')} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: SUCCESS"
+            )
+        else:
+            logger_persistence.error(
+                f"💾 UPDATE PERSISTENCE | "
+                f"Table: samb_cronjobs | "
+                f"Project: {self.entity.get_project_name()} | "
+                f"Method: set_ejecution_repository | "
+                f"Cronjob ID: {data.get('id_cronjobs', 'N/A')} | "
+                f"Execution Time: {execution_time:.2f}ms | "
+                f"Status: FAILED | "
+                f"Error: {result.get('message', 'Unknown error')}"
+            )
+
+        return result
     
     def set_ejecution(self,date,time_execution,id_cronjobs):
 
