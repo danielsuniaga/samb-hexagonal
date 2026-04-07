@@ -705,7 +705,10 @@ class EntityDeriv():
                     logger_response.info(
                         f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
                         f"contract_id: {contract_id} | "
-                        f"profit: {profit_or_loss} | "
+                        f"broker_profit: {profit_or_loss} | "
+                        f"broker_sell_price: {contract_info.get('sell_price', 'N/A')} | "
+                        f"broker_buy_price: {contract_info.get('buy_price', 'N/A')} | "
+                        f"broker_payout: {contract_info.get('payout', 'N/A')} | "
                         f"status: won | Win: True"
                     )
                     return self.get_won_contract(profit_or_loss, contract_info)
@@ -713,7 +716,10 @@ class EntityDeriv():
                     logger_response.info(
                         f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
                         f"contract_id: {contract_id} | "
-                        f"profit: {profit_or_loss} | "
+                        f"broker_profit: {profit_or_loss} | "
+                        f"broker_sell_price: {contract_info.get('sell_price', 'N/A')} | "
+                        f"broker_buy_price: {contract_info.get('buy_price', 'N/A')} | "
+                        f"broker_payout: {contract_info.get('payout', 'N/A')} | "
                         f"status: lost | Win: False"
                     )
                     return self.get_lost_contract(profit_or_loss, contract_info)
