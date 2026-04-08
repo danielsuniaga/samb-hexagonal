@@ -49,6 +49,10 @@ class EntityDeriv():
 
     max_attempts_broker_deriv_execute_proposal = None
 
+    max_close_reconnect_retries = None
+
+    reconnect_wait_seconds = None
+
     _current_mode = None
 
     _broker_exec_id = None
@@ -83,6 +87,8 @@ class EntityDeriv():
 
         self.init_max_attempts_broker_deriv_execute_proposal()
 
+        self.init_close_reconnect_config()
+
     def init_max_attempts_broker_deriv_execute_proposal(self):
         self.max_attempts_broker_deriv_execute_proposal = int(config("MAX_ATTEMPTS_BROKER_DERIV_EXECUTE_PROPOSAL"))
         return True
@@ -96,6 +102,17 @@ class EntityDeriv():
     
     def get_max_attempts_broker_deriv(self):
         return self.max_attempts_broker_deriv
+
+    def init_close_reconnect_config(self):
+        self.max_close_reconnect_retries = int(config("BROKER_CLOSE_MAX_RECONNECT_RETRIES", default=3))
+        self.reconnect_wait_seconds      = int(config("BROKER_CLOSE_RECONNECT_WAIT_SECONDS",  default=10))
+        return True
+
+    def get_max_close_reconnect_retries(self):
+        return self.max_close_reconnect_retries
+
+    def get_reconnect_wait_seconds(self):
+        return self.reconnect_wait_seconds
 
     def init_tokens(self):
 
@@ -638,6 +655,54 @@ class EntityDeriv():
     
         await asyncio.sleep(self.duration_seconds)
 
+    async def _reconnect_api(self, contract_id, attempt, max_retries):
+        """
+        Cierra la instancia DerivAPI actual (si existe) y abre una nueva,
+        reutilizando la misma lógica de init(). Solo se invoca desde el
+        bloque de recovery de check_position_result().
+        """
+        app_id = self.get_id_app()
+
+        logger_session.info(
+            f"🔌 BROKER SESSION | Event: RECONNECT_START | "
+            f"contract_id: {contract_id} | attempt: {attempt}/{max_retries} | "
+            f"app_id: {app_id}"
+        )
+
+        try:
+            if self.api is not None:
+                try:
+                    await self.api.disconnect()
+                except Exception:
+                    pass
+                self.api = None
+                gc.collect()
+
+            self.api = DerivAPI(app_id=app_id)
+            check_result = await self.check(False)
+
+            if check_result['status']:
+                logger_session.info(
+                    f"🔌 BROKER SESSION | Event: RECONNECT_OK | "
+                    f"contract_id: {contract_id} | attempt: {attempt}/{max_retries}"
+                )
+                return True
+
+            logger_session.warning(
+                f"🔌 BROKER SESSION | Event: RECONNECT_FAILED | "
+                f"contract_id: {contract_id} | attempt: {attempt}/{max_retries} | "
+                f"error: check() returned status=False"
+            )
+            return False
+
+        except Exception as reconnect_err:
+            logger_session.warning(
+                f"🔌 BROKER SESSION | Event: RECONNECT_FAILED | "
+                f"contract_id: {contract_id} | attempt: {attempt}/{max_retries} | "
+                f"error: {reconnect_err}"
+            )
+            return False
+
     async def check_position_result(self, contract_id):
 
         if self.api is None:
@@ -738,10 +803,123 @@ class EntityDeriv():
             except Exception as err:
                 api_error_count += 1
                 if api_error_count >= max_api_errors:
+                    # ── WARNING original — se conserva sin cambios ────────────────
                     logger_response.warning(
                         f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
                         f"contract_id: {contract_id} | Result: FAILED | "
                         f"Reason: exception | error: {err}"
+                    )
+
+                    # ── RECOVERY: reconexión WebSocket + re-consulta de contrato ──
+                    max_retries   = self.get_max_close_reconnect_retries()
+                    wait_seconds  = self.get_reconnect_wait_seconds()
+
+                    for attempt in range(1, max_retries + 1):
+
+                        try:
+                            await asyncio.sleep(wait_seconds)
+
+                            logger_response.info(
+                                f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                f"contract_id: {contract_id} | "
+                                f"Recovery: WEBSOCKET_RECONNECT | attempt: {attempt}/{max_retries} | "
+                                f"Status: RECONNECTING"
+                            )
+
+                            reconnected = await self._reconnect_api(contract_id, attempt, max_retries)
+
+                            if not reconnected:
+                                logger_response.warning(
+                                    f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                    f"contract_id: {contract_id} | "
+                                    f"Recovery: FAILED | attempt: {attempt}/{max_retries} | "
+                                    f"error: reconnect returned False"
+                                )
+                                continue
+
+                            logger_response.info(
+                                f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                f"contract_id: {contract_id} | "
+                                f"Recovery: QUERYING_CONTRACT | attempt: {attempt}/{max_retries}"
+                            )
+
+                            recovery_response = await self.api.proposal_open_contract(
+                                {"proposal_open_contract": 1, "contract_id": contract_id}
+                            )
+
+                            if not recovery_response or 'proposal_open_contract' not in recovery_response:
+                                logger_response.warning(
+                                    f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                    f"contract_id: {contract_id} | "
+                                    f"Recovery: FAILED | attempt: {attempt}/{max_retries} | "
+                                    f"error: empty or missing proposal_open_contract in recovery response"
+                                )
+                                continue
+
+                            recovery_info = recovery_response['proposal_open_contract']
+
+                            if not recovery_info or not isinstance(recovery_info, dict):
+                                logger_response.warning(
+                                    f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                    f"contract_id: {contract_id} | "
+                                    f"Recovery: FAILED | attempt: {attempt}/{max_retries} | "
+                                    f"error: contract_info invalid in recovery response"
+                                )
+                                continue
+
+                            if not recovery_info.get('is_sold'):
+                                logger_response.warning(
+                                    f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                    f"contract_id: {contract_id} | "
+                                    f"Recovery: NOT_SOLD_YET | attempt: {attempt}/{max_retries}"
+                                )
+                                continue
+
+                            recovery_status     = recovery_info.get('status', 'unknown')
+                            recovery_profit     = recovery_info.get('profit', 0)
+                            recovery_sell_price = recovery_info.get('sell_price', 'N/A')
+                            recovery_buy_price  = recovery_info.get('buy_price', 'N/A')
+                            recovery_payout     = recovery_info.get('payout', 'N/A')
+
+                            logger_response.info(
+                                f"📥 BROKER RESPONSE CLOSE RECOVERED | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                f"contract_id: {contract_id} | "
+                                f"broker_profit: {recovery_profit} | "
+                                f"broker_sell_price: {recovery_sell_price} | "
+                                f"broker_buy_price: {recovery_buy_price} | "
+                                f"broker_payout: {recovery_payout} | "
+                                f"status: {recovery_status} | "
+                                f"Recovery: WEBSOCKET_RECONNECT | attempt: {attempt}"
+                            )
+
+                            if recovery_status == 'won':
+                                return self.get_won_contract(recovery_profit, recovery_info)
+                            elif recovery_status == 'lost':
+                                return self.get_lost_contract(recovery_profit, recovery_info)
+                            else:
+                                logger_response.warning(
+                                    f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                    f"contract_id: {contract_id} | "
+                                    f"Recovery: FAILED | attempt: {attempt}/{max_retries} | "
+                                    f"error: unexpected status in recovery: {recovery_status}"
+                                )
+                                continue
+
+                        except Exception as recovery_err:
+                            logger_response.warning(
+                                f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                                f"contract_id: {contract_id} | "
+                                f"Recovery: FAILED | attempt: {attempt}/{max_retries} | "
+                                f"error: {recovery_err}"
+                            )
+                            continue
+
+                    # Todos los reintentos de recovery agotados
+                    logger_response.error(
+                        f"📥 BROKER RESPONSE CLOSE UNRECOVERABLE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
+                        f"contract_id: {contract_id} | "
+                        f"Recovery: EXHAUSTED | attempts: {max_retries} | "
+                        f"ACTION_REQUIRED: manual review"
                     )
                     return False
                 await asyncio.sleep(random.randint(0, 1))
