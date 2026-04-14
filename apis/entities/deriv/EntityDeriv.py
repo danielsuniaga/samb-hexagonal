@@ -770,6 +770,7 @@ class EntityDeriv():
                     logger_response.info(
                         f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
                         f"contract_id: {contract_id} | "
+                        f"account_id: {contract_info.get('account_id', 'N/A')} | "
                         f"broker_profit: {profit_or_loss} | "
                         f"broker_sell_price: {contract_info.get('sell_price', 'N/A')} | "
                         f"broker_buy_price: {contract_info.get('buy_price', 'N/A')} | "
@@ -781,6 +782,7 @@ class EntityDeriv():
                     logger_response.info(
                         f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
                         f"contract_id: {contract_id} | "
+                        f"account_id: {contract_info.get('account_id', 'N/A')} | "
                         f"broker_profit: {profit_or_loss} | "
                         f"broker_sell_price: {contract_info.get('sell_price', 'N/A')} | "
                         f"broker_buy_price: {contract_info.get('buy_price', 'N/A')} | "
@@ -884,6 +886,7 @@ class EntityDeriv():
                             logger_response.info(
                                 f"📥 BROKER RESPONSE CLOSE RECOVERED | BrokerExec: {self._broker_exec_id or 'N/A'} | "
                                 f"contract_id: {contract_id} | "
+                                f"account_id: {recovery_info.get('account_id', 'N/A')} | "
                                 f"broker_profit: {recovery_profit} | "
                                 f"broker_sell_price: {recovery_sell_price} | "
                                 f"broker_buy_price: {recovery_buy_price} | "
