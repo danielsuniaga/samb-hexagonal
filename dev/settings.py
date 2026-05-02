@@ -163,155 +163,164 @@ LOGGING = {
             'formatter': 'verbose',
             'encoding': 'utf-8',
         },
+        'file_response': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/samb/response.log',
+            'maxBytes': 10485760,
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
     },
     'loggers': {
         'apis.entities.models.EntityModels': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
             'propagate': False,
         },
         'apis.services.entrysresults': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
             'propagate': False,
         },
         'apis.services.cronjobs': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
             'propagate': False,
         },
         'apis.services.entrys': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
             'propagate': False,
         },
         'apis.services.events': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',  # Cambiar a 'DEBUG' para logs más detallados
             'propagate': False,
         },
         'apis.services.managerdays': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',  # WARNING para solo ver problemas
             'propagate': False,
         },
         'apis.services.checkpinbar': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrends': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsrecent': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsrecentml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsexpansive': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsexpansiveml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsexpansiverecent': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsexpansiverecentml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsminus': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsminusrecent': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsminusrecentml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checkenvolvent': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checkenvolventml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checkpinbarml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checktrendsminusml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checkwma': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checkwmarecent': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checkwmarecentml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'apis.services.checkwmaml': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'ServicesBrokerSession': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'ServicesBrokerRequest': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'ServicesBrokerResponse': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
         'ServicesAccountValidation': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file_response'],
             'level': 'INFO',
             'propagate': False,
         },
