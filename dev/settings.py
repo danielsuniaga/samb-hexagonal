@@ -158,8 +158,8 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/var/log/samb/persistence.log',
-            'maxBytes': 10485760,
-            'backupCount': 5,
+            'maxBytes': 15 * 1024 * 1024,  # 15 MB — cubre ~3-4 días de operación normal
+            'backupCount': 3,               # Conserva persistence.log.1, .2, .3
             'formatter': 'verbose',
             'encoding': 'utf-8',
         },
