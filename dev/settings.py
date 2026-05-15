@@ -172,6 +172,14 @@ LOGGING = {
             'formatter': 'verbose',
             'encoding': 'utf-8',
         },
+        # --- BROKER INTERACTIONS DEDICATED LOG (no rotation — append-only like persistence.log) ---
+        'file_deriv': {
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/samb/logs_deriv.log',
+            'mode': 'a',
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
     },
     'loggers': {
         'apis.entities.models.EntityModels': {
@@ -310,12 +318,12 @@ LOGGING = {
             'propagate': False,
         },
         'ServicesBrokerRequest': {
-            'handlers': ['console', 'file_response'],
+            'handlers': ['console', 'file_response', 'file_deriv'],
             'level': 'INFO',
             'propagate': False,
         },
         'ServicesBrokerResponse': {
-            'handlers': ['console', 'file_response'],
+            'handlers': ['console', 'file_response', 'file_deriv'],
             'level': 'INFO',
             'propagate': False,
         },
