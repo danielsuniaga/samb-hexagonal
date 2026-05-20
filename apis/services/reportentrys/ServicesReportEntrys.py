@@ -87,9 +87,9 @@ class ServicesReportEntrys():
 
         return self.entity.generate_message(data,name_methodology)
     
-    def generate_message_parameters(self,data):
-            
-        return self.entity.generate_message_parameters(data)
+    def generate_message_parameters(self, data, unique_code):
+
+        return self.entity.generate_message_parameters(data, unique_code)
     
     def send_message(self,mensaje):
 
@@ -358,27 +358,35 @@ class ServicesReportEntrys():
         methodology_id = methodology.get('id', 'Unknown')
         
         try:
-            # Inicializar datos de reportes
+            # 1. Inicializar estructura de datos del reporte
             try:
                 self.init_data_reports()
             except Exception as e:
                 return {'status': False, 'message': f'Error inicializando datos: {str(e)}'}
-            
-            # Obtener parámetros del día
+
+            # 2. Obtener parámetros del día desde manager_days
             try:
                 data_param = self.get_type_manager_days_reporting(day, methodology_id)
-                message_param = self.generate_message_parameters(data_param)
-                self.set_message_params(message_param)
             except Exception as e:
-                return {'status': False, 'message': f'Error configurando parámetros: {str(e)}'}
-            
-            # Generar datos del reporte
+                return {'status': False, 'message': f'Error obteniendo parámetros del día: {str(e)}'}
+
+            # 3. Generar datos del reporte (CUR, SUN-SAT, TOT) — necesario antes del código único
             try:
                 data = self.generate_data_reports_daily(methodology_id)
             except Exception as e:
                 return {'status': False, 'message': f'Error generando datos: {str(e)}'}
-            
-            # Generar mensaje
+
+            # 4. Construir código único usando el resultado real del CUR
+            try:
+                cur_usd = self.entity.extract_cur_usd(data, data_param.get('type', ''))
+                current_date = self.ServicesDates.get_current_date_only()
+                unique_code = self.entity.build_unique_code(data_param, cur_usd, current_date)
+                message_param = self.generate_message_parameters(data_param, unique_code)
+                self.set_message_params(message_param)
+            except Exception as e:
+                return {'status': False, 'message': f'Error construyendo código único: {str(e)}'}
+
+            # 5. Generar mensaje
             try:
                 message = self.generate_message(data, methodology_name)
             except Exception as e:
@@ -504,6 +512,7 @@ class ServicesReportEntrys():
                     
                     # Estructura de datos para exportar
                     export_data = {
+                        'unique_code': report_result.get('unique_code'),
                         'timestamp': timestamp,
                         'methodology': methodology_name,
                         'container': container,
@@ -590,22 +599,28 @@ class ServicesReportEntrys():
         try:
             # Usar la MISMA lógica que funciona para Telegram
             
-            # 1. Inicializar datos de reportes
+            # 1. Inicializar estructura de datos del reporte
             self.init_data_reports()
-            
-            # 2. Obtener parámetros del día
+
+            # 2. Obtener parámetros del día desde manager_days
             data_param = self.get_type_manager_days_reporting(day, methodology_id)
-            message_param = self.generate_message_parameters(data_param)
-            self.set_message_params(message_param)
-            
-            # 3. Generar datos del reporte (MISMA lógica que Telegram)
+
+            # 3. Generar datos del reporte (CUR, SUN-SAT, TOT) — necesario antes del código único
             report_data = self.generate_data_reports_daily(methodology_id)
-            
-            # 4. Generar mensaje (para tener el texto también)
+
+            # 4. Construir código único usando el resultado real del CUR
+            cur_usd = self.entity.extract_cur_usd(report_data, data_param.get('type', ''))
+            current_date = self.ServicesDates.get_current_date_only()
+            unique_code = self.entity.build_unique_code(data_param, cur_usd, current_date)
+            message_param = self.generate_message_parameters(data_param, unique_code)
+            self.set_message_params(message_param)
+
+            # 5. Generar mensaje (para tener el texto también)
             telegram_message = self.generate_message(report_data, methodology_name)
-            
-            # 5. Retornar datos estructurados
+
+            # 6. Retornar datos estructurados con unique_code como campo dedicado
             return {
+                'unique_code': unique_code,
                 'methodology_info': {
                     'name': methodology_name,
                     'id': methodology_id,

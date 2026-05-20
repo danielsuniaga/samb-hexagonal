@@ -1,3 +1,5 @@
+import re
+from datetime import datetime
 from decouple import config
 
 class EntityReportEntrys():
@@ -260,32 +262,51 @@ class EntityReportEntrys():
 
         return message + self.get_message_params() +"\n".join(report_lines) + "\n"
     
-    def generate_message_parameters_index(self, data):
-        import re
-        # Limpiar y convertir profit y loss
-        try:
-            profit = float(str(data.get('profit', 0)).replace(',', '.').strip())
-        except Exception:
-            profit = 0
-        try:
-            loss = float(str(data.get('loss', 0)).replace(',', '.').strip())
-        except Exception:
-            loss = 0
-        # Limpiar type de espacios, tabs, saltos de línea, zero-width chars
-        type_value = str(data.get('type', '')).strip()
-        type_clean = re.sub(r'[\s\u200b\u200c\u200d\ufeff]+', '', type_value).upper()
-        # Calcular resultado neto
-        result = profit - abs(loss)
-        is_success = result >= 0
-        # El index será 'true|TYPE' o 'false|TYPE' (TYPE limpio)
-        return f"{str(is_success).lower()}|{type_clean}"
-    
-    def generate_message_parameters(self, data):
-        # El campo index es igual al type por ahora
-        index = self.generate_message_parameters_index(data)
-        
+    # ------------------------------------------------------------------
+    # Unique code generation
+    # ------------------------------------------------------------------
+
+    def _sanitize_component(self, text):
+        """Removes hyphens, underscores, whitespace and zero-width chars, returns UPPERCASE."""
+        cleaned = re.sub(r'[\-_\s\u200b\u200c\u200d\ufeff]+', '', str(text))
+        return cleaned.upper()
+
+    def _sanitize_container(self, project_name):
+        """Sanitizes PROJECT_NAME (e.g. 'R_75-stsma') into a code component (e.g. 'R75STSMA')."""
+        return self._sanitize_component(project_name)
+
+    def extract_cur_usd(self, report_data, session_type):
+        """
+        Returns the CUR USD result for the active session type.
+        REAL  -> R.USD
+        PRACTICE -> D.USD
+        """
+        type_clean = self._sanitize_component(str(session_type))
+        cur_entry = next((item for item in report_data if item['name'] == 'CUR'), None)
+        if cur_entry is None:
+            return 0.0
+        if type_clean == 'REAL':
+            return float(cur_entry['data']['R']['USD'])
+        return float(cur_entry['data']['D']['USD'])
+
+    def build_unique_code(self, data_param, cur_usd, current_date):
+        """
+        Builds the session unique code.
+        Format: {CONTAINER}{TYPE}{METHODOLOGY}{DAY}{DATE}{POSITIVE}
+        Example: R75STSMAPRACTICETRENDSMINUSMLWEDNESDAY20260520TRUE
+        """
+        container   = self._sanitize_container(config('PROJECT_NAME'))
+        type_code   = self._sanitize_component(data_param.get('type', ''))
+        methodology = self._sanitize_component(data_param.get('name_methodology', ''))
+        day         = self._sanitize_component(data_param.get('day_description', ''))
+        is_positive = 'TRUE' if float(cur_usd) >= 0 else 'FALSE'
+        return f"{container}{type_code}{methodology}{day}{current_date}{is_positive}"
+
+    # ------------------------------------------------------------------
+
+    def generate_message_parameters(self, data, unique_code):
         return (
-            "PARAMS: (Index: " + index +
+            "PARAMS: (Index: " + unique_code +
             ", Type: " + str(data['type']) +
             ", Day: " + str(data['day_description']) +
             " Permission real: " + str(data['permision_real']) +
