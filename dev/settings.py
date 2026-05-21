@@ -337,5 +337,10 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'ServicesViews': {
+            'handlers': ['console', 'file_response'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }

@@ -1,4 +1,6 @@
-from deriv_api import DerivAPI
+import aiohttp
+import json as _json
+import websockets as _ws_lib
 
 from decouple import config
 
@@ -296,7 +298,7 @@ class EntityDeriv():
 
     async def init_id_app(self):
 
-        self.id_app = int(config("ID_APP"))
+        self.id_app = config("ID_APP")
 
         return True
 
@@ -326,7 +328,7 @@ class EntityDeriv():
         
         return self.get_token_real()
     
-    async def check(self,mode):
+    async def check(self, mode):
 
         self._current_mode = mode
         mode_str = "REAL" if mode is True else ("DEMO" if mode is False else "UNKNOWN")
@@ -335,46 +337,72 @@ class EntityDeriv():
             f"tokens_loaded: {self.tokens_asignado is not None}"
         )
 
-        await self.init_token()
+        # Close existing connection before reconnecting
+        if self.api is not None:
+            try:
+                await self.api.close()
+            except Exception:
+                pass
+            self.api = None
 
-        token = await self.get_token_mode(mode)
+        account_id = config("DERIV_ACCOUNT_ID_REAL") if mode else config("DERIV_ACCOUNT_ID_DEMO")
+        pat_token  = config("DERIV_PAT_TOKEN")
+        app_id     = config("ID_APP")
 
         max_attempts = self.get_max_attempts_broker_deriv()
 
         for attempt in range(1, max_attempts + 1):
             try:
-                response = await self.api.authorize(token)
-                
-                if response:
-                    authorize_data = response.get('authorize', {})
-                    self._account_id_broker = (
-                        authorize_data.get('loginid')
-                        or authorize_data.get('account_id', 'N/A')
-                    )
-                    logger_validation.info(
-                        f"🔐 ACCOUNT TYPE CHECK | account_type: {mode_str} | "
-                        f"account_id_broker: {self._account_id_broker} | "
-                        f"currency: {authorize_data.get('currency', 'N/A')} | "
-                        f"is_virtual: {authorize_data.get('is_virtual', 'N/A')}"
-                    )
-                    return {
-                        'status': True,
-                        'message': f'Conexion exitosa con deriv en intento {attempt}',
-                        'attempts': attempt
-                    }
-                else:
+                # Step 1: REST call to get authenticated WebSocket URL (OTP)
+                otp_url = f"https://api.derivws.com/trading/v1/options/accounts/{account_id}/otp"
+                headers = {
+                    "Authorization": f"Bearer {pat_token}",
+                    "Deriv-App-ID": app_id,
+                    "Content-Type": "application/json"
+                }
+
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(otp_url, headers=headers) as resp:
+                        resp_status = resp.status
+                        otp_data = await resp.json()
+
+                logger_validation.info(
+                    f"🔐 OTP REQUEST | account_type: {mode_str} | "
+                    f"account_id: {account_id} | http_status: {resp_status} | attempt: {attempt}"
+                )
+
+                if "data" not in otp_data or "url" not in otp_data.get("data", {}):
                     if attempt < max_attempts:
                         await asyncio.sleep(random.randint(0, 1))
                         continue
-                    return {'status': False, 'message': f'Respuesta vacía de autorización después de {max_attempts} intentos'}
-                
+                    return {"status": False, "message": f"OTP response inválida: {otp_data}"}
+
+                ws_url = otp_data["data"]["url"]
+
+                # Step 2: Connect WebSocket using OTP URL (already authenticated)
+                self.api = await _ws_lib.connect(ws_url)
+                self._account_id_broker = account_id
+
+                logger_validation.info(
+                    f"🔐 ACCOUNT TYPE CHECK | account_type: {mode_str} | "
+                    f"account_id_broker: {account_id} | "
+                    f"currency: USD | "
+                    f"is_virtual: {not mode}"
+                )
+
+                return {
+                    "status": True,
+                    "message": f"Conexion exitosa con deriv en intento {attempt}",
+                    "attempts": attempt
+                }
+
             except Exception as err:
                 if attempt < max_attempts:
                     await asyncio.sleep(random.randint(0, 1))
                     continue
-                return {'status': False, 'message': f'Se genero una excepcion al chequear sincronizcion con deriv después de {max_attempts} intentos: {str(err)}'}
-        
-        return {'status': False, 'message': f'Falló después de {max_attempts} intentos'}
+                return {"status": False, "message": f"Se genero una excepcion al chequear sincronizcion con deriv después de {max_attempts} intentos: {str(err)}"}
+
+        return {"status": False, "message": f"Falló después de {max_attempts} intentos"}
 
     async def init(self):
 
@@ -391,11 +419,8 @@ class EntityDeriv():
 
         for attempt in range(1, max_attempts + 1):
             try:
-                self.api = DerivAPI(app_id=app_id)
-                
-                # Verificar la conexión
                 check_result = await self.check(False)
-                
+
                 if check_result['status']:
                     logger_session.info(
                         f"🔌 BROKER SESSION | Event: CONNECTION_OK | "
@@ -411,7 +436,7 @@ class EntityDeriv():
                         await asyncio.sleep(random.randint(0, 1))
                         continue
                     return {'status': False, 'message': f'Error al verificar conexión después de {max_attempts} intentos: {check_result["message"]}'}
-            
+
             except Exception as err:
                 if attempt < max_attempts:
                     await asyncio.sleep(random.randint(0, 1))
@@ -434,8 +459,8 @@ class EntityDeriv():
 
         for attempt in range(1, max_attempts + 1):
             try:
-                await self.api.disconnect()
-                
+                await self.api.close()
+
                 self.api = None
 
                 gc.collect()
@@ -443,20 +468,45 @@ class EntityDeriv():
                 logger_session.info(
                     f"🔌 BROKER SESSION | Event: CONNECTION_CLOSED_OK | attempt: {attempt}"
                 )
-                
+
                 return {
                     'status': True,
                     'message': f'Conexión con Deriv cerrada correctamente en intento {attempt}',
                     'attempts': attempt
                 }
-            
+
             except Exception as err:
                 if attempt < max_attempts:
                     await asyncio.sleep(random.randint(0, 1))
                     continue
                 return {'status': False, 'message': f'Se generó una excepción al cerrar la conexión con Deriv después de {max_attempts} intentos: {err}'}
-        
+
         return {'status': False, 'message': f'Falló después de {max_attempts} intentos'}
+
+    async def _send_ws(self, data):
+
+        req_id  = random.randint(1, 999999)
+        payload = dict(data)
+        payload['req_id'] = req_id
+
+        msg_type = next((k for k in payload if k not in ('req_id',)), 'unknown')
+        logger_request.debug(
+            f"📡 WS SEND | req_id: {req_id} | msg_type: {msg_type}"
+        )
+
+        await self.api.send(_json.dumps(payload))
+
+        while True:
+            raw      = await asyncio.wait_for(self.api.recv(), timeout=30.0)
+            response = _json.loads(raw)
+            if response.get('req_id') == req_id:
+                if 'error' in response:
+                    logger_request.error(
+                        f"📡 WS ERROR | req_id: {req_id} | msg_type: {msg_type} | "
+                        f"error_code: {response['error'].get('code')} | "
+                        f"error_msg: {response['error'].get('message')}"
+                    )
+                return response
     
     async def init_data_ticks_history(self):
 
@@ -478,7 +528,7 @@ class EntityDeriv():
         for attempt in range(1, max_attempts + 1):
             try:
                 data = await self.init_data_ticks_history()
-                candles_response = await self.api.ticks_history(data)
+                candles_response = await self._send_ws(data)
 
                 # Validar que la respuesta tenga la estructura esperada
                 if not candles_response or not isinstance(candles_response, dict):
@@ -538,7 +588,7 @@ class EntityDeriv():
                 "currency": self.get_proposal_env_currency(),
                 "duration": duration,
                 "duration_unit": duration_unit,
-                "symbol": symbol
+                "underlying_symbol": symbol
             }
         
     async def generate_proposal(self,data):
@@ -566,7 +616,7 @@ class EntityDeriv():
                     f"attempt: {attempt}"
                 )
 
-                proposal_response = await self.api.proposal(proposal_data)
+                proposal_response = await self._send_ws(proposal_data)
 
                 if proposal_response is None:
                     if attempt < max_attempts:
@@ -613,7 +663,7 @@ class EntityDeriv():
 
         for attempt in range(1, max_attempts + 1):
             try:
-                execution_response = await self.api.buy({"buy": proposal_id, "price": 100})
+                execution_response = await self._send_ws({"buy": proposal_id, "price": 100})
 
                 if execution_response is None:
                     if attempt < max_attempts:
@@ -672,14 +722,13 @@ class EntityDeriv():
         try:
             if self.api is not None:
                 try:
-                    await self.api.disconnect()
+                    await self.api.close()
                 except Exception:
                     pass
                 self.api = None
                 gc.collect()
 
-            self.api = DerivAPI(app_id=app_id)
-            check_result = await self.check(False)
+            check_result = await self.check(self._current_mode)
 
             if check_result['status']:
                 logger_session.info(
@@ -719,7 +768,7 @@ class EntityDeriv():
 
         while True:
             try:
-                response = await self.api.proposal_open_contract(
+                response = await self._send_ws(
                     {"proposal_open_contract": 1, "contract_id": contract_id}
                 )
                 if not response or 'proposal_open_contract' not in response:
@@ -765,7 +814,7 @@ class EntityDeriv():
                     await asyncio.sleep(5)
                     continue
                 status = contract_info.get('status', 'unknown')
-                profit_or_loss = contract_info.get('profit', 0)
+                profit_or_loss = float(contract_info.get('profit', 0))
                 if status == 'won':
                     logger_response.info(
                         f"📥 BROKER RESPONSE CLOSE | BrokerExec: {self._broker_exec_id or 'N/A'} | "
@@ -845,7 +894,7 @@ class EntityDeriv():
                                 f"Recovery: QUERYING_CONTRACT | attempt: {attempt}/{max_retries}"
                             )
 
-                            recovery_response = await self.api.proposal_open_contract(
+                            recovery_response = await self._send_ws(
                                 {"proposal_open_contract": 1, "contract_id": contract_id}
                             )
 
@@ -878,7 +927,7 @@ class EntityDeriv():
                                 continue
 
                             recovery_status     = recovery_info.get('status', 'unknown')
-                            recovery_profit     = recovery_info.get('profit', 0)
+                            recovery_profit     = float(recovery_info.get('profit', 0))
                             recovery_sell_price = recovery_info.get('sell_price', 'N/A')
                             recovery_buy_price  = recovery_info.get('buy_price', 'N/A')
                             recovery_payout     = recovery_info.get('payout', 'N/A')
@@ -930,26 +979,30 @@ class EntityDeriv():
         
     def get_won_contract(self, profit, contract_info):
 
+        details = dict(contract_info)
+        details['account_id_broker'] = self._account_id_broker
         return {
             'status': True,
             'message': 'La posición fue exitosa',
             'profit': profit,
-            'contract_details': contract_info,
+            'contract_details': details,
         }
 
     def get_lost_contract(self, loss, contract_info):
 
+        details = dict(contract_info)
+        details['account_id_broker'] = self._account_id_broker
         return {
             'status': False,
             'message': 'La posición fue perdedora',
             'loss': loss,
-            'contract_details': contract_info,
+            'contract_details': details,
         }
 
     async def verify_contract_created(self, contract_id):
 
         try:
-            response = await self.api.proposal_open_contract(
+            response = await self._send_ws(
                 {"proposal_open_contract": 1, "contract_id": contract_id}
             )
             if response and 'proposal_open_contract' in response:

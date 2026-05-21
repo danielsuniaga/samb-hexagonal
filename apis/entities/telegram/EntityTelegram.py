@@ -30,9 +30,12 @@ class EntityTelegram():
     
     def get_data_entrys_account_id(self):
 
-        if self.data_entrys and 'contract_details' in self.data_entrys and 'account_id' in self.data_entrys['contract_details']:
-            
-            return str(self.data_entrys['contract_details']['account_id'])
+        if self.data_entrys and 'contract_details' in self.data_entrys:
+            details = self.data_entrys['contract_details']
+            if 'account_id_broker' in details and details['account_id_broker']:
+                return str(details['account_id_broker'])
+            if 'account_id' in details:
+                return str(details['account_id'])
         
         return None
 
