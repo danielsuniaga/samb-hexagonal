@@ -5,6 +5,10 @@ from rest_framework import status
 from asgiref.sync import async_to_sync
 from django.db import close_old_connections
 import gc
+import logging
+import traceback
+
+logger_views = logging.getLogger('ServicesViews')
 
 import apis.controllers.GetDataAnalysisDerivTrends.GetDataAnalysisDerivTrends as ControllerGetDataAnalysisDerivTrends
 import apis.controllers.GetEndPoint.GetEndPoint as ControllerGetEndPoint
@@ -212,6 +216,12 @@ class GetDataAnalysisDerivExpansive(APIView):
             controller = ControllerGetDataAnalysisDerivTrendsExpansive.ControllerGetDataAnalysisDerivTrendsExpansive()
             response_data = async_to_sync(self.async_post)(request, controller)
             return Response(response_data)
+        except Exception as err:
+            logger_views.error(
+                f"❌ VIEW ERROR | View: GetDataAnalysisDerivExpansive | "
+                f"Error: {str(err)} | Traceback: {traceback.format_exc()}"
+            )
+            return Response({'status': False, 'message': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         finally:
             if controller:
                 del controller
