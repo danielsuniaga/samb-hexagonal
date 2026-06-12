@@ -313,7 +313,7 @@ LOGGING = {
             'propagate': False,
         },
         'ServicesBrokerSession': {
-            'handlers': ['console', 'file_response'],
+            'handlers': ['console', 'file_response', 'file_deriv'],
             'level': 'INFO',
             'propagate': False,
         },
@@ -328,7 +328,7 @@ LOGGING = {
             'propagate': False,
         },
         'ServicesAccountValidation': {
-            'handlers': ['console', 'file_response'],
+            'handlers': ['console', 'file_response', 'file_deriv'],
             'level': 'INFO',
             'propagate': False,
         },

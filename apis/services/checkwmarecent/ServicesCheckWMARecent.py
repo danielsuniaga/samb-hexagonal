@@ -1,6 +1,7 @@
 
 import logging
 import uuid
+import apis.services.persistencelifecycle.PersistenceLifecycleLogger as PersistenceLifecycleLogger
 
 logger = logging.getLogger(__name__)
 
@@ -492,28 +493,8 @@ class ServicesCheckWMARecent:
         
         return self.add_movements_persistence(data)
     
-    def add_entry_persistence(self,result,candles):
-
-        if not result:
-
-            return False
-        
-        self.set_candles_movements(candles)
-
-        result = self.set_result_positions(result)
-
-        self.set_result_positions_entity(result)
-
-        self.set_candles_positions(candles)
-
-        result = self.add_entrys(result)
-
-        if not result['status']:
-            
-            return False
-        
-        return self.add_indicators_entrys_persistence()
-    
+    def add_entry_persistence(self, result, candles):
+        return PersistenceLifecycleLogger.PersistenceLifecycleLogger.wrap_add_entry_persistence(self, result, candles)
     def get_name_methodology(self):
 
         return self.ServicesMethodologyWMARecent.get_name()

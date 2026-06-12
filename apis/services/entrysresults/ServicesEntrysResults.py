@@ -6,6 +6,8 @@ import os
 import re
 import uuid
 
+import apis.services.persistencelifecycle.PersistenceLifecycleLogger as PersistenceLifecycleLogger
+
 logger = logging.getLogger('apis.services.entrysresults')
 logger_persistence = logging.getLogger('ServicesPersistence')
 
@@ -101,6 +103,19 @@ class ServicesEntrysResults():
         result_entry = data_persistence['result_entry']
         win = result_entry > 0
         contract_id = data.get('contract_details', {}).get('contract_id', 'N/A') if isinstance(data, dict) else 'N/A'
+        account_label = PersistenceLifecycleLogger.PersistenceLifecycleLogger.account_label(
+            data.get('mode') if isinstance(data, dict) else None,
+            data.get('contract_details', {}).get('account_id') if isinstance(data, dict) else None,
+        )
+        methodology = data.get('id_methodology', data_indicators.get('data_entry', {}).get('id_methodology', 'N/A'))
+
+        PersistenceLifecycleLogger.PersistenceLifecycleLogger.result_attempt(
+            contract_id=contract_id,
+            account=account_label,
+            methodology=methodology,
+            project=self.get_project_name(),
+            result_value=f"${result_entry:.2f}",
+        )
 
         if result.get('status'):
             logger_persistence.info(
@@ -116,6 +131,16 @@ class ServicesEntrysResults():
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: SUCCESS"
             )
+            PersistenceLifecycleLogger.PersistenceLifecycleLogger.result_success(
+                contract_id=contract_id,
+                account=account_label,
+                methodology=methodology,
+                result_id=data_persistence['id_entry_result'],
+                result_value=f"${result_entry:.2f}",
+                win=win,
+                entry_id=data_persistence['id_entry'],
+                project=self.get_project_name(),
+            )
         else:
             logger_persistence.error(
                 f"💾 ADD PERSISTENCE | "
@@ -130,6 +155,15 @@ class ServicesEntrysResults():
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: FAILED | "
                 f"Error: {result.get('message', 'Unknown error')}"
+            )
+            PersistenceLifecycleLogger.PersistenceLifecycleLogger.result_failed(
+                contract_id=contract_id,
+                account=account_label,
+                methodology=methodology,
+                result_value=f"${result_entry:.2f}",
+                entry_id=data_persistence['id_entry'],
+                error=result.get('message', 'Unknown error'),
+                project=self.get_project_name(),
             )
 
         return result

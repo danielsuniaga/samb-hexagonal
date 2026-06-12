@@ -4,6 +4,8 @@ import time
 import apis.entities.entrys.EntityEntrys as EntityEntrys
 import apis.repositories.entrys.RepositoryEntrys as RepositoryEntrys
 
+import apis.services.persistencelifecycle.PersistenceLifecycleLogger as PersistenceLifecycleLogger
+
 logger = logging.getLogger('apis.services.entrys')
 logger_persistence = logging.getLogger('ServicesPersistence')
 
@@ -73,6 +75,19 @@ class ServicesEntrys():
         contract_details  = entrys.get('contract_details', {}) if isinstance(entrys, dict) else {}
         contract_id_broker = contract_details.get('contract_id', 'N/A')
         account_id_broker  = contract_details.get('account_id', 'N/A')
+        account_label = PersistenceLifecycleLogger.PersistenceLifecycleLogger.account_label(
+            entrys.get('mode') if isinstance(entrys, dict) else None,
+            account_id_broker,
+        )
+
+        PersistenceLifecycleLogger.PersistenceLifecycleLogger.entry_attempt(
+            contract_id=contract_id_broker,
+            account=account_label,
+            methodology=data['id_methodology'],
+            project=self.get_project_name(),
+            stake=f"${data['amount']}",
+            cronjob_id=data['id_cronjobs'],
+        )
 
         if result.get('status'):
             logger_persistence.info(
@@ -90,6 +105,13 @@ class ServicesEntrys():
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: SUCCESS"
             )
+            PersistenceLifecycleLogger.PersistenceLifecycleLogger.entry_success(
+                contract_id=contract_id_broker,
+                account=account_label,
+                methodology=data['id_methodology'],
+                entry_id=data['id_entry'],
+                project=self.get_project_name(),
+            )
         else:
             logger_persistence.error(
                 f"💾 ADD PERSISTENCE | "
@@ -106,6 +128,14 @@ class ServicesEntrys():
                 f"Execution Time: {execution_time:.2f}ms | "
                 f"Status: FAILED | "
                 f"Error: {result.get('message', 'Unknown error')}"
+            )
+            PersistenceLifecycleLogger.PersistenceLifecycleLogger.entry_failed(
+                contract_id=contract_id_broker,
+                account=account_label,
+                methodology=data['id_methodology'],
+                entry_id=data['id_entry'],
+                error=result.get('message', 'Unknown error'),
+                project=self.get_project_name(),
             )
 
         return result

@@ -5,6 +5,7 @@ import uuid
 import apis.entities.managerdays.EntityManagerDays as EntityManagerDays
 
 import apis.repositories.ManagerDays.RepositoryManagerDays as RepositoryManagerDays
+import apis.services.persistencelifecycle.PersistenceLifecycleLogger as PersistenceLifecycleLogger
 
 logger = logging.getLogger('apis.services.managerdays')
 
@@ -139,6 +140,15 @@ class ServicesManagerDays():
             'methodology': data.get('name_methodology', 'N/A')
         }
     
+    def _log_mode_entry_skipped(self, context, skip_reason, account='N/A'):
+        PersistenceLifecycleLogger.PersistenceLifecycleLogger.entry_skipped(
+            contract_id='N/A',
+            account=account,
+            methodology=context.get('methodology', 'N/A'),
+            skip_reason=skip_reason,
+            project=context.get('container'),
+        )
+
     def generate_log_permission_blocked(self, execution_id, context, permission):
         """
         Log cuando se bloquea por falta de permiso.
@@ -153,6 +163,7 @@ class ServicesManagerDays():
             f"Reason: No permission_real | "
             f"Permission: {permission}"
         )
+        self._log_mode_entry_skipped(context, skip_reason='NO_PERMISSION_REAL')
     
     def generate_log_mode_check_start(self, execution_id, context, type_sanitized, mode_env, mode_real):
         """
@@ -183,6 +194,7 @@ class ServicesManagerDays():
             f"Reason: Type matches MODE (PRACTICE mode) | "
             f"Type: '{type_sanitized}' == MODE: '{mode_env}'"
         )
+        self._log_mode_entry_skipped(context, skip_reason='MODE_BLOCKED_PRACTICE', account='PRACTICE')
     
     def generate_log_real_mode_allowed(self, execution_id, context, type_sanitized, mode_real):
         """
@@ -217,6 +229,7 @@ class ServicesManagerDays():
             f"MODE_REAL: '{mode_real}' | "
             f"⚠️ DATA INCONSISTENCY DETECTED"
         )
+        self._log_mode_entry_skipped(context, skip_reason='MODE_BLOCKED_UNEXPECTED')
     
     def check_mode_logic(self, type_sanitized, mode_env, mode_real):
         """
