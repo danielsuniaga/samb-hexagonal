@@ -14,6 +14,8 @@ import logging
 
 import uuid
 
+import apis.services.persistencelifecycle.PersistenceLifecycleLogger as PersistenceLifecycleLogger
+
 logger_request    = logging.getLogger('ServicesBrokerRequest')
 logger_response   = logging.getLogger('ServicesBrokerResponse')
 logger_validation = logging.getLogger('ServicesAccountValidation')
@@ -705,6 +707,18 @@ class EntityDeriv():
     
         await asyncio.sleep(self.duration_seconds)
 
+    def _log_broker_close_received(self, contract_id, contract_info, broker_profit, close_status=None):
+        PersistenceLifecycleLogger.PersistenceLifecycleLogger.broker_close_received(
+            contract_id=contract_id,
+            account=PersistenceLifecycleLogger.PersistenceLifecycleLogger.account_label(
+                self._current_mode,
+                contract_info.get('account_id') if isinstance(contract_info, dict) else None,
+            ),
+            broker_profit=broker_profit,
+            broker_exec_id=self._broker_exec_id,
+            close_status=close_status,
+        )
+
     async def _reconnect_api(self, contract_id, attempt, max_retries):
         """
         Cierra la instancia DerivAPI actual (si existe) y abre una nueva,
@@ -826,6 +840,7 @@ class EntityDeriv():
                         f"broker_payout: {contract_info.get('payout', 'N/A')} | "
                         f"status: won | Win: True"
                     )
+                    self._log_broker_close_received(contract_id, contract_info, profit_or_loss, close_status='won')
                     return self.get_won_contract(profit_or_loss, contract_info)
                 elif status == 'lost':
                     logger_response.info(
@@ -838,6 +853,7 @@ class EntityDeriv():
                         f"broker_payout: {contract_info.get('payout', 'N/A')} | "
                         f"status: lost | Win: False"
                     )
+                    self._log_broker_close_received(contract_id, contract_info, profit_or_loss, close_status='lost')
                     return self.get_lost_contract(profit_or_loss, contract_info)
                 else:
                     api_error_count += 1
@@ -943,6 +959,12 @@ class EntityDeriv():
                                 f"status: {recovery_status} | "
                                 f"Recovery: WEBSOCKET_RECONNECT | attempt: {attempt}"
                             )
+                            self._log_broker_close_received(
+                                contract_id,
+                                recovery_info,
+                                recovery_profit,
+                                close_status=f'recovered_{recovery_status}',
+                            )
 
                             if recovery_status == 'won':
                                 return self.get_won_contract(recovery_profit, recovery_info)
@@ -972,6 +994,12 @@ class EntityDeriv():
                         f"contract_id: {contract_id} | "
                         f"Recovery: EXHAUSTED | attempts: {max_retries} | "
                         f"ACTION_REQUIRED: manual review"
+                    )
+                    PersistenceLifecycleLogger.PersistenceLifecycleLogger.entry_failed(
+                        contract_id=contract_id,
+                        account=PersistenceLifecycleLogger.PersistenceLifecycleLogger.account_label(self._current_mode),
+                        methodology='N/A',
+                        error='RECOVERY_EXHAUSTED',
                     )
                     return False
                 await asyncio.sleep(random.randint(0, 1))
